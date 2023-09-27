@@ -1,19 +1,22 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "SAC1Character.h"
 #include "SAC1Projectile.h"
-#include "Animation/AnimInstance.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "SACPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
-
-//////////////////////////////////////////////////////////////////////////
-// ASAC1Character
+#include "InputActionValue.h"
+#include "Animation/AnimInstance.h"
+#include "Engine/LocalPlayer.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ASAC1Character::ASAC1Character()
 {
+	m_MoveSpeed = 100.f;
+	m_CameraSpeed=50.f;
+	m_ZoomSpeed = 300.f;
+	m_CanMove=true;
+	m_IsInvertX = false;
+	m_IsInvertY=true;
 	// Character doesnt have a rifle at start
 	bHasRifle = false;
 	
@@ -39,64 +42,102 @@ ASAC1Character::ASAC1Character()
 
 void ASAC1Character::BeginPlay()
 {
-	// Call the base class  
 	Super::BeginPlay();
-
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
-
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
 void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	ASACPlayerController* controller = Cast<ASACPlayerController>(Controller);
+	if (IsValid(input) && IsValid(controller))
 	{
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASAC1Character::Move);
-
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASAC1Character::Look);
+		input->BindAction(controller->m_MouseLClick, ETriggerEvent::Started, this, &ASAC1Character::Attack);
+		input->BindAction(controller->m_MousePos, ETriggerEvent::Triggered, this, &ASAC1Character::CameraRotation);
+		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::CameraZoom);
+		input->BindAction(controller->m_Space, ETriggerEvent::Started, this, &ASAC1Character::Jump);
+		input->BindAction(controller->m_Space, ETriggerEvent::Completed, this, &ASAC1Character::StopJumping);
+		input->BindAction(controller->m_E, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
+		input->BindAction(controller->m_Move, ETriggerEvent::Triggered, this, &ASAC1Character::Move);
+		controller->SetNewController();
 	}
 }
 
+
+void ASAC1Character::BodyHit(UPrimitiveComponent* comp, AActor* otherActor, 
+	UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& result)
+{
+}
+
+void ASAC1Character::OverlapBegin(UPrimitiveComponent* comp, AActor* otherActor, 
+	UPrimitiveComponent* otherComp, int32 index, bool bFromSweep, const FHitResult& result)
+{
+}
+
+void ASAC1Character::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, 
+	UPrimitiveComponent* otherComp, int32 index)
+{
+}
 
 void ASAC1Character::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
+	FVector movementVector = Value.Get<FVector>();
+	if (!m_CanMove || !Controller)
 	{
-		// add movement 
-		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);
+		return;
 	}
+	const FRotator rotation = Controller->GetControlRotation();
+	const FRotator yawRotation(0, rotation.Yaw, 0);
+	const FVector forwardDir = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
+	const FVector rightDir = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
+	AddMovementInput(forwardDir, movementVector.X);
+	AddMovementInput(rightDir, movementVector.Y);
+
+	//AddMovementInput(GetActorForwardVector(), MovementVector.Y);
+	//AddMovementInput(GetActorRightVector(), MovementVector.X);
 }
 
-void ASAC1Character::Look(const FInputActionValue& Value)
+void ASAC1Character::Attack(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
+}
 
-	if (Controller != nullptr)
+void ASAC1Character::CameraRotation(const FInputActionValue& Value)
+{
+	float deltaTime = GetWorld()->GetDeltaSeconds();
+	double x = Value.Get<FVector2D>().X * deltaTime * m_CameraSpeed;
+	double y = Value.Get<FVector2D>().Y * deltaTime * m_CameraSpeed;
+	if (m_IsInvertX)
 	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		x *= -1;
 	}
+	if (m_IsInvertY)
+	{
+		y *= -1;
+	}
+	AddControllerYawInput(x);
+	AddControllerPitchInput(y);
+}
+
+void ASAC1Character::CameraZoom(const FInputActionValue& Value)
+{
+	//double length = Value.Get<float>() * -1 * m_ZoomSpeed * GetWorld()->GetDeltaSeconds();
+	//m_CameraBoom->TargetArmLength += length;
+}
+
+void ASAC1Character::Jump()
+{
+	Super::Jump();
+}
+
+void ASAC1Character::StopJumping()
+{
+	Super::StopJumping();
+}
+
+void ASAC1Character::CollectPickUps()
+{
 }
 
 void ASAC1Character::SetHasRifle(bool bNewHasRifle)
