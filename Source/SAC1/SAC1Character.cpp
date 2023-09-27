@@ -54,7 +54,6 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	ASACPlayerController* controller = Cast<ASACPlayerController>(Controller);
 	if (IsValid(input) && IsValid(controller))
 	{
-		input->BindAction(controller->m_MouseLClick, ETriggerEvent::Started, this, &ASAC1Character::Attack);
 		input->BindAction(controller->m_MousePos, ETriggerEvent::Triggered, this, &ASAC1Character::CameraRotation);
 		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::CameraZoom);
 		input->BindAction(controller->m_Space, ETriggerEvent::Started, this, &ASAC1Character::Jump);
@@ -97,10 +96,6 @@ void ASAC1Character::Move(const FInputActionValue& Value)
 
 	//AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 	//AddMovementInput(GetActorRightVector(), MovementVector.X);
-}
-
-void ASAC1Character::Attack(const FInputActionValue& Value)
-{
 }
 
 void ASAC1Character::CameraRotation(const FInputActionValue& Value)
