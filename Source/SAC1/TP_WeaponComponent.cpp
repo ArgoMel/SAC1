@@ -1,35 +1,39 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
-
 #include "TP_WeaponComponent.h"
 #include "SAC1Character.h"
 #include "SAC1Projectile.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "SACPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
 // Sets default values for this component's properties
 UTP_WeaponComponent::UTP_WeaponComponent()
 {
+	//PrimaryActorTick.bCanEverTick = true;
+	
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 }
 
+void UTP_WeaponComponent::Tick(float DeltaTime)
+{
+	//Super::Tick(DeltaTime);
+}
 
 void UTP_WeaponComponent::Fire()
 {
-	if (Character == nullptr || Character->GetController() == nullptr)
+	if (!IsValid(Character) || !Character->GetController())
 	{
 		return;
 	}
 
 	// Try and fire a projectile
-	if (ProjectileClass != nullptr)
+	if (IsValid(ProjectileClass))
 	{
 		UWorld* const World = GetWorld();
-		if (World != nullptr)
+		if (IsValid(World))
 		{
 			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
 			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
@@ -66,7 +70,7 @@ void UTP_WeaponComponent::Fire()
 void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 {
 	Character = TargetCharacter;
-	if (Character == nullptr)
+	if (!IsValid(Character))
 	{
 		return;
 	}
@@ -79,34 +83,11 @@ void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 	Character->SetHasRifle(true);
 
 	// Set up action bindings
-	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
+	ASACPlayerController* controller = Cast<ASACPlayerController>(Character->GetController());
+	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(controller->InputComponent);
+	if (IsValid(input) && IsValid(controller))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			// Set the priority of the mapping to 1, so that it overrides the Jump action with the Fire action when using touch input
-			Subsystem->AddMappingContext(FireMappingContext, 1);
-		}
-
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{
-			// Fire
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
-		}
-	}
-}
-
-void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (Character == nullptr)
-	{
-		return;
-	}
-	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = 
-			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->RemoveMappingContext(FireMappingContext);
-		}
+		input->BindAction(controller->m_MouseLClick, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
+		//controller->SetNewController();
 	}
 }

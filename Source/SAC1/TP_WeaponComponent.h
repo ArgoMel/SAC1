@@ -12,6 +12,13 @@ UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnab
 class SAC1_API UTP_WeaponComponent : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
+public:
+	/** Sets default values for this component's properties */
+	UTP_WeaponComponent();
+	virtual void Tick(float DeltaTime) override;
+
+private:
+	ASAC1Character* Character;
 
 public:
 	/** Projectile class to spawn */
@@ -30,17 +37,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector MuzzleOffset;
 
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	class UInputMappingContext* FireMappingContext;
-
-	/** Fire Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	class UInputAction* FireAction;
-
-	/** Sets default values for this component's properties */
-	UTP_WeaponComponent();
-
+public:
 	/** Attaches the actor to a FirstPersonCharacter */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void AttachWeapon(ASAC1Character* TargetCharacter);
@@ -48,13 +45,4 @@ public:
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
-
-protected:
-	/** Ends gameplay for this component. */
-	UFUNCTION()
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-private:
-	/** The Character holding this weapon*/
-	ASAC1Character* Character;
 };

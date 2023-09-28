@@ -52,7 +52,6 @@ protected:
 		UPrimitiveComponent* otherComp, int32 index);
 
 	void Move(const FInputActionValue& Value);
-	void Attack(const FInputActionValue& Value);
 	void CameraRotation(const FInputActionValue& Value);
 	void CameraZoom(const FInputActionValue& Value);
 	void Jump();
