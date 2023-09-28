@@ -27,10 +27,10 @@ bool UBTDecorator_CheckTargetDistance::CalculateRawConditionValue(
 	switch (mCheckType)
 	{
 	case ECheckDistanceType::Attack:
-		TypeDistance = AIPawn->GetAIState()->GetAttackDistance();
+		TypeDistance = AIPawn->GetAIState()->GetData()->AttackDistance;
 		break;
 	case ECheckDistanceType::Interaction:
-		TypeDistance = AIPawn->GetAIState()->GetInteractionDistance();
+		TypeDistance = AIPawn->GetAIState()->GetData()->InteractionDistance;
 		break;
 	}
 

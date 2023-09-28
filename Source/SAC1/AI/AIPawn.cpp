@@ -7,10 +7,8 @@
 
 TObjectPtr<UDataTable> AAIPawn::mAIDataTable;
 
-// Sets default values
 AAIPawn::AAIPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	mAttackEnd = false;
@@ -56,7 +54,7 @@ void AAIPawn::LoadAIData()
 		TEXT("/Script/Engine.DataTable'/Game/Data/DT_AIData.DT_AIData'"));
 }
 
-const FAIDataTable* AAIPawn::FindAIData(const FName& Name)
+FAIDataTable* AAIPawn::FindAIData(const FName& Name)
 {
 	return mAIDataTable->FindRow<FAIDataTable>(Name, TEXT(""));
 }
@@ -96,7 +94,7 @@ void AAIPawn::OnConstruction(const FTransform& Transform)
 	{
 		LOG(TEXT("AIDataTable Valid"));
 
-		const FAIDataTable* Data = FindAIData(mName);
+		FAIDataTable* Data = FindAIData(mName);
 
 		mAIState->SetInfo(mName.ToString(), Data);
 

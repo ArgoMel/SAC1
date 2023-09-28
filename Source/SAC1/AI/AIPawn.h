@@ -12,7 +12,6 @@ class SAC1_API AAIPawn : public APawn
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	AAIPawn();
 
 protected:
@@ -22,7 +21,7 @@ public:
 	static void LoadAIData();
 
 protected:
-	static const FAIDataTable* FindAIData(const FName& Name);
+	static FAIDataTable* FindAIData(const FName& Name);
 
 protected:
 	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -69,6 +68,8 @@ protected:
 	float				mDissolveCurrentTime;
 	bool				mDissolveEnable;
 
+	FVector m_TargetLoc;
+
 public:
 	bool GetPatrolEnable()	const
 	{
@@ -90,7 +91,15 @@ public:
 		mTeam = Team;
 	}
 
-public:
+	const FVector GetTargetLoc()	const
+	{
+		return m_TargetLoc;
+	}
+	void SetTargetLoc(FVector vec)
+	{
+		m_TargetLoc = vec;
+	}
+
 	bool GetAttackEnd()	const
 	{
 		return mAttackEnd;

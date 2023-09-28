@@ -51,7 +51,7 @@ bool UBTDecorator_CheckTeam::CalculateRawConditionValue(
 		Distance -= Capsule->GetScaledCapsuleRadius();
 	}
 
-	if (Distance > AIPawn->GetAIState()->GetAttackDistance())
+	if (Distance > AIPawn->GetAIState()->GetData()->AttackDistance)
 		return false;
 
 	ASAC1Character* Target = Cast<ASAC1Character>(Controller->GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
