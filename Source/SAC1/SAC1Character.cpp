@@ -38,14 +38,24 @@ ASAC1Character::ASAC1Character()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Mannequin_Arms(TEXT(
+		"/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms"));
+	if(SK_Mannequin_Arms.Succeeded())
+	{
+		Mesh1P->SetSkeletalMesh(SK_Mannequin_Arms.Object);
+	}
+	static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimClass(TEXT(
+		"/Game/FirstPersonArms/Animations/FirstPerson_AnimBP.FirstPerson_AnimBP_C"));
+	if (AnimClass.Succeeded())
+	{
+		Mesh1P->SetAnimInstanceClass(AnimClass.Class);
+	}
 }
 
 void ASAC1Character::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
-//////////////////////////////////////////////////////////////////////////// Input
 
 void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {

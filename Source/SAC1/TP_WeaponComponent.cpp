@@ -11,15 +11,8 @@
 // Sets default values for this component's properties
 UTP_WeaponComponent::UTP_WeaponComponent()
 {
-	//PrimaryActorTick.bCanEverTick = true;
-	
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
-}
-
-void UTP_WeaponComponent::Tick(float DeltaTime)
-{
-	//Super::Tick(DeltaTime);
 }
 
 void UTP_WeaponComponent::Fire()

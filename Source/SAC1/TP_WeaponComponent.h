@@ -15,7 +15,6 @@ class SAC1_API UTP_WeaponComponent : public USkeletalMeshComponent
 public:
 	/** Sets default values for this component's properties */
 	UTP_WeaponComponent();
-	virtual void Tick(float DeltaTime) override;
 
 private:
 	ASAC1Character* Character;
