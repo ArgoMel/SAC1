@@ -7,12 +7,13 @@
 
 ASAC1GameMode::ASAC1GameMode() : Super()
 {
-	static ConstructorHelpers::FClassFinder<ASAC1Character> PlayerPawnClassFinder(TEXT(
-		"/Game/Blueprints/BP_FirstPersonCharacter"));
-	if(PlayerPawnClassFinder.Succeeded())
-	{
-		DefaultPawnClass = PlayerPawnClassFinder.Class;
-	}
+	//static ConstructorHelpers::FClassFinder<ASAC1Character> PlayerPawnClassFinder(TEXT(
+	//	"/Game/Blueprints/BP_FirstPersonCharacter"));
+	//if(PlayerPawnClassFinder.Succeeded())
+	//{
+	//	DefaultPawnClass = PlayerPawnClassFinder.Class;
+	//}
+	DefaultPawnClass = ASAC1Character::StaticClass();
 	PlayerStateClass = ASAC1PlayerState::StaticClass();
 
 	GameStateClass = ASAC1GameState::StaticClass();
