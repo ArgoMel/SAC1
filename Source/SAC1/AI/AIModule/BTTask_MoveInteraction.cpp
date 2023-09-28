@@ -131,7 +131,7 @@ void UBTTask_MoveInteraction::TickTask(UBehaviorTreeComponent& OwnerComp,
 		Distance -= Capsule->GetScaledCapsuleRadius();
 	}
 
-	if (Distance <= AIPawn->GetAIState()->GetAttackDistance())
+	if (Distance <= AIPawn->GetAIState()->GetData()->AttackDistance)
 	{
 		// Task를 종료시킨다.
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

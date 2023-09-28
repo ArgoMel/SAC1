@@ -1,8 +1,5 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
-
-#include "CoreMinimal.h"
+#include "GameInfo.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "TP_WeaponComponent.generated.h"
 
@@ -13,11 +10,15 @@ class SAC1_API UTP_WeaponComponent : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
 public:
-	/** Sets default values for this component's properties */
 	UTP_WeaponComponent();
 
 private:
 	ASAC1Character* Character;
+	FTimerHandle m_FireTimer;
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float m_FireRate;
 
 public:
 	/** Projectile class to spawn */
@@ -36,6 +37,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector MuzzleOffset;
 
+private:
+	void FireStart();
+	void FireStop();
+	void FireReady();
 public:
 	/** Attaches the actor to a FirstPersonCharacter */
 	UFUNCTION(BlueprintCallable, Category="Weapon")

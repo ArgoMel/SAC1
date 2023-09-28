@@ -39,7 +39,7 @@ void UBTService_TargetDetect::TickNode(UBehaviorTreeComponent& OwnerComp,
 		AILoc, AILoc,
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel8,
-		FCollisionShape::MakeSphere(AIPawn->GetAIState()->GetInteractionDistance()),
+		FCollisionShape::MakeSphere(AIPawn->GetAIState()->GetData()->InteractionDistance),
 		param);
 
 	// 디버깅 용(에디터)으로 출력한다.
@@ -53,7 +53,7 @@ void UBTService_TargetDetect::TickNode(UBehaviorTreeComponent& OwnerComp,
 	// 의 앞쪽으로 만들어주는 회전 행렬을 구한다.(FMatrix로 결과가 나온다)
 	// 그래서 .ToQuat() 을 이용해서 FQuat(회전값)으로 변환한다.
 	DrawDebugSphere(GetWorld(), AILoc,
-		AIPawn->GetAIState()->GetInteractionDistance(),
+		AIPawn->GetAIState()->GetData()->InteractionDistance,
 		20, DrawColor, false, 0.35f);
 
 #endif
