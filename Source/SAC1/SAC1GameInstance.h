@@ -1,7 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "GameInfo.h"
 #include "Engine/GameInstance.h"
 #include "SAC1GameInstance.generated.h"
@@ -14,25 +11,11 @@ class SAC1_API USAC1GameInstance : public UGameInstance
 	
 public:
 	USAC1GameInstance();
+public:
+	virtual void Init();
 
 private:
 	TObjectPtr<UDataTable>	mPlayerDataTable;
-
-	EPlayerJob		mSelectJob;
-
-public:
-	void SetPlayerJob(EPlayerJob Job)
-	{
-		mSelectJob = Job;
-	}
-
-	EPlayerJob GetPlayerJob()	const
-	{
-		return mSelectJob;
-	}
-
-public:
-	virtual void Init();
 
 public:
 	const FPlayerDataTable* FindPlayerData(const FName& Name);

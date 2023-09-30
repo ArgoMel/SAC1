@@ -7,17 +7,9 @@
 
 ASAC1GameMode::ASAC1GameMode() : Super()
 {
-	//static ConstructorHelpers::FClassFinder<ASAC1Character> PlayerPawnClassFinder(TEXT(
-	//	"/Game/Blueprints/BP_FirstPersonCharacter"));
-	//if(PlayerPawnClassFinder.Succeeded())
-	//{
-	//	DefaultPawnClass = PlayerPawnClassFinder.Class;
-	//}
 	DefaultPawnClass = ASAC1Character::StaticClass();
 	PlayerStateClass = ASAC1PlayerState::StaticClass();
-
 	GameStateClass = ASAC1GameState::StaticClass();
-
 	PlayerControllerClass = ASACPlayerController::StaticClass();
 }
 
@@ -35,12 +27,11 @@ void ASAC1GameMode::InitGameState()
 void ASAC1GameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
-	// auto : 대입받는 값의 타입으로 자동으로 결정된다.
-	auto PlayerState = NewPlayer->GetPlayerState<ASAC1PlayerState>();
-
-	if (IsValid(PlayerState))
-		PlayerState->InitPlayerData(EPlayerJob::Magicion);
+	auto state = NewPlayer->GetPlayerState<ASAC1PlayerState>();
+	if (IsValid(state))
+	{
+		state->InitPlayerData(TEXT("Archer"));
+	}
 }
 
 void ASAC1GameMode::BeginPlay()
