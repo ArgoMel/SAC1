@@ -7,6 +7,9 @@ void ASAC1PlayerState::InitPlayerData(const FName& name)
 	if (IsValid(gameInst))
 	{
 		m_data = *gameInst->FindPlayerData(name);
+		m_data = *gameInst->FindPlayerData(name);
+		m_data = *gameInst->FindPlayerData(name);
+		m_data = *gameInst->FindPlayerData(name);
 	}
 }
 
