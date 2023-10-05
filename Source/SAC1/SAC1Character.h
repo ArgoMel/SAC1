@@ -38,6 +38,7 @@ protected:
 	FVector m_ClimbLoc;
 	FRotator m_ClimRot;
 	ETeam		mTeam;
+	float m_PickUpRadius;
 	float m_MoveSpeed;
 	float m_CameraSpeed;
 	float m_ZoomSpeed;
@@ -64,7 +65,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void CollectPickUps();
-
 public:
 	ETeam GetTeam()
 	{
@@ -87,7 +87,5 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
-
 };
 

@@ -2,15 +2,15 @@
 #include "GameInfo.h"
 #include "InputModifiers.h"
 #include "GameFramework/PlayerController.h"
-#include "SACPlayerController.generated.h"
+#include "SAC1PlayerController.generated.h"
 
 UCLASS()
-class SAC1_API ASACPlayerController : public APlayerController
+class SAC1_API ASAC1PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
 public:
-	ASACPlayerController();
+	ASAC1PlayerController();
 protected:
 	virtual void OnConstruction(const FTransform& Transform);
 	virtual void BeginPlay() override;
@@ -36,6 +36,8 @@ public:
 	TObjectPtr<class UInputAction> m_MousePos;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> m_E;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	TObjectPtr<class UInputAction> m_R;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> m_Space;
 	UPROPERTY(VisibleAnywhere, Category = Input)

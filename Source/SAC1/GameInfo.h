@@ -21,6 +21,8 @@
 
 #include "CameraRig_Rail.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 #include "UObject/NoExportTypes.h"
 #include "GameInfo.generated.h"
 

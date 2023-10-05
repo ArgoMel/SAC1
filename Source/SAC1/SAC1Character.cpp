@@ -1,6 +1,7 @@
 #include "SAC1Character.h"
 #include "SAC1Projectile.h"
-#include "SACPlayerController.h"
+#include "SAC1PlayerController.h"
+#include "Actor_PickUp.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -11,6 +12,7 @@
 
 ASAC1Character::ASAC1Character()
 {
+	m_PickUpRadius = 200.f;
 	m_MoveSpeed = 100.f;
 	m_CameraSpeed=50.f;
 	m_ZoomSpeed = 300.f;
@@ -29,7 +31,6 @@ ASAC1Character::ASAC1Character()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
@@ -61,7 +62,7 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	ASACPlayerController* controller = Cast<ASACPlayerController>(Controller);
+	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Controller);
 	if (IsValid(input) && IsValid(controller))
 	{
 		input->BindAction(controller->m_MousePos, ETriggerEvent::Triggered, this, &ASAC1Character::CameraRotation);
@@ -143,6 +144,36 @@ void ASAC1Character::StopJumping()
 
 void ASAC1Character::CollectPickUps()
 {
+	TArray<FHitResult> results;
+	FVector traceStart = GetActorLocation();
+	//FVector traceEnd = GetActorLocation() + GetActorForwardVector() * 60.;
+	FCollisionQueryParams param(NAME_None, false, this);
+	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceStart, FQuat::Identity,
+		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(m_PickUpRadius), param);
+#if ENABLE_DRAW_DEBUG
+	FColor drawColor;
+	if (isCol)
+	{
+		drawColor = FColor::Red;
+	}
+	else
+	{
+		drawColor = FColor::Green;
+	}
+	DrawDebugSphere(GetWorld(), traceStart, m_PickUpRadius, 0, drawColor, false, 0.5f);
+#endif
+	if (isCol)
+	{
+		for (auto& result : results)
+		{
+			AActor_PickUp* const pickUP = Cast<AActor_PickUp>(result.GetActor());
+			if (IsValid(pickUP) && pickUP->GetActive())
+			{
+				pickUP->PickedUpBy(this);
+				pickUP->SetActive(false);
+			}
+		}
+	}
 }
 
 void ASAC1Character::SetHasRifle(bool bNewHasRifle)

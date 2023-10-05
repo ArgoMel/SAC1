@@ -1,16 +1,16 @@
-#include "SACPlayerController.h"
+#include "SAC1PlayerController.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 
-ASACPlayerController::ASACPlayerController()
+ASAC1PlayerController::ASAC1PlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	//bShowMouseCursor = true;
 }
 
-void ASACPlayerController::OnConstruction(const FTransform& Transform)
+void ASAC1PlayerController::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
@@ -19,17 +19,17 @@ void ASACPlayerController::OnConstruction(const FTransform& Transform)
 	SetInputMode(InputMode);
 }
 
-void ASACPlayerController::BeginPlay()
+void ASAC1PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void ASACPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ASAC1PlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 }
 
-void ASACPlayerController::SetupInputComponent()
+void ASAC1PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	m_IMC = NewObject<UInputMappingContext>(this);
@@ -48,6 +48,9 @@ void ASACPlayerController::SetupInputComponent()
 	m_E = NewObject<UInputAction>(this);
 	m_E->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(m_E, EKeys::E);
+	m_R = NewObject<UInputAction>(this);
+	m_R->ValueType = EInputActionValueType::Boolean;
+	m_IMC->MapKey(m_R, EKeys::R);
 	m_Space = NewObject<UInputAction>(this);
 	m_Space->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(m_Space, EKeys::SpaceBar);
@@ -63,22 +66,22 @@ void ASACPlayerController::SetupInputComponent()
 	MoveModifier(m_IMC, m_Move, EKeys::D, false, true);
 }
 
-void ASACPlayerController::OnPossess(APawn* aPawn)
+void ASAC1PlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 }
 
-void ASACPlayerController::OnUnPossess()
+void ASAC1PlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
 }
 
-void ASACPlayerController::Tick(float DeltaTime)
+void ASAC1PlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void ASACPlayerController::MoveModifier(UInputMappingContext* IMC, UInputAction* IA, FKey key, 
+void ASAC1PlayerController::MoveModifier(UInputMappingContext* IMC, UInputAction* IA, FKey key,
 	bool isNegate, bool isSwizzle, EInputAxisSwizzle swizzleOrder)
 {
 	FEnhancedActionKeyMapping& mapping = IMC->MapKey(IA, key);
@@ -96,7 +99,7 @@ void ASACPlayerController::MoveModifier(UInputMappingContext* IMC, UInputAction*
 	}
 }
 
-void ASACPlayerController::SetNewController()
+void ASAC1PlayerController::SetNewController()
 {
 	ULocalPlayer* localPlayer = GetLocalPlayer();
 	if (IsValid(localPlayer))
