@@ -2,15 +2,18 @@
 #include "SAC1Character.h"
 #include "SAC1GameState.h"
 #include "SAC1PlayerState.h"
-#include "SACPlayerController.h"
+#include "SAC1PlayerController.h"
+#include "SAC1HUD.h"
 #include "UObject/ConstructorHelpers.h"
 
-ASAC1GameMode::ASAC1GameMode() : Super()
+ASAC1GameMode::ASAC1GameMode() 
+	: Super()
 {
 	DefaultPawnClass = ASAC1Character::StaticClass();
 	PlayerStateClass = ASAC1PlayerState::StaticClass();
 	GameStateClass = ASAC1GameState::StaticClass();
-	PlayerControllerClass = ASACPlayerController::StaticClass();
+	PlayerControllerClass = ASAC1PlayerController::StaticClass();
+	HUDClass = ASAC1HUD::StaticClass();
 }
 
 void ASAC1GameMode::InitGame(const FString& MapName, const FString& Options,
