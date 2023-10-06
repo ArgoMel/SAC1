@@ -112,8 +112,9 @@ void ASAC1Character::Move(const FInputActionValue& Value)
 void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 {
 	float deltaTime = GetWorld()->GetDeltaSeconds();
-	double x = Value.Get<FVector2D>().X * deltaTime * m_CameraSpeed;
-	double y = Value.Get<FVector2D>().Y * deltaTime * m_CameraSpeed;
+	m_ScreenRotVec = Value.Get<FVector2D>();
+	double x = m_ScreenRotVec.X * deltaTime * m_CameraSpeed;
+	double y = m_ScreenRotVec.Y * deltaTime * m_CameraSpeed;
 	if (m_IsInvertX)
 	{
 		x *= -1;

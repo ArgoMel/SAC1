@@ -7,23 +7,83 @@
 
 UTP_WeaponComponent::UTP_WeaponComponent()
 {
+	PrimaryComponentTick.bCanEverTick = true;
+
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 	m_FireRate = 0.1f;
 	m_ReloadTime = 1.25f;
 	m_DefaultArmo = 30;
 	m_CurArmo = m_DefaultArmo;
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_HorizontalRecoil(TEXT(
+		"/Game/Recoil/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
+	if (Curve_HorizontalRecoil.Succeeded())
+	{
+		m_HorizontalCurve= Curve_HorizontalRecoil.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_VerticalRecoil(TEXT(
+		"/Game/Recoil/Curves/Curve_VerticalRecoil.Curve_VerticalRecoil"));
+	if (Curve_VerticalRecoil.Succeeded())
+	{
+		m_VerticalCurve= Curve_VerticalRecoil.Object;
+	}
+}
+
+void UTP_WeaponComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	FOnTimelineFloat recoilXCurve;
+	FOnTimelineFloat recoilYCurve;
+	recoilXCurve.BindUFunction(this, FName("StartHorizontalRecoil"));
+	recoilYCurve.BindUFunction(this, FName("StartVerticalRecoil"));
+	if(IsValid(m_HorizontalCurve)&& IsValid(m_VerticalCurve))
+	{
+		m_RecoilTimeline.AddInterpFloat(m_HorizontalCurve, recoilXCurve);
+		m_RecoilTimeline.AddInterpFloat(m_VerticalCurve, recoilYCurve);
+	}
+}
+
+void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if(m_RecoilTimeline.IsPlaying())
+	{
+		m_RecoilTimeline.TickTimeline(DeltaTime);
+	}
+	if (m_RecoilTimeline.IsReversing())
+	{
+		if (!IsValid(Character))
+		{
+			return;
+		}
+		AController* controller = Character->GetController();
+		if (!IsValid(controller))
+		{
+			return;
+		}	
+		FVector2D vec = Character->GetScreenRotVec();
+		if (abs(vec.Y > 0.005) || abs(vec.X > 0.005))
+		{
+			m_RecoilTimeline.Stop();
+			return;
+		}
+		FRotator newRot = UKismetMathLibrary::RInterpTo(Character->GetControlRotation(),
+			m_StartRot, DeltaTime, 2.f);	
+		Character->GetController()->ClientSetRotation(newRot);	
+	}
 }
 
 void UTP_WeaponComponent::Fire()
 {	
-	if (!IsValid(Character)||m_CurArmo<=0)
+	if (!IsValid(Character)|| m_CurArmo <= 0)
 	{
+		OnStopFire();
 		return;
 	}
-
 	UWorld* const world = GetWorld();
 	AController* controller = Character->GetController();
-	if (!IsValid(world)||!IsValid(Character))
+	if (!IsValid(world)||!IsValid(controller))
 	{
 		return;
 	}
@@ -71,7 +131,14 @@ void UTP_WeaponComponent::Fire()
 
 void UTP_WeaponComponent::OnStartFire()
 {
+	if (!IsValid(Character) || m_CurArmo <= 0)
+	{
+		OnStopFire();
+		return;
+	}
+	m_StartRot = Character->GetControlRotation();
 	Fire();
+	StartRecoil();
 	GetWorld()->GetTimerManager().SetTimer(m_AutoFireHandle, this,
 		&UTP_WeaponComponent::Fire, m_FireRate, true);
 }
@@ -81,6 +148,7 @@ void UTP_WeaponComponent::OnStopFire()
 	//손 내리는 애니메이션 재생
 	//마지막 프레임의 노티파이로 bool 변수 설정
 	GetWorld()->GetTimerManager().ClearTimer(m_AutoFireHandle);
+	ReverseRecoil();
 }
 
 void UTP_WeaponComponent::OnStartReload()
@@ -93,6 +161,34 @@ void UTP_WeaponComponent::OnStartReload()
 void UTP_WeaponComponent::Reload()
 {
 	m_CurArmo = m_DefaultArmo;
+}
+
+void UTP_WeaponComponent::StartHorizontalRecoil(float value)
+{
+	if (!IsValid(Character)||m_RecoilTimeline.IsReversing())
+	{
+		return;
+	}
+	Character->AddControllerYawInput(value);
+}
+
+void UTP_WeaponComponent::StartVerticalRecoil(float value)
+{
+	if (!IsValid(Character) || m_RecoilTimeline.IsReversing())
+	{
+		return;
+	}
+	Character->AddControllerPitchInput(value);
+}
+
+void UTP_WeaponComponent::StartRecoil()
+{
+	m_RecoilTimeline.PlayFromStart();
+}
+
+void UTP_WeaponComponent::ReverseRecoil()
+{
+	m_RecoilTimeline.ReverseFromEnd();
 }
 
 void UTP_WeaponComponent::SetAnimAsset(const FString& Path)

@@ -35,6 +35,7 @@ protected:
 	bool bHasRifle;
 
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
+	FVector2D m_ScreenRotVec;
 	FVector m_ClimbLoc;
 	FRotator m_ClimRot;
 	ETeam		mTeam;
@@ -66,6 +67,10 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void CollectPickUps();
 public:
+	FVector2D GetScreenRotVec()
+	{
+		return m_ScreenRotVec;
+	}
 	ETeam GetTeam()
 	{
 		return mTeam;
