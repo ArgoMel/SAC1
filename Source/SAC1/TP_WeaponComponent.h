@@ -22,6 +22,7 @@ private:
 	FRotator m_StartRot;
 	int32 m_CurArmo;
 	int32 m_DefaultArmo;
+	bool m_IsTargeting;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -50,6 +51,10 @@ public:
 	TObjectPtr<UCurveFloat> m_HorizontalCurve;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|Curves")
 	TObjectPtr<UCurveFloat> m_VerticalCurve;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|FX")
+	TObjectPtr<UParticleSystem> m_HitEmitter;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|FX")
+	TObjectPtr<UMaterialInstance> m_HitDecalMaterial;
 
 private:
 	void OnStartFire();
@@ -63,6 +68,8 @@ private:
 	void StartVerticalRecoil(float value);
 	void StartRecoil();
 	void ReverseRecoil();
+	void StartTargeting();
+	void StopTargeting();
 
 public:
 	void SetAnimAsset(const FString& Path);
