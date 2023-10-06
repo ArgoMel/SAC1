@@ -31,6 +31,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> m_MouseMClick;
 	UPROPERTY(VisibleAnywhere, Category = Input)
+	TObjectPtr<class UInputAction> m_MouseRClick;
+	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> m_MouseWheel;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> m_MousePos;
@@ -38,6 +40,8 @@ public:
 	TObjectPtr<class UInputAction> m_E;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> m_R;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	TObjectPtr<class UInputAction> m_F;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> m_Space;
 	UPROPERTY(VisibleAnywhere, Category = Input)

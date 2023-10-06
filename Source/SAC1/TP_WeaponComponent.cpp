@@ -14,6 +14,7 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	m_ReloadTime = 1.25f;
 	m_DefaultArmo = 30;
 	m_CurArmo = m_DefaultArmo;
+	m_IsTargeting = false;
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_HorizontalRecoil(TEXT(
 		"/Game/Recoil/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
@@ -26,6 +27,18 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	if (Curve_VerticalRecoil.Succeeded())
 	{
 		m_VerticalCurve= Curve_VerticalRecoil.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UParticleSystem>	P_BelicaHitWorld(TEXT(
+		"/Game/KBJ/VFX/P_BelicaHitWorld.P_BelicaHitWorld"));
+	if (P_BelicaHitWorld.Succeeded())
+	{
+		m_HitEmitter = P_BelicaHitWorld.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UMaterialInstance>	MI_Asphalt_2(TEXT(
+		"/Game/KBJ/BulletHoleDecals/Instances/Decals/Asphalt/MI_Asphalt_2.MI_Asphalt_2"));
+	if (MI_Asphalt_2.Succeeded())
+	{
+		m_HitDecalMaterial = MI_Asphalt_2.Object;
 	}
 }
 
@@ -69,7 +82,7 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			return;
 		}
 		FRotator newRot = UKismetMathLibrary::RInterpTo(Character->GetControlRotation(),
-			m_StartRot, DeltaTime, 2.f);	
+			m_StartRot, DeltaTime, 4.5f);	
 		Character->GetController()->ClientSetRotation(newRot);	
 	}
 }
@@ -98,11 +111,34 @@ void UTP_WeaponComponent::Fire()
 	params.AddIgnoredActor(Character);
 	FVector traceStart = camLoc;
 	FVector traceEnd = traceStart+ camRot.Vector()*10000;
+	if(!m_IsTargeting)
+	{
+		traceEnd.Y += traceEnd.Y*FMath::RandRange(-0.35f, 0.35f);
+		traceEnd.Z += traceEnd.Z*FMath::RandRange(-0.35f,0.35f);
+	}
+	else
+	{
+		traceEnd.Y += traceEnd.Y * FMath::RandRange(-0.05f, 0.05f);
+		traceEnd.Z += traceEnd.Z * FMath::RandRange(-0.05f, 0.05f);
+	}
 	bool isCol=world->LineTraceSingleByChannel(hit, traceStart, traceEnd,ECC_Visibility,params);
-	DrawDebugLine(world, traceStart, traceEnd, FColor::Green, false, 3.f, 0, 0.5f);
+//#if ENABLE_DRAW_DEBUG
+//	DrawDebugLine(world, traceStart, traceEnd, FColor::Green, false, 3.f, 0, 0.5f);
+//#endif
 	if(isCol)
 	{
-		DrawDebugBox(world,hit.Location,FVector(15.),FColor::Red,false,3.f,0,3.f);
+//#if ENABLE_DRAW_DEBUG
+//		DrawDebugBox(world,hit.Location,FVector(15.),FColor::Red,false,3.f,0,3.f);
+//#endif
+		if(IsValid(m_HitEmitter))
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(world, m_HitEmitter, hit.Location);
+		}		
+		if (IsValid(m_HitDecalMaterial))
+		{
+			UGameplayStatics::SpawnDecalAtLocation(world, m_HitDecalMaterial,
+				FVector(15.), hit.Location, hit.ImpactNormal.Rotation(), 10.f);
+		}	
 	}
 	
 	//const FRotator SpawnRotation = controller->PlayerCameraManager->GetCameraRotation();
@@ -145,8 +181,6 @@ void UTP_WeaponComponent::OnStartFire()
 
 void UTP_WeaponComponent::OnStopFire()
 {
-	//손 내리는 애니메이션 재생
-	//마지막 프레임의 노티파이로 bool 변수 설정
 	GetWorld()->GetTimerManager().ClearTimer(m_AutoFireHandle);
 	ReverseRecoil();
 }
@@ -191,6 +225,16 @@ void UTP_WeaponComponent::ReverseRecoil()
 	m_RecoilTimeline.ReverseFromEnd();
 }
 
+void UTP_WeaponComponent::StartTargeting()
+{
+	m_IsTargeting = true;
+}
+
+void UTP_WeaponComponent::StopTargeting()
+{
+	m_IsTargeting = false;
+}
+
 void UTP_WeaponComponent::SetAnimAsset(const FString& Path)
 {
 	FireAnimation = LoadObject<UAnimMontage>(nullptr, *Path);
@@ -233,6 +277,8 @@ void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 	{
 		input->BindAction(controller->m_MouseLClick, ETriggerEvent::Started, this, &UTP_WeaponComponent::OnStartFire);
 		input->BindAction(controller->m_MouseLClick, ETriggerEvent::Completed, this, &UTP_WeaponComponent::OnStopFire);
+		input->BindAction(controller->m_MouseRClick, ETriggerEvent::Started, this, &UTP_WeaponComponent::StartTargeting);
+		input->BindAction(controller->m_MouseRClick, ETriggerEvent::Completed, this, &UTP_WeaponComponent::StopTargeting);
 		input->BindAction(controller->m_R, ETriggerEvent::Started, this, &UTP_WeaponComponent::OnStartReload);
 		//controller->SetNewController();
 	}

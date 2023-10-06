@@ -39,6 +39,9 @@ void ASAC1PlayerController::SetupInputComponent()
 	m_MouseMClick = NewObject<UInputAction>(this);
 	m_MouseMClick->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(m_MouseMClick, EKeys::MiddleMouseButton);
+	m_MouseRClick = NewObject<UInputAction>(this);
+	m_MouseRClick->ValueType = EInputActionValueType::Boolean;
+	m_IMC->MapKey(m_MouseRClick, EKeys::RightMouseButton);
 	m_MouseWheel = NewObject<UInputAction>(this);
 	m_MouseWheel->ValueType = EInputActionValueType::Axis1D;
 	m_IMC->MapKey(m_MouseWheel, EKeys::MouseWheelAxis);
@@ -51,6 +54,9 @@ void ASAC1PlayerController::SetupInputComponent()
 	m_R = NewObject<UInputAction>(this);
 	m_R->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(m_R, EKeys::R);
+	m_F = NewObject<UInputAction>(this);
+	m_F->ValueType = EInputActionValueType::Boolean;
+	m_IMC->MapKey(m_F, EKeys::F);
 	m_Space = NewObject<UInputAction>(this);
 	m_Space->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(m_Space, EKeys::SpaceBar);

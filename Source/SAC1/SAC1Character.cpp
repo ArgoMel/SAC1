@@ -69,12 +69,11 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::CameraZoom);
 		input->BindAction(controller->m_Space, ETriggerEvent::Started, this, &ASAC1Character::Jump);
 		input->BindAction(controller->m_Space, ETriggerEvent::Completed, this, &ASAC1Character::StopJumping);
-		input->BindAction(controller->m_E, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
+		input->BindAction(controller->m_F, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
 		input->BindAction(controller->m_Move, ETriggerEvent::Triggered, this, &ASAC1Character::Move);
 		controller->SetNewController();
 	}
 }
-
 
 void ASAC1Character::BodyHit(UPrimitiveComponent* comp, AActor* otherActor, 
 	UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& result)
