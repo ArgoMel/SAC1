@@ -17,6 +17,11 @@ AActor_PickUp::AActor_PickUp()
 	m_Particle->SetupAttachment(GetRootComponent());
 }
 
+void AActor_PickUp::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+}
+
 void AActor_PickUp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -45,6 +50,11 @@ void AActor_PickUp::SetActive(bool state)
 	//{
 		m_IsActive = state;
 	//}
+}
+
+void AActor_PickUp::SetName(const FName& name)
+{
+	m_Name = name;
 }
 
 void AActor_PickUp::WasCollected()

@@ -10,6 +10,7 @@ class SAC1_API AActor_SpawnVolume : public AActor
 public:	
 	AActor_SpawnVolume();
 protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -22,12 +23,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	TSubclassOf<class AActor_PickUp> m_SpawnThing;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
+	TArray<FName> m_Names;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
 	float m_SpawnDelayRangeMin;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
 	float m_SpawnDelayRangeMax;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
+	float m_SpawnCountMax;
 
 	FTimerHandle m_SpawnTimer;
 	float m_SpawnDelay;
+	float m_SpawnCount;
 
 private:
 	void SpawnPickUp();
