@@ -31,14 +31,24 @@ ASAC1Character::ASAC1Character()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+	GetMesh()->SetupAttachment(FirstPersonCameraComponent);
+	GetMesh()->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
+	GetMesh()->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
+	Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> BrimStone_SkeletonMesh(TEXT(
+		"/Game/KBJ/Brimstone/Anims/BrimStone_SkeletonMesh.BrimStone_SkeletonMesh"));
+	if (BrimStone_SkeletonMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(BrimStone_SkeletonMesh.Object);
+	}
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Mannequin_Arms(TEXT(
 		"/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms"));
 	if(SK_Mannequin_Arms.Succeeded())
