@@ -30,11 +30,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 
-	/** Bool for AnimBP to switch to another animation set */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-	bool bHasRifle;
 
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
+	TObjectPtr<class USAC1AnimInstance>	m_AnimInst;
 	FVector2D m_ScreenRotVec;
 	FVector m_ClimbLoc;
 	FRotator m_ClimRot;
@@ -80,13 +78,10 @@ public:
 		mTeam = Team;
 	}
 
-	/** Setter to set the bool */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void SetHasRifle(bool bNewHasRifle);
-
-	/** Getter for the bool */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	bool GetHasRifle();
+	UFUNCTION(BlueprintCallable, Category = Anim)
+	void SetCharacterState(ECharacterEquip state);
+	UFUNCTION(BlueprintCallable, Category = Anim)
+	ECharacterEquip GetCharacterState();
 
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
