@@ -40,6 +40,15 @@ DECLARE_LOG_CATEGORY_EXTERN(SAC1, Log, All);
 
 #define	LOGSTRING(str)		UE_LOG(SAC1, Warning, TEXT("%S : %S"), *LOG_CALLINFO, *str)
 
+UENUM(BlueprintType)
+enum class ECharacterEquip : uint8
+{
+	None,
+	Rifle,
+	Pistrol,
+	Knife,
+	Granade,
+};
 
 UENUM(BlueprintType)
 enum class EPlayerJob : uint8
@@ -180,10 +189,16 @@ public:
 	FVector	MuzzleOffset;	//ÃÑ±¸ À§Ä¡
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	ECharacterEquip	State;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USoundBase> FireSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> FireAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> ReloadAnimation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UParticleSystem> HitEmitter;

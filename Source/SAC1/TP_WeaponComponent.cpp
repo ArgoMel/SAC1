@@ -227,14 +227,11 @@ void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 		return;
 	}
 
-	// Attach the weapon to the First Person Character
+	Character->SetCharacterState(m_WeaponData.State);
+
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
-	
-	// switch bHasRifle so the animation blueprint can switch to another animation set
-	Character->SetHasRifle(true);
 
-	// Set up action bindings
 	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(controller->InputComponent);
 	if (IsValid(input) && IsValid(controller))
