@@ -46,7 +46,11 @@ void UAC_ItemState::SetItemInfo(const FName& name, FItemData* data)
 	m_ItemData = *data;
 	if(m_ItemData.ItemKind==EItem::Weapon)
 	{
-		m_WeaponData = *FindWeaponData(name);
+		FWeaponData* weaponData = FindWeaponData(name);
+		if(weaponData)
+		{
+			m_WeaponData = *weaponData;
+		}
 	}
 }
 
