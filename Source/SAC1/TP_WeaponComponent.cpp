@@ -13,13 +13,13 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	m_IsTargeting = false;
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_HorizontalRecoil(TEXT(
-		"/Game/Recoil/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
+		"/Game/KBJ/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
 	if (Curve_HorizontalRecoil.Succeeded())
 	{
 		m_HorizontalCurve= Curve_HorizontalRecoil.Object;
 	}
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_VerticalRecoil(TEXT(
-		"/Game/Recoil/Curves/Curve_VerticalRecoil.Curve_VerticalRecoil"));
+		"/Game/KBJ/Curves/Curve_VerticalRecoil.Curve_VerticalRecoil"));
 	if (Curve_VerticalRecoil.Succeeded())
 	{
 		m_VerticalCurve= Curve_VerticalRecoil.Object;

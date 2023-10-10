@@ -4,7 +4,7 @@
 ASAC1HUD::ASAC1HUD()
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> WBP_HUD
-	(TEXT("/Game/Recoil/UI/WBP_HUD.WBP_HUD_C"));
+	(TEXT("/Game/UI/WBP_HUD.WBP_HUD_C"));
 	if (WBP_HUD.Succeeded())
 	{
 		m_HUDClass = WBP_HUD.Class;
