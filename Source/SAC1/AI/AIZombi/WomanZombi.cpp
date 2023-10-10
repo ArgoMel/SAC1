@@ -5,6 +5,8 @@
 
 AWomanZombi::AWomanZombi()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>	MeshAsset(TEXT("/Script/Engine.SkeletalMesh'/Game/Zombi/WomanZombi/Zombiegirl_W_Kurniawan.Zombiegirl_W_Kurniawan'"));
 
 	if (MeshAsset.Succeeded())
