@@ -1,6 +1,7 @@
 #include "SAC1Character.h"
 #include "SAC1Projectile.h"
 #include "SAC1PlayerController.h"
+#include "SAC1AnimInstance.h"
 #include "Actor_PickUp.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -19,43 +20,60 @@ ASAC1Character::ASAC1Character()
 	m_CanMove=true;
 	m_IsInvertX = false;
 	m_IsInvertY=true;
-	// Character doesnt have a rifle at start
-	bHasRifle = false;
 	
-	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+	float height = 96.f;
+	GetCapsuleComponent()->InitCapsuleSize(55.f, height);
 		
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, height)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+
+	GetMesh()->SetupAttachment(FirstPersonCameraComponent);
+	//GetMesh()->SetRelativeRotation(FRotator(0., 10., 0.));
+	GetMesh()->SetRelativeLocation(FVector(-20., 0., -(height+98.)));
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
-	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+	Mesh1P->SetRelativeRotation(FRotator(0.9f, -90.f, 5.2f));
+	Mesh1P->SetRelativeLocation(FVector(-30., -2., -(height + 78.)));
+	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Mannequin_Arms(TEXT(
-		"/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms"));
-	if(SK_Mannequin_Arms.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> BrimStone_SkeletonMesh(TEXT(
+		"/Game/KBJ/Brimstone/Anims/BrimStone_SkeletonMesh.BrimStone_SkeletonMesh"));
+	if (BrimStone_SkeletonMesh.Succeeded())
 	{
-		Mesh1P->SetSkeletalMesh(SK_Mannequin_Arms.Object);
+		GetMesh()->SetSkeletalMesh(BrimStone_SkeletonMesh.Object);
 	}
-	static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimClass(TEXT(
-		"/Game/FirstPersonArms/Animations/FirstPerson_AnimBP.FirstPerson_AnimBP_C"));
-	if (AnimClass.Succeeded())
+	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_BrimStone(TEXT(
+		"/Game/KBJ/Brimstone/Anims/AB_BrimStone.AB_BrimStone_C"));
+	if (AB_BrimStone.Succeeded())
 	{
-		Mesh1P->SetAnimInstanceClass(AnimClass.Class);
+		GetMesh()->SetAnimInstanceClass(AB_BrimStone.Class);
+	}
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Godric_FP_Naked(TEXT(
+		"/Game/_Assets/Meshes/FPArms/Godric_FP_Naked.Godric_FP_Naked"));
+	if(Godric_FP_Naked.Succeeded())
+	{
+		Mesh1P->SetSkeletalMesh(Godric_FP_Naked.Object);
+	}
+	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_FPSArm(TEXT(
+		"/Game/_Assets/AB_FPSArm.AB_FPSArm_C"));
+	if (AB_FPSArm.Succeeded())
+	{
+		Mesh1P->SetAnimInstanceClass(AB_FPSArm.Class);
 	}
 }
 
 void ASAC1Character::BeginPlay()
 {
 	Super::BeginPlay();
+	m_AnimInst = Cast<USAC1AnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -69,12 +87,11 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::CameraZoom);
 		input->BindAction(controller->m_Space, ETriggerEvent::Started, this, &ASAC1Character::Jump);
 		input->BindAction(controller->m_Space, ETriggerEvent::Completed, this, &ASAC1Character::StopJumping);
-		input->BindAction(controller->m_E, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
+		input->BindAction(controller->m_F, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
 		input->BindAction(controller->m_Move, ETriggerEvent::Triggered, this, &ASAC1Character::Move);
 		controller->SetNewController();
 	}
 }
-
 
 void ASAC1Character::BodyHit(UPrimitiveComponent* comp, AActor* otherActor, 
 	UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& result)
@@ -177,12 +194,12 @@ void ASAC1Character::CollectPickUps()
 	}
 }
 
-void ASAC1Character::SetHasRifle(bool bNewHasRifle)
+void ASAC1Character::SetCharacterState(ECharacterEquip state)
 {
-	bHasRifle = bNewHasRifle;
+	m_AnimInst->SetCharacterState(state);
 }
 
-bool ASAC1Character::GetHasRifle()
+ECharacterEquip ASAC1Character::GetCharacterState()
 {
-	return bHasRifle;
+	return m_AnimInst->GetCharacterState();
 }

@@ -9,11 +9,8 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
-	m_FireRate = 0.1f;
-	m_ReloadTime = 1.25f;
-	m_DefaultArmo = 30;
-	m_CurArmo = m_DefaultArmo;
+	m_CurArmo = 0;
+	m_IsTargeting = false;
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_HorizontalRecoil(TEXT(
 		"/Game/Recoil/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
@@ -69,7 +66,7 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			return;
 		}
 		FRotator newRot = UKismetMathLibrary::RInterpTo(Character->GetControlRotation(),
-			m_StartRot, DeltaTime, 2.f);	
+			m_StartRot, DeltaTime, 4.5f);	
 		Character->GetController()->ClientSetRotation(newRot);	
 	}
 }
@@ -88,43 +85,60 @@ void UTP_WeaponComponent::Fire()
 		return;
 	}
 
-	--m_CurArmo;
-
-	FHitResult hit;
-	FVector camLoc;
-	FRotator camRot;
-	Character->GetController()->GetPlayerViewPoint(camLoc, camRot);
-	FCollisionQueryParams params;
-	params.AddIgnoredActor(Character);
-	FVector traceStart = camLoc;
-	FVector traceEnd = traceStart+ camRot.Vector()*10000;
-	bool isCol=world->LineTraceSingleByChannel(hit, traceStart, traceEnd,ECC_Visibility,params);
-	DrawDebugLine(world, traceStart, traceEnd, FColor::Green, false, 3.f, 0, 0.5f);
-	if(isCol)
+	m_CurArmo -= m_WeaponData.BulletCount;
+	for (int i = 0;i< m_WeaponData.BulletCount;++i)
 	{
-		DrawDebugBox(world,hit.Location,FVector(15.),FColor::Red,false,3.f,0,3.f);
+		FHitResult hit;
+		FVector camLoc;
+		FRotator camRot;
+		Character->GetController()->GetPlayerViewPoint(camLoc, camRot);
+		FCollisionQueryParams params;
+		params.AddIgnoredActor(Character);
+		FVector traceStart = camLoc;
+		FVector traceEnd = traceStart + camRot.Vector() * 10000;
+		if (!m_IsTargeting)
+		{
+			traceEnd.Y += traceEnd.Y * FMath::RandRange(-0.35f, 0.35f);
+			traceEnd.Z += traceEnd.Z * FMath::RandRange(-0.35f, 0.35f);
+		}
+		else
+		{
+			traceEnd.Y += traceEnd.Y * FMath::RandRange(-0.05f, 0.05f);
+			traceEnd.Z += traceEnd.Z * FMath::RandRange(-0.05f, 0.05f);
+		}
+		bool isCol = world->LineTraceSingleByChannel(hit, traceStart, traceEnd, ECC_Visibility, params);
+		//#if ENABLE_DRAW_DEBUG
+		//	DrawDebugLine(world, traceStart, traceEnd, FColor::Green, false, 3.f, 0, 0.5f);
+		//#endif
+		if (isCol)
+		{
+			//#if ENABLE_DRAW_DEBUG
+			//		DrawDebugBox(world,hit.Location,FVector(15.),FColor::Red,false,3.f,0,3.f);
+			//#endif
+			if (IsValid(m_WeaponData.HitEmitter))
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(world, m_WeaponData.HitEmitter, hit.Location);
+			}
+			if (IsValid(m_WeaponData.HitDecalMaterial))
+			{
+				UGameplayStatics::SpawnDecalAtLocation(world, m_WeaponData.HitDecalMaterial,
+					FVector(15.), hit.Location, hit.ImpactNormal.Rotation(), 10.f);
+			}
+		}
 	}
 	
-	//const FRotator SpawnRotation = controller->PlayerCameraManager->GetCameraRotation();
-	//const FVector SpawnLocation = GetOwner()->GetActorLocation() 
-	//	+ SpawnRotation.RotateVector(MuzzleOffset);
-	//FActorSpawnParameters ActorSpawnParams;
-	//ActorSpawnParams.SpawnCollisionHandlingOverride = 
-	//	ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	//world->SpawnActor<ASAC1Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-	
-	if (IsValid(FireSound))
+	if (IsValid(m_WeaponData.FireSound))
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, m_WeaponData.FireSound, Character->GetActorLocation());
 	}
 
-	if (IsValid(FireAnimation))
+	if (IsValid(m_WeaponData.FireAnimation))
 	{
 		UAnimInstance* animInst = Character->GetMesh1P()->GetAnimInstance();
-		if (IsValid(animInst) && !animInst->Montage_IsPlaying(FireAnimation))
+		if (IsValid(animInst) && !animInst->Montage_IsPlaying(m_WeaponData.FireAnimation))
 		{
 			//bool 변수로 팔올리는 애니메이션 스테이트로 전환
-			animInst->Montage_Play(FireAnimation, 1.f);
+			animInst->Montage_Play(m_WeaponData.FireAnimation, 1.f);
 		}
 	}
 }
@@ -140,13 +154,11 @@ void UTP_WeaponComponent::OnStartFire()
 	Fire();
 	StartRecoil();
 	GetWorld()->GetTimerManager().SetTimer(m_AutoFireHandle, this,
-		&UTP_WeaponComponent::Fire, m_FireRate, true);
+		&UTP_WeaponComponent::Fire, m_WeaponData.FireRate, true);
 }
 
 void UTP_WeaponComponent::OnStopFire()
 {
-	//손 내리는 애니메이션 재생
-	//마지막 프레임의 노티파이로 bool 변수 설정
 	GetWorld()->GetTimerManager().ClearTimer(m_AutoFireHandle);
 	ReverseRecoil();
 }
@@ -155,12 +167,12 @@ void UTP_WeaponComponent::OnStartReload()
 {
 	FTimerHandle reloadHandle;
 	GetWorld()->GetTimerManager().SetTimer(reloadHandle, this,
-		&UTP_WeaponComponent::Reload, m_ReloadTime, false);
+		&UTP_WeaponComponent::Reload, m_WeaponData.ReloadTime, false);
 }
 
 void UTP_WeaponComponent::Reload()
 {
-	m_CurArmo = m_DefaultArmo;
+	m_CurArmo = m_WeaponData.Armo;
 }
 
 void UTP_WeaponComponent::StartHorizontalRecoil(float value)
@@ -191,24 +203,20 @@ void UTP_WeaponComponent::ReverseRecoil()
 	m_RecoilTimeline.ReverseFromEnd();
 }
 
-void UTP_WeaponComponent::SetAnimAsset(const FString& Path)
+void UTP_WeaponComponent::StartTargeting()
 {
-	FireAnimation = LoadObject<UAnimMontage>(nullptr, *Path);
+	m_IsTargeting = true;
 }
 
-void UTP_WeaponComponent::SetAnimAsset(UAnimMontage* montage)
+void UTP_WeaponComponent::StopTargeting()
 {
-	FireAnimation = montage;
+	m_IsTargeting = false;
 }
 
-void UTP_WeaponComponent::SetAudioAsset(const FString& Path)
+void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
 {
-	FireSound = LoadObject<USoundBase>(nullptr,*Path);
-}
-
-void UTP_WeaponComponent::SetAudioAsset(USoundBase* Sound)
-{
-	FireSound = Sound;
+	m_WeaponData = *data;
+	m_CurArmo = m_WeaponData.Armo;
 }
 
 void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
@@ -219,21 +227,28 @@ void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 		return;
 	}
 
-	// Attach the weapon to the First Person Character
+	Character->SetCharacterState(m_WeaponData.State);
+
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
-	
-	// switch bHasRifle so the animation blueprint can switch to another animation set
-	Character->SetHasRifle(true);
 
-	// Set up action bindings
 	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(controller->InputComponent);
 	if (IsValid(input) && IsValid(controller))
 	{
 		input->BindAction(controller->m_MouseLClick, ETriggerEvent::Started, this, &UTP_WeaponComponent::OnStartFire);
 		input->BindAction(controller->m_MouseLClick, ETriggerEvent::Completed, this, &UTP_WeaponComponent::OnStopFire);
+		input->BindAction(controller->m_MouseRClick, ETriggerEvent::Started, this, &UTP_WeaponComponent::StartTargeting);
+		input->BindAction(controller->m_MouseRClick, ETriggerEvent::Completed, this, &UTP_WeaponComponent::StopTargeting);
 		input->BindAction(controller->m_R, ETriggerEvent::Started, this, &UTP_WeaponComponent::OnStartReload);
 		//controller->SetNewController();
 	}
 }
+
+//const FRotator SpawnRotation = controller->PlayerCameraManager->GetCameraRotation();
+//const FVector SpawnLocation = GetOwner()->GetActorLocation() 
+//	+ SpawnRotation.RotateVector(MuzzleOffset);
+//FActorSpawnParameters ActorSpawnParams;
+//ActorSpawnParams.SpawnCollisionHandlingOverride = 
+//	ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+//world->SpawnActor<ASAC1Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);

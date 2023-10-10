@@ -21,35 +21,19 @@ private:
 	FTimeline m_RecoilTimeline;
 	FRotator m_StartRot;
 	int32 m_CurArmo;
-	int32 m_DefaultArmo;
+	bool m_IsTargeting;
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	float m_FireRate;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	float m_ReloadTime;
-
-public:
 	/** Projectile class to spawn */
 	//UPROPERTY(EditDefaultsOnly, Category=Projectile)
 	//TSubclassOf<class ASAC1Projectile> ProjectileClass;
-
-	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
-	TObjectPtr<USoundBase> FireSound;
-	
-	/** AnimMontage to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	TObjectPtr<UAnimMontage> FireAnimation;
-
-	/** Gun muzzle's offset from the characters location */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
-	FVector MuzzleOffset;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|Curves")
 	TObjectPtr<UCurveFloat> m_HorizontalCurve;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|Curves")
 	TObjectPtr<UCurveFloat> m_VerticalCurve;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
+	FWeaponData m_WeaponData;
 
 private:
 	void OnStartFire();
@@ -63,12 +47,11 @@ private:
 	void StartVerticalRecoil(float value);
 	void StartRecoil();
 	void ReverseRecoil();
+	void StartTargeting();
+	void StopTargeting();
 
 public:
-	void SetAnimAsset(const FString& Path);
-	void SetAnimAsset(UAnimMontage* montage);
-	void SetAudioAsset(const FString& Path);
-	void SetAudioAsset(USoundBase* Sound);
+	void SetWeaponData(FWeaponData* data);
 
 	/** Attaches the actor to a FirstPersonCharacter */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
