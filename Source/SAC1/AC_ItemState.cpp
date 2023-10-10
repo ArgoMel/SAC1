@@ -32,21 +32,21 @@ void UAC_ItemState::LoadWeaponData()
 
 FItemData* UAC_ItemState::GetItemData()
 {
-	return &m_ItemData;
+	return &m_ItemData;   
 }
 
 FWeaponData* UAC_ItemState::GetWeaponData()
 {
-	return &m_WeaponData;
+	return &m_WeaponData;   
 }
 
 void UAC_ItemState::SetItemInfo(const FName& name, FItemData* data)
 {
 	m_Name = name;
 	m_ItemData = *data;
-	if(m_ItemData.ItemKind==EItem::Weapon)
-	{
-		m_WeaponData = *FindWeaponData(name);
-	}
+	//if(m_ItemData.ItemKind==EItem::Weapon)
+	//{
+	//	m_WeaponData = *FindWeaponData(name);
+	//}   
 }
 
