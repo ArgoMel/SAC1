@@ -5,10 +5,20 @@
 
 AWomanZombi::AWomanZombi()
 {
+	//PrimaryActorTick.bCanEverTick = true;
+
+	////mName=TEXT("WomanZombi")
+
+	//mBody->SetCapsuleHalfHeight(110.f);
+	//mBody->SetCapsuleRadius(33.f);
+
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>	MeshAsset(TEXT("/Script/Engine.SkeletalMesh'/Game/Zombi/WomanZombi/Zombiegirl_W_Kurniawan.Zombiegirl_W_Kurniawan'"));
 
 	if (MeshAsset.Succeeded())
 		mMesh->SetSkeletalMesh(MeshAsset.Object);
+
+	mMesh->SetRelativeLocation(FVector(0.0, 0.0, -110.0));
+	mMesh->SetRelativeRotation(FRotator(0.0, -110.0, 0.0));
 }
 
 void AWomanZombi::BeginPlay()

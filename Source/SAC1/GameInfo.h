@@ -40,6 +40,15 @@ DECLARE_LOG_CATEGORY_EXTERN(SAC1, Log, All);
 
 #define	LOGSTRING(str)		UE_LOG(SAC1, Warning, TEXT("%S : %S"), *LOG_CALLINFO, *str)
 
+UENUM(BlueprintType)
+enum class ECharacterEquip : uint8
+{
+	None,
+	Rifle,
+	Pistrol,
+	Knife,
+	Granade,
+};
 
 UENUM(BlueprintType)
 enum class EPlayerJob : uint8
@@ -48,6 +57,22 @@ enum class EPlayerJob : uint8
 	Knight,
 	Archer,
 	Magicion
+};
+
+UENUM(BlueprintType)
+enum class EItem : uint8
+{
+	Weapon,
+	Consumable,
+	Interaction,	//안없어지고 상호작용만(예-스위치)	
+};
+
+UENUM(BlueprintType)
+enum class ETeam : uint8
+{
+	Team1,
+	Team2,
+	Team3
 };
 
 // FTableRowBase 구조체를 상속받아야 데이터테이블 용 구조체를 만들 수 있다.
@@ -95,7 +120,6 @@ public:
 	float	AttackDistance;
 };
 
-
 // FTableRowBase 구조체를 상속받아야 데이터테이블 용 구조체를 만들 수 있다.
 USTRUCT(BlueprintType)
 struct FAIDataTable :
@@ -138,23 +162,80 @@ public:
 	float	InteractionDistance;
 };
 
-
-UENUM(BlueprintType)
-enum class ETeam : uint8
+USTRUCT(BlueprintType)
+struct FWeaponData :	public FTableRowBase
 {
-	Team1,
-	Team2,
-	Team3
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int32	Armo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int32	ArmoMax;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int32	BulletCount;	//한번에 발사하는 총알 개수
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float	FireRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float	ReloadTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float	AtkRate;	//데미지 비율(플레이어 공격력*this= 최종 공격력)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FVector	MuzzleOffset;	//총구 위치
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	ECharacterEquip	State;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USoundBase> FireSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> FireAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> ReloadAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UParticleSystem> HitEmitter;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UMaterialInstance> HitDecalMaterial;
 };
 
+USTRUCT(BlueprintType)
+struct FItemData : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int32	HP;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int32	MaxHP;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int32	Value;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EItem	ItemKind;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FVector Offset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FRotator WeaponRot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMesh> ItemMesh;
+};
 
 UCLASS()
 class SAC1_API UGameInfo : public UObject
 {
 	GENERATED_BODY()
-	
 };
