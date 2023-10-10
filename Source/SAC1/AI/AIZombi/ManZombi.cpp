@@ -21,10 +21,10 @@ AManZombi::AManZombi()
 	mMesh->SetRelativeLocation(FVector(0.0, 0.0, -98.0));
 	mMesh->SetRelativeRotation(FRotator(0.0, -90.0, 0.0));
 
-	//static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimAsset(TEXT(""));
+	static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimAsset(TEXT("/Script/Engine.AnimBlueprint'/Game/Zombi/AB_ManZombi.AB_ManZombi_C'"));
 
-	//if (AnimAsset.Succeeded())
-	//	mMesh->SetAnimInstanceClass(AnimAsset.Class);
+	if (AnimAsset.Succeeded())
+		mMesh->SetAnimInstanceClass(AnimAsset.Class);
 
 }
 
