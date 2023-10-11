@@ -16,12 +16,10 @@ public:
 protected:
 	static TObjectPtr<UDataTable>	ItemDataTable;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Pickup")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Pickup")
 	TObjectPtr<USphereComponent> m_Collider;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Pickup")
 	TObjectPtr<class UTP_WeaponComponent> m_Weapon;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Pickup")
-	TObjectPtr<class USkeletalMeshComponent> m_WeaponMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAC_ItemState>	m_ItemState;
 

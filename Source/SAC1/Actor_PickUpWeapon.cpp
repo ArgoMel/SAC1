@@ -9,17 +9,18 @@ AActor_PickUpWeapon::AActor_PickUpWeapon()
 {
 	SetReplicateMovement(true);
 
+	GetStaticMeshComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+
 	m_Name = TEXT("Rifle");
 
 	//닿는 순간 ui 출력
 	m_Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	SetRootComponent(m_Collider);
+	m_Collider->SetGenerateOverlapEvents(true);
+	m_Collider->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
 	m_Weapon = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("WeaponComponent"));
 	m_Weapon->SetupAttachment(m_Collider);
-
-	m_WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	m_WeaponMesh->SetupAttachment(m_Weapon);
 
 	m_ItemState = CreateDefaultSubobject<UAC_ItemState>(TEXT("ItemState"));
 }
@@ -41,8 +42,12 @@ void AActor_PickUpWeapon::WasCollected()
 	ASAC1Character* player = Cast<ASAC1Character>(m_PickUpInstigator);
 	if(IsValid(player)&& m_ItemState->GetItemData()->ItemKind==EItem::Weapon)
 	{
+		m_Collider->SetGenerateOverlapEvents(false);
+		m_Collider->SetCollisionProfileName(TEXT("NoCollision"));
 		m_Weapon->SetWeaponData(m_ItemState->GetWeaponData());
 		m_Weapon->AttachWeapon(player);
+		FItemData* itemData= m_ItemState->GetItemData();
+		m_Weapon->SetRelativeLocationAndRotation(itemData->Offset, itemData->WeaponRot);
 	}
 }
 
@@ -78,6 +83,5 @@ void AActor_PickUpWeapon::SetName(const FName& name)
 		return;	
 	}
 	m_ItemState->SetItemInfo(m_Name, data);
-	m_WeaponMesh->SetSkeletalMesh(m_ItemState->GetItemData()->ItemMesh);
-	m_WeaponMesh->SetRelativeRotation(m_ItemState->GetItemData()->WeaponRot);
+	m_Weapon->SetSkeletalMesh(m_ItemState->GetItemData()->ItemMesh);
 }

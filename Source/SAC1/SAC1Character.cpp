@@ -13,7 +13,9 @@
 
 ASAC1Character::ASAC1Character()
 {
-	m_PickUpRadius = 200.f;
+	float height = 96.f;
+
+	m_PickUpExtent = FVector(50.f,50.f, height);
 	m_MoveSpeed = 100.f;
 	m_CameraSpeed=50.f;
 	m_ZoomSpeed = 300.f;
@@ -21,10 +23,9 @@ ASAC1Character::ASAC1Character()
 	m_IsInvertX = false;
 	m_IsInvertY=true;
 	
-	float height = 96.f;
 	GetCapsuleComponent()->InitCapsuleSize(55.f, height);
-		
-	// Create a CameraComponent	
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
+
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, height)); // Position the camera
@@ -163,11 +164,12 @@ void ASAC1Character::StopJumping()
 void ASAC1Character::CollectPickUps()
 {
 	TArray<FHitResult> results;
-	FVector traceStart = GetActorLocation();
-	//FVector traceEnd = GetActorLocation() + GetActorForwardVector() * 60.;
+	FVector traceStart = GetActorLocation()-GetActorUpVector()* m_PickUpExtent.Z*0.5;
+	FVector traceEnd = traceStart + GetActorForwardVector() * m_PickUpExtent.Y;
 	FCollisionQueryParams param(NAME_None, false, this);
-	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceStart, FQuat::Identity,
-		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(m_PickUpRadius), param);
+	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
+		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeBox(m_PickUpExtent), param);
+		//ECollisionChannel::ECC_GameTraceChannel5, FCollisionShape::MakeBox(m_PickUpExtent), param);
 #if ENABLE_DRAW_DEBUG
 	FColor drawColor;
 	if (isCol)
@@ -178,7 +180,7 @@ void ASAC1Character::CollectPickUps()
 	{
 		drawColor = FColor::Green;
 	}
-	DrawDebugSphere(GetWorld(), traceStart, m_PickUpRadius, 0, drawColor, false, 0.5f);
+	DrawDebugBox(GetWorld(), (traceStart+ traceEnd)*0.5, m_PickUpExtent, drawColor, false, 0.5f);
 #endif
 	if (isCol)
 	{

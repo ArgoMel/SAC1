@@ -28,7 +28,7 @@ protected:
 	TObjectPtr<UBoxComponent>	mBody;
 
 	UPROPERTY(Category = Trigger, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		EUserTriggerType	mTriggerType;
+	EUserTriggerType	mTriggerType;
 
 public:
 	void SetTriggerType(EUserTriggerType Type)
