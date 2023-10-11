@@ -34,10 +34,10 @@ protected:
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
 	TObjectPtr<class USAC1AnimInstance>	m_AnimInst;
 	FVector2D m_ScreenRotVec;
+	FVector m_PickUpExtent;
 	FVector m_ClimbLoc;
 	FRotator m_ClimRot;
 	ETeam		mTeam;
-	float m_PickUpRadius;
 	float m_MoveSpeed;
 	float m_CameraSpeed;
 	float m_ZoomSpeed;
