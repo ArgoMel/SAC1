@@ -38,7 +38,7 @@ void UBTService_TargetDetect::TickNode(UBehaviorTreeComponent& OwnerComp,
 	bool Collision = GetWorld()->SweepSingleByChannel(result,
 		AILoc, AILoc,
 		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel8,
+		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(AIPawn->GetAIState()->GetData()->InteractionDistance),
 		param);
 
