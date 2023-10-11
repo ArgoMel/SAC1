@@ -21,6 +21,7 @@ private:
 	FTimeline m_RecoilTimeline;
 	FRotator m_StartRot;
 	int32 m_CurArmo;
+	int32 m_TotalArmo;
 	bool m_IsTargeting;
 	
 protected:
@@ -60,4 +61,5 @@ public:
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
+	void PickUpArmo(float value);
 };

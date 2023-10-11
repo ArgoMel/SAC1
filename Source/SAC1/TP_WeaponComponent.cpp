@@ -10,16 +10,17 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	m_CurArmo = 0;
+	m_TotalArmo = 0;
 	m_IsTargeting = false;
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_HorizontalRecoil(TEXT(
-		"/Game/Recoil/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
+		"/Game/KBJ/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
 	if (Curve_HorizontalRecoil.Succeeded())
 	{
 		m_HorizontalCurve= Curve_HorizontalRecoil.Object;
 	}
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_VerticalRecoil(TEXT(
-		"/Game/Recoil/Curves/Curve_VerticalRecoil.Curve_VerticalRecoil"));
+		"/Game/KBJ/Curves/Curve_VerticalRecoil.Curve_VerticalRecoil"));
 	if (Curve_VerticalRecoil.Succeeded())
 	{
 		m_VerticalCurve= Curve_VerticalRecoil.Object;
@@ -143,6 +144,15 @@ void UTP_WeaponComponent::Fire()
 	}
 }
 
+void UTP_WeaponComponent::PickUpArmo(float value)
+{
+	m_TotalArmo += value;
+	if (m_TotalArmo> m_WeaponData.ArmoMax)
+	{
+		m_TotalArmo = m_WeaponData.ArmoMax;
+	}
+}
+
 void UTP_WeaponComponent::OnStartFire()
 {
 	if (!IsValid(Character) || m_CurArmo <= 0)
@@ -172,7 +182,16 @@ void UTP_WeaponComponent::OnStartReload()
 
 void UTP_WeaponComponent::Reload()
 {
-	m_CurArmo = m_WeaponData.Armo;
+	if(m_TotalArmo>m_WeaponData.Armo)
+	{
+		m_CurArmo = m_WeaponData.Armo;
+		m_TotalArmo -= m_WeaponData.Armo;
+	}
+	else
+	{		
+		m_CurArmo = m_TotalArmo;
+		m_TotalArmo = 0;
+	}
 }
 
 void UTP_WeaponComponent::StartHorizontalRecoil(float value)
@@ -216,7 +235,8 @@ void UTP_WeaponComponent::StopTargeting()
 void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
 {
 	m_WeaponData = *data;
-	m_CurArmo = m_WeaponData.Armo;
+	PickUpArmo(m_WeaponData.ArmoCountWhenPick);
+	Reload();
 }
 
 void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
@@ -230,7 +250,7 @@ void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 	Character->SetCharacterState(m_WeaponData.State);
 
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
+	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("VB weapon_r")));
 
 	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(controller->InputComponent);

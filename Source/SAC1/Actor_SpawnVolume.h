@@ -21,7 +21,7 @@ private:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<class AActor_PickUp> m_SpawnThing;
+	TArray<TSubclassOf<class AActor>> m_SpawnThings;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
 	TArray<FName> m_Names;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
@@ -30,6 +30,12 @@ protected:
 	float m_SpawnDelayRangeMax;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
 	float m_SpawnCountMax;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
+	bool m_IsRotateX;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
+	bool m_IsRotateY;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Spawn")
+	bool m_IsRotateZ;
 
 	FTimerHandle m_SpawnTimer;
 	float m_SpawnDelay;
