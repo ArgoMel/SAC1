@@ -13,7 +13,7 @@
 
 ASAC1Character::ASAC1Character()
 {
-	float height = 96.f;
+	float height = 91.f;
 
 	m_PickUpExtent = FVector(50.f,50.f, height);
 	m_CameraSpeed = 50.f;
@@ -39,19 +39,19 @@ ASAC1Character::ASAC1Character()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm);
-	m_Camera->SetRelativeLocation(FVector(5., 15., 0.));
+	m_Camera->SetRelativeLocation(FVector(15., 20., 0.));
 	m_Camera->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SKM_Manny(TEXT(
-		"/Game/ControlRig/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn"));
-	if (SKM_Manny.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Mannequin(TEXT(
+		"/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin"));
+	if (SK_Mannequin.Succeeded())
 	{
-		GetMesh()->SetSkeletalMesh(SKM_Manny.Object);
+		GetMesh()->SetSkeletalMesh(SK_Mannequin.Object);
 	}
 	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_Player(TEXT(
-		"/Game/ControlRig/Characters/Mannequins/Animations/AB_Player.AB_Player_C"));
+		"/Game/AnimStarterPack/Animations/AB_Player.AB_Player_C"));
 	if (AB_Player.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(AB_Player.Class);
@@ -185,12 +185,13 @@ void ASAC1Character::CollectPickUps()
 	DrawDebugBox(GetWorld(), (traceStart+ traceEnd)*0.5, m_PickUpExtent, drawColor, false, 0.5f);
 #endif
 	if (isCol)
-	{
+	{		
 		for (auto& result : results)
 		{
 			AActor_PickUp* const pickUP = Cast<AActor_PickUp>(result.GetActor());
 			if (IsValid(pickUP) && pickUP->GetActive())
 			{
+				m_AnimInst->CollectPickUps();
 				pickUP->PickedUpBy(this);
 				pickUP->SetActive(false);
 			}

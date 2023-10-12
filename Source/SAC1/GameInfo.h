@@ -64,6 +64,14 @@ enum class EItem : uint8
 };
 
 UENUM(BlueprintType)
+enum class EAttackType : uint8
+{
+	Melee,
+	Shoot,
+	Throw,	
+};
+
+UENUM(BlueprintType)
 enum class ETeam : uint8
 {
 	Team1,
@@ -163,9 +171,6 @@ struct FWeaponData :	public FTableRowBase
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	bool	IsMelee;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	int32	Armo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -185,6 +190,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float	AtkRate;	//데미지 비율(플레이어 공격력*this= 최종 공격력)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EAttackType	AttackType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FVector	MuzzleOffset;	//총구 위치
