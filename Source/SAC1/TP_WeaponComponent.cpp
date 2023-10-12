@@ -86,6 +86,26 @@ void UTP_WeaponComponent::Fire()
 		return;
 	}
 
+	if (IsValid(m_WeaponData.FireSound))
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, m_WeaponData.FireSound, Character->GetActorLocation());
+	}
+
+	if (IsValid(m_WeaponData.FireAnimation))
+	{
+		UAnimInstance* animInst = Character->GetMesh()->GetAnimInstance();
+		if (IsValid(animInst) && !animInst->Montage_IsPlaying(m_WeaponData.FireAnimation))
+		{
+			animInst->Montage_Play(m_WeaponData.FireAnimation, 1.f);
+		}
+	}
+
+	if(m_WeaponData.IsMelee)
+	{
+		//트레이스 생성
+		return;
+	}
+
 	m_CurArmo -= m_WeaponData.BulletCount;
 	for (int i = 0;i< m_WeaponData.BulletCount;++i)
 	{
@@ -125,21 +145,6 @@ void UTP_WeaponComponent::Fire()
 				UGameplayStatics::SpawnDecalAtLocation(world, m_WeaponData.HitDecalMaterial,
 					FVector(15.), hit.Location, hit.ImpactNormal.Rotation(), 10.f);
 			}
-		}
-	}
-	
-	if (IsValid(m_WeaponData.FireSound))
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, m_WeaponData.FireSound, Character->GetActorLocation());
-	}
-
-	if (IsValid(m_WeaponData.FireAnimation))
-	{
-		UAnimInstance* animInst = Character->GetMesh1P()->GetAnimInstance();
-		if (IsValid(animInst) && !animInst->Montage_IsPlaying(m_WeaponData.FireAnimation))
-		{
-			//bool 변수로 팔올리는 애니메이션 스테이트로 전환
-			animInst->Montage_Play(m_WeaponData.FireAnimation, 1.f);
 		}
 	}
 }
@@ -250,7 +255,7 @@ void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 	Character->SetCharacterState(m_WeaponData.State);
 
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("VB weapon_r")));
+	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("ik_hand_gun")));
 
 	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(controller->InputComponent);

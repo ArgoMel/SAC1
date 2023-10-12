@@ -4,7 +4,7 @@
 USAC1AnimInstance::USAC1AnimInstance()
 {
 	m_CharState=ECharacterEquip::None;
-	m_IsMoving=false;
+	m_Speed =0.f;
 	m_IsInAir = false;
 }
 
@@ -26,7 +26,7 @@ void USAC1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 	m_IsInAir = m_Character->GetMovementComponent()->IsFalling();
-	m_IsMoving = m_Character->GetVelocity().Length()>0;
+	m_Speed = m_Character->GetVelocity().Length();
 }
 
 void USAC1AnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)

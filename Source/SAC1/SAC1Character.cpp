@@ -16,58 +16,45 @@ ASAC1Character::ASAC1Character()
 	float height = 96.f;
 
 	m_PickUpExtent = FVector(50.f,50.f, height);
-	m_MoveSpeed = 100.f;
-	m_CameraSpeed=50.f;
-	m_ZoomSpeed = 300.f;
-	m_CanMove=true;
+	m_CameraSpeed = 50.f;
+	m_ZoomSpeed = 200.f;
+	m_MaxWalkSpeed = 75.f;
+	m_MaxSprintSpeed = 375.f;
 	m_IsInvertX = false;
-	m_IsInvertY=true;
+	m_IsInvertY = true;
+	m_CanMove = true;
+	m_IsSprinting = false;
 	
-	GetCapsuleComponent()->InitCapsuleSize(55.f, height);
+	GetCapsuleComponent()->InitCapsuleSize(20.f, height);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
+	SetRootComponent(GetCapsuleComponent());
 
-	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, height)); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
-
-	GetMesh()->SetupAttachment(FirstPersonCameraComponent);
-	//GetMesh()->SetRelativeRotation(FRotator(0., 10., 0.));
-	GetMesh()->SetRelativeLocation(FVector(-20., 0., -(height+98.)));
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -height));
+	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(true);
-	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
-	Mesh1P->bCastDynamicShadow = false;
-	Mesh1P->CastShadow = false;
-	Mesh1P->SetRelativeRotation(FRotator(0.9f, -90.f, 5.2f));
-	Mesh1P->SetRelativeLocation(FVector(-30., -2., -(height + 78.)));
-	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	m_SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	m_SpringArm->SetupAttachment(GetMesh(), TEXT("head"));
+	m_SpringArm->TargetArmLength = 0.f;
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> BrimStone_SkeletonMesh(TEXT(
-		"/Game/KBJ/Brimstone/Anims/BrimStone_SkeletonMesh.BrimStone_SkeletonMesh"));
-	if (BrimStone_SkeletonMesh.Succeeded())
+	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	m_Camera->SetupAttachment(m_SpringArm);
+	m_Camera->SetRelativeLocation(FVector(5., 15., 0.));
+	m_Camera->bUsePawnControlRotation = true;
+
+	GetCharacterMovement()->MaxWalkSpeed = 75.f;
+
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SKM_Manny(TEXT(
+		"/Game/ControlRig/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn"));
+	if (SKM_Manny.Succeeded())
 	{
-		GetMesh()->SetSkeletalMesh(BrimStone_SkeletonMesh.Object);
+		GetMesh()->SetSkeletalMesh(SKM_Manny.Object);
 	}
-	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_BrimStone(TEXT(
-		"/Game/KBJ/Brimstone/Anims/AB_BrimStone.AB_BrimStone_C"));
-	if (AB_BrimStone.Succeeded())
+	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_Player(TEXT(
+		"/Game/ControlRig/Characters/Mannequins/Animations/AB_Player.AB_Player_C"));
+	if (AB_Player.Succeeded())
 	{
-		GetMesh()->SetAnimInstanceClass(AB_BrimStone.Class);
-	}
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Godric_FP_Naked(TEXT(
-		"/Game/_Assets/Meshes/FPArms/Godric_FP_Naked.Godric_FP_Naked"));
-	if(Godric_FP_Naked.Succeeded())
-	{
-		Mesh1P->SetSkeletalMesh(Godric_FP_Naked.Object);
-	}
-	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_FPSArm(TEXT(
-		"/Game/_Assets/AB_FPSArm.AB_FPSArm_C"));
-	if (AB_FPSArm.Succeeded())
-	{
-		Mesh1P->SetAnimInstanceClass(AB_FPSArm.Class);
+		GetMesh()->SetAnimInstanceClass(AB_Player.Class);
 	}
 }
 
@@ -90,6 +77,8 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		input->BindAction(controller->m_Space, ETriggerEvent::Completed, this, &ASAC1Character::StopJumping);
 		input->BindAction(controller->m_F, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
 		input->BindAction(controller->m_Move, ETriggerEvent::Triggered, this, &ASAC1Character::Move);
+		input->BindAction(controller->m_LShift, ETriggerEvent::Started, this, &ASAC1Character::Sprint);
+		input->BindAction(controller->m_LShift, ETriggerEvent::Completed, this, &ASAC1Character::Sprint);
 		controller->SetNewController();
 	}
 }
@@ -159,6 +148,19 @@ void ASAC1Character::Jump()
 void ASAC1Character::StopJumping()
 {
 	Super::StopJumping();
+}
+
+void ASAC1Character::Sprint()
+{
+	m_IsSprinting = !m_IsSprinting;
+	if (m_IsSprinting)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = m_MaxSprintSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = m_MaxWalkSpeed;
+	}
 }
 
 void ASAC1Character::CollectPickUps()
