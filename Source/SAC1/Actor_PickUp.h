@@ -46,5 +46,5 @@ public:
 	//둘중에 1개만 작성해야 한다.
 	//virtual void WasCollected_Implementation();
 	UFUNCTION(BlueprintAuthorityOnly, Category = "Pickup")
-	virtual void PickedUpBy(APawn* pawn);
+	virtual bool PickedUpBy(APawn* pawn);
 };

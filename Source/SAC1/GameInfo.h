@@ -43,6 +43,7 @@ enum class ECharacterEquip : uint8
 	Pistrol,
 	Knife,
 	Granade,
+	FireBottle,
 	Food,
 };
 

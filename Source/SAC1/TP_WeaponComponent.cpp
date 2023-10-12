@@ -245,20 +245,24 @@ void UTP_WeaponComponent::StopTargeting()
 void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
 {
 	m_WeaponData = *data;
-	PickUpArmo(m_WeaponData.ArmoCountWhenPick);
-	Reload();
 }
 
-void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
+bool UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 {
 	Character = TargetCharacter;
 	if (!IsValid(Character))
 	{
-		return;
+		return false;
 	}
 
-	Character->SetCharacterState(m_WeaponData.State);
+	if(!Character->TryAddWeapon(this, m_WeaponData.State))
+	{		
+		return false;
+	}
 
+	PickUpArmo(m_WeaponData.ArmoCountWhenPick);
+	Reload();
+	
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("hand_r")));
 
@@ -273,6 +277,7 @@ void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 		input->BindAction(controller->m_R, ETriggerEvent::Started, this, &UTP_WeaponComponent::OnStartReload);
 		//controller->SetNewController();
 	}
+	return true;
 }
 
 //const FRotator SpawnRotation = controller->PlayerCameraManager->GetCameraRotation();
