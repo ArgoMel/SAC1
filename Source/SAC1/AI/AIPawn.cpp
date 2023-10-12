@@ -28,7 +28,7 @@ AAIPawn::AAIPawn()
 
 	mMovement->SetUpdatedComponent(mBody);
 
-	mBody->SetCollisionProfileName(TEXT("ZombiAI"));
+	mBody->SetCollisionProfileName(TEXT("AI"));
 
 	mMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -54,7 +54,7 @@ void AAIPawn::LoadAIData()
 		TEXT("/Script/Engine.DataTable'/Game/Data/DT_AIData.DT_AIData'"));
 }
 
-FAIDataTable* AAIPawn::FindAIData(const FName& Name)
+const FAIDataTable* AAIPawn::FindAIData(const FName& Name)
 {
 	return mAIDataTable->FindRow<FAIDataTable>(Name, TEXT(""));
 }
@@ -94,7 +94,7 @@ void AAIPawn::OnConstruction(const FTransform& Transform)
 	{
 		LOG(TEXT("AIDataTable Valid"));
 
-		FAIDataTable* Data = FindAIData(mName);
+		const FAIDataTable* Data = FindAIData(mName);
 
 		mAIState->SetInfo(mName.ToString(), Data);
 

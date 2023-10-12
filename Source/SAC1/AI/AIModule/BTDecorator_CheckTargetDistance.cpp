@@ -1,7 +1,7 @@
 #include "BTDecorator_CheckTargetDistance.h"
 #include "../AIPawn.h"
 #include "../AIState.h"
-#include "AIController.h"
+#include "../DefaultAIController.h"
 
 UBTDecorator_CheckTargetDistance::UBTDecorator_CheckTargetDistance()
 {
