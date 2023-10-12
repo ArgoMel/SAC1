@@ -5,7 +5,7 @@
 #include "../AIPawn.h"
 #include "../AIState.h"
 #include "../../SAC1Character.h"
-#include "../DefaultAIController.h"
+#include "AIController.h"
 
 UBTDecorator_CheckTeam::UBTDecorator_CheckTeam()
 {
