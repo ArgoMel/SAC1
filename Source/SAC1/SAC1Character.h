@@ -22,23 +22,23 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 protected:
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	TObjectPtr<USkeletalMeshComponent> Mesh1P;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
+	TObjectPtr<USpringArmComponent> m_SpringArm;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
+	TObjectPtr<UCameraComponent> m_Camera;
 
-	/** First person camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
-
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	float m_MaxWalkSpeed;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	float m_MaxSprintSpeed;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	bool m_IsSprinting;
 
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
 	TObjectPtr<class USAC1AnimInstance>	m_AnimInst;
 	FVector2D m_ScreenRotVec;
 	FVector m_PickUpExtent;
-	FVector m_ClimbLoc;
-	FRotator m_ClimRot;
 	ETeam		mTeam;
-	float m_MoveSpeed;
 	float m_CameraSpeed;
 	float m_ZoomSpeed;
 	bool m_CanMove;
@@ -61,6 +61,7 @@ protected:
 	void CameraZoom(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
+	void Sprint();
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void CollectPickUps();
@@ -83,9 +84,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Anim)
 	ECharacterEquip GetCharacterState();
 
-	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-	/** Returns FirstPersonCameraComponent subobject **/
-	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }
 };
 
