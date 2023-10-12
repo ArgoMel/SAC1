@@ -2,7 +2,6 @@
 #include "SAC1Character.h"
 #include "SAC1GameState.h"
 #include "SAC1PlayerState.h"
-#include "AI/AIPawn.h"
 #include "SAC1PlayerController.h"
 #include "SAC1HUD.h"
 #include "UObject/ConstructorHelpers.h"

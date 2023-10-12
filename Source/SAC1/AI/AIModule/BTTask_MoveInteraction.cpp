@@ -5,7 +5,7 @@
 #include "../AIPawn.h"
 #include "../DefaultAIAnimInstance.h"
 #include "../AIState.h"
-#include "../DefaultAIController.h"
+#include "AIController.h"
 
 UBTTask_MoveInteraction::UBTTask_MoveInteraction()
 {
@@ -130,7 +130,7 @@ void UBTTask_MoveInteraction::TickTask(UBehaviorTreeComponent& OwnerComp,
 	{
 		Distance -= Capsule->GetScaledCapsuleRadius();
 	}
-	LOG(TEXT("%f"), Distance);
+
 	if (Distance <= AIPawn->GetAIState()->GetData()->AttackDistance)
 	{
 		// Task를 종료시킨다.

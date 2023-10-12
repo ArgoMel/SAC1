@@ -2,7 +2,7 @@
 #include "../AIPawn.h"
 #include "../AIState.h"
 #include "../../SAC1Character.h"
-#include "../DefaultAIController.h"
+#include "AIController.h"
 
 UBTDecorator_PatrolEnable::UBTDecorator_PatrolEnable()
 {

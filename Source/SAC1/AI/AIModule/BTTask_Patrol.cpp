@@ -2,7 +2,7 @@
 #include "../AIPawn.h"
 #include "../DefaultAIAnimInstance.h"
 #include "../AIState.h"
-#include "../DefaultAIController.h"
+#include "AIController.h"
 
 UBTTask_Patrol::UBTTask_Patrol()
 {
