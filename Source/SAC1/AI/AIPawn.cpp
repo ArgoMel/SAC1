@@ -28,7 +28,7 @@ AAIPawn::AAIPawn()
 
 	mMovement->SetUpdatedComponent(mBody);
 
-	mBody->SetCollisionProfileName(TEXT("ZombiAI"));
+	mBody->SetCollisionProfileName(TEXT("AI"));
 
 	mMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
