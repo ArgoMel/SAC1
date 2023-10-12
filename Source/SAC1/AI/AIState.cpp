@@ -20,9 +20,4 @@ FAIDataTable* UAIState::GetData()
 	return &m_Data;
 }
 
-void UAIState::SetInfo(const FString& name, FAIDataTable* data)
-{
-	m_Name = name;
-	m_Data = *data;
-}
 

@@ -21,7 +21,7 @@ public:
 	static void LoadAIData();
 
 protected:
-	static FAIDataTable* FindAIData(const FName& Name);
+	static const FAIDataTable* FindAIData(const FName& Name);
 
 protected:
 	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
