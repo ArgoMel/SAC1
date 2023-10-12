@@ -3,13 +3,14 @@
 #include "SAC1PlayerController.h"
 #include "SAC1AnimInstance.h"
 #include "Actor_PickUp.h"
+#include "TP_WeaponComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "Animation/AnimInstance.h"
-#include "Engine/LocalPlayer.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
+//#include "Animation/AnimInstance.h"
+//#include "Engine/LocalPlayer.h"
+//#include "Camera/CameraComponent.h"
+//#include "Components/CapsuleComponent.h"
 
 ASAC1Character::ASAC1Character()
 {
@@ -17,13 +18,15 @@ ASAC1Character::ASAC1Character()
 
 	m_PickUpExtent = FVector(50.f,50.f, height);
 	m_CameraSpeed = 50.f;
-	m_ZoomSpeed = 200.f;
 	m_MaxWalkSpeed = 75.f;
 	m_MaxSprintSpeed = 375.f;
+	m_CurWeaponIndex = -1;
 	m_IsInvertX = false;
 	m_IsInvertY = true;
 	m_CanMove = true;
 	m_IsSprinting = false;
+
+	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
 	
 	GetCapsuleComponent()->InitCapsuleSize(20.f, height);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
@@ -72,7 +75,7 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	if (IsValid(input) && IsValid(controller))
 	{
 		input->BindAction(controller->m_MousePos, ETriggerEvent::Triggered, this, &ASAC1Character::CameraRotation);
-		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::CameraZoom);
+		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::ChangeWeapon);
 		input->BindAction(controller->m_Space, ETriggerEvent::Started, this, &ASAC1Character::Jump);
 		input->BindAction(controller->m_Space, ETriggerEvent::Completed, this, &ASAC1Character::StopJumping);
 		input->BindAction(controller->m_F, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
@@ -134,10 +137,35 @@ void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 	AddControllerPitchInput(y);
 }
 
-void ASAC1Character::CameraZoom(const FInputActionValue& Value)
-{
-	//double length = Value.Get<float>() * -1 * m_ZoomSpeed * GetWorld()->GetDeltaSeconds();
-	//m_CameraBoom->TargetArmLength += length;
+void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
+{	
+	m_CurWeaponIndex += (int)Value.Get<float>();
+	int32 weaponCount = m_Weapons.Num();
+	if(m_CurWeaponIndex<0)
+	{
+		m_CurWeaponIndex = weaponCount - 1;
+	}
+	else if(m_CurWeaponIndex>= weaponCount)
+	{
+		m_CurWeaponIndex = 0;
+	}
+	for (auto weapon : m_Weapons)
+	{
+		if (!weapon)
+		{
+			if(weapon== m_Weapons[m_CurWeaponIndex])
+			{
+				m_CurWeaponIndex = (m_CurWeaponIndex + 1)% weaponCount;
+			}
+			continue;
+		}
+		weapon->SetActive(false);
+	}
+	if(m_Weapons[m_CurWeaponIndex])
+	{
+		m_Weapons[m_CurWeaponIndex]->SetActive(true);
+		SetCharacterState((ECharacterEquip)(m_CurWeaponIndex+1));
+	}	
 }
 
 void ASAC1Character::Jump()
@@ -191,9 +219,10 @@ void ASAC1Character::CollectPickUps()
 			AActor_PickUp* const pickUP = Cast<AActor_PickUp>(result.GetActor());
 			if (IsValid(pickUP) && pickUP->GetActive())
 			{
-				m_AnimInst->CollectPickUps();
-				pickUP->PickedUpBy(this);
-				pickUP->SetActive(false);
+				if(pickUP->PickedUpBy(this))
+				{
+					break;
+				}
 			}
 		}
 	}
@@ -207,4 +236,18 @@ void ASAC1Character::SetCharacterState(ECharacterEquip state)
 ECharacterEquip ASAC1Character::GetCharacterState()
 {
 	return m_AnimInst->GetCharacterState();
+}
+
+bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip)
+{
+	int32 index = (int)equip - 1;
+	if(m_Weapons[index])
+	{
+		return false;
+	}
+	m_Weapons[index] = weapon;
+	m_CurWeaponIndex = index;
+	m_AnimInst->CollectPickUps();
+	SetCharacterState(equip);
+	return true;
 }

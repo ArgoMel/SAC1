@@ -64,6 +64,6 @@ void USAC1AnimInstance::CollectPickUps()
 	}
 	if (!Montage_IsPlaying(m_GrabItem))
 	{
-		Montage_Play(m_GrabItem, 1.f);
+		Montage_Play(m_GrabItem, 2.f);
 	}
 }
