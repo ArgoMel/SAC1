@@ -20,8 +20,6 @@ private:
 	FTimerHandle m_AutoFireHandle;
 	FTimeline m_RecoilTimeline;
 	FRotator m_StartRot;
-	int32 m_CurArmo;
-	int32 m_TotalArmo;
 	bool m_IsTargeting;
 	
 protected:
@@ -33,8 +31,12 @@ protected:
 	TObjectPtr<UCurveFloat> m_HorizontalCurve;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|Curves")
 	TObjectPtr<UCurveFloat> m_VerticalCurve;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
 	FWeaponData m_WeaponData;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
+	int32 m_CurArmo;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
+	int32 m_TotalArmo;
 
 private:
 	void OnStartFire();

@@ -6,6 +6,13 @@ USAC1AnimInstance::USAC1AnimInstance()
 	m_CharState=ECharacterEquip::None;
 	m_Speed =0.f;
 	m_IsInAir = false;
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Picking(TEXT(
+		"/Game/AnimStarterPack/ECT/AM_Picking.AM_Picking"));
+	if (AM_Picking.Succeeded())
+	{
+		m_GrabItem=AM_Picking.Object;
+	}
 }
 
 void USAC1AnimInstance::NativeInitializeAnimation()
@@ -47,4 +54,16 @@ void USAC1AnimInstance::NativeUninitializeAnimation()
 void USAC1AnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
+}
+
+void USAC1AnimInstance::CollectPickUps()
+{
+	if (!IsValid(m_GrabItem))
+	{
+		return;
+	}
+	if (!Montage_IsPlaying(m_GrabItem))
+	{
+		Montage_Play(m_GrabItem, 1.f);
+	}
 }

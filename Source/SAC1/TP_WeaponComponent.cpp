@@ -100,52 +100,57 @@ void UTP_WeaponComponent::Fire()
 		}
 	}
 
-	if(m_WeaponData.IsMelee)
+	if(m_WeaponData.AttackType==EAttackType::Melee)
 	{
 		//트레이스 생성
-		return;
 	}
-
-	m_CurArmo -= m_WeaponData.BulletCount;
-	for (int i = 0;i< m_WeaponData.BulletCount;++i)
+	else if (m_WeaponData.AttackType == EAttackType::Shoot)
 	{
-		FHitResult hit;
-		FVector camLoc;
-		FRotator camRot;
-		Character->GetController()->GetPlayerViewPoint(camLoc, camRot);
-		FCollisionQueryParams params;
-		params.AddIgnoredActor(Character);
-		FVector traceStart = camLoc;
-		FVector traceEnd = traceStart + camRot.Vector() * 10000;
-		if (!m_IsTargeting)
+		m_CurArmo -= m_WeaponData.BulletCount;
+		for (int i = 0; i < m_WeaponData.BulletCount; ++i)
 		{
-			traceEnd.Y += traceEnd.Y * FMath::RandRange(-0.35f, 0.35f);
-			traceEnd.Z += traceEnd.Z * FMath::RandRange(-0.35f, 0.35f);
-		}
-		else
-		{
-			traceEnd.Y += traceEnd.Y * FMath::RandRange(-0.05f, 0.05f);
-			traceEnd.Z += traceEnd.Z * FMath::RandRange(-0.05f, 0.05f);
-		}
-		bool isCol = world->LineTraceSingleByChannel(hit, traceStart, traceEnd, ECC_Visibility, params);
-		//#if ENABLE_DRAW_DEBUG
-		//	DrawDebugLine(world, traceStart, traceEnd, FColor::Green, false, 3.f, 0, 0.5f);
-		//#endif
-		if (isCol)
-		{
+			FHitResult hit;
+			FVector camLoc;
+			FRotator camRot;
+			Character->GetController()->GetPlayerViewPoint(camLoc, camRot);
+			FCollisionQueryParams params;
+			params.AddIgnoredActor(Character);
+			FVector traceStart = camLoc;
+			FVector traceEnd = traceStart + camRot.Vector() * 10000;
+			if (!m_IsTargeting)
+			{
+				traceEnd.Y += traceEnd.Y * FMath::RandRange(-0.35f, 0.35f);
+				traceEnd.Z += traceEnd.Z * FMath::RandRange(-0.35f, 0.35f);
+			}
+			else
+			{
+				traceEnd.Y += traceEnd.Y * FMath::RandRange(-0.05f, 0.05f);
+				traceEnd.Z += traceEnd.Z * FMath::RandRange(-0.05f, 0.05f);
+			}
+			bool isCol = world->LineTraceSingleByChannel(hit, traceStart, traceEnd, ECC_Visibility, params);
 			//#if ENABLE_DRAW_DEBUG
-			//		DrawDebugBox(world,hit.Location,FVector(15.),FColor::Red,false,3.f,0,3.f);
+			//	DrawDebugLine(world, traceStart, traceEnd, FColor::Green, false, 3.f, 0, 0.5f);
 			//#endif
-			if (IsValid(m_WeaponData.HitEmitter))
+			if (isCol)
 			{
-				UGameplayStatics::SpawnEmitterAtLocation(world, m_WeaponData.HitEmitter, hit.Location);
-			}
-			if (IsValid(m_WeaponData.HitDecalMaterial))
-			{
-				UGameplayStatics::SpawnDecalAtLocation(world, m_WeaponData.HitDecalMaterial,
-					FVector(15.), hit.Location, hit.ImpactNormal.Rotation(), 10.f);
+				//#if ENABLE_DRAW_DEBUG
+				//		DrawDebugBox(world,hit.Location,FVector(15.),FColor::Red,false,3.f,0,3.f);
+				//#endif
+				if (IsValid(m_WeaponData.HitEmitter))
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(world, m_WeaponData.HitEmitter, hit.Location);
+				}
+				if (IsValid(m_WeaponData.HitDecalMaterial))
+				{
+					UGameplayStatics::SpawnDecalAtLocation(world, m_WeaponData.HitDecalMaterial,
+						FVector(15.), hit.Location, hit.ImpactNormal.Rotation(), 10.f);
+				}
 			}
 		}
+	}
+	else if (m_WeaponData.AttackType == EAttackType::Throw)
+	{
+		
 	}
 }
 
@@ -255,7 +260,7 @@ void UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 	Character->SetCharacterState(m_WeaponData.State);
 
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("ik_hand_gun")));
+	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("hand_r")));
 
 	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(controller->InputComponent);
