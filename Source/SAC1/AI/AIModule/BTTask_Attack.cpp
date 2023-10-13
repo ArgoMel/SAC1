@@ -5,7 +5,7 @@
 #include "../AIPawn.h"
 #include "../DefaultAIAnimInstance.h"
 #include "../AIState.h"
-#include "AIController.h"
+#include "../DefaultAIController.h"
 
 UBTTask_Attack::UBTTask_Attack()
 {

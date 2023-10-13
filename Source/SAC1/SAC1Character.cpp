@@ -7,10 +7,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-//#include "Animation/AnimInstance.h"
-//#include "Engine/LocalPlayer.h"
-//#include "Camera/CameraComponent.h"
-//#include "Components/CapsuleComponent.h"
 
 ASAC1Character::ASAC1Character()
 {
@@ -139,7 +135,8 @@ void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 
 void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
 {	
-	m_CurWeaponIndex += (int)Value.Get<float>();
+	int value= (int)Value.Get<float>();
+	m_CurWeaponIndex += value;
 	int32 weaponCount = m_Weapons.Num();
 	if(m_CurWeaponIndex<0)
 	{
@@ -155,7 +152,11 @@ void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
 		{
 			if(weapon== m_Weapons[m_CurWeaponIndex])
 			{
-				m_CurWeaponIndex = (m_CurWeaponIndex + 1)% weaponCount;
+				m_CurWeaponIndex = (m_CurWeaponIndex + value)% weaponCount;
+				if(m_CurWeaponIndex<0)
+				{
+					m_CurWeaponIndex = weaponCount - 1;
+				}
 			}
 			continue;
 		}
@@ -221,6 +222,7 @@ void ASAC1Character::CollectPickUps()
 			{
 				if(pickUP->PickedUpBy(this))
 				{
+					m_AnimInst->CollectPickUps();
 					break;
 				}
 			}
@@ -238,6 +240,11 @@ ECharacterEquip ASAC1Character::GetCharacterState()
 	return m_AnimInst->GetCharacterState();
 }
 
+UTP_WeaponComponent* ASAC1Character::GetCurWeapon()
+{
+	return m_Weapons[m_CurWeaponIndex];
+}
+
 bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip)
 {
 	int32 index = (int)equip - 1;
@@ -247,7 +254,7 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 	}
 	m_Weapons[index] = weapon;
 	m_CurWeaponIndex = index;
-	m_AnimInst->CollectPickUps();
-	SetCharacterState(equip);
+	FInputActionValue value;
+	ChangeWeapon(value);
 	return true;
 }

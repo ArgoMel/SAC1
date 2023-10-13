@@ -23,10 +23,8 @@ private:
 	bool m_IsTargeting;
 	
 protected:
-	/** Projectile class to spawn */
-	//UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	//TSubclassOf<class ASAC1Projectile> ProjectileClass;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class ASAC1Projectile> m_ProjectileClass;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|Curves")
 	TObjectPtr<UCurveFloat> m_HorizontalCurve;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|Curves")
@@ -56,12 +54,18 @@ private:
 public:
 	void SetWeaponData(FWeaponData* data);
 
-	/** Attaches the actor to a FirstPersonCharacter */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
-	bool AttachWeapon(ASAC1Character* TargetCharacter);
-
-	/** Make the weapon Fire a Projectile */
+	bool TryAttachWeapon(ASAC1Character* TargetCharacter);
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void AttachWeapon();
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void MeleeAttack();
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void ThrowThing();
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void EatFood();
+
 	void PickUpArmo(float value);
 };

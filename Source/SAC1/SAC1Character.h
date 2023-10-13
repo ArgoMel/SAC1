@@ -81,7 +81,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Anim)
 	ECharacterEquip GetCharacterState();
 
-	bool TryAddWeapon(UTP_WeaponComponent* weapon,ECharacterEquip equip);
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	UTP_WeaponComponent* GetCurWeapon();
+
+	bool TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip);
 
 	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
 	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }

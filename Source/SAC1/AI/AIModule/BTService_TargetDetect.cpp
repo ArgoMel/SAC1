@@ -4,7 +4,7 @@
 #include "BTService_TargetDetect.h"
 #include "../AIPawn.h"
 #include "../AIState.h"
-#include "AIController.h"
+#include "../DefaultAIController.h"
 
 UBTService_TargetDetect::UBTService_TargetDetect()
 {

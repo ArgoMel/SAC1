@@ -45,11 +45,6 @@ void AActor_PickUpWeapon::WasCollected()
 	}
 	m_Collider->SetGenerateOverlapEvents(false);
 	m_Collider->SetCollisionProfileName(TEXT("NoCollision"));
-	if(m_ItemState->GetItemData()->ItemKind==EItem::Weapon)
-	{	
-		FItemData* itemData = m_ItemState->GetItemData();
-		m_Weapon->SetRelativeLocationAndRotation(itemData->Offset, itemData->WeaponRot);
-	}
 }
 
 bool AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
@@ -58,7 +53,7 @@ bool AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
 	if (IsValid(player) && m_ItemState->GetItemData()->ItemKind == EItem::Weapon)
 	{
 		m_Weapon->SetWeaponData(m_ItemState->GetWeaponData());
-		m_IsActive= !m_Weapon->AttachWeapon(player);
+		m_IsActive= !m_Weapon->TryAttachWeapon(player);
 	}
 	Super::PickedUpBy(pawn);
 	return !m_IsActive;

@@ -1,6 +1,7 @@
 #include "TP_WeaponComponent.h"
 #include "SAC1Character.h"
-//#include "SAC1Projectile.h"
+#include "SAC1PlayerState.h"
+#include "SAC1Projectile.h"
 #include "SAC1PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -12,6 +13,10 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	m_CurArmo = 0;
 	m_TotalArmo = 0;
 	m_IsTargeting = false;
+	m_ProjectileClass = ASAC1Projectile::StaticClass();
+
+	SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_HorizontalRecoil(TEXT(
 		"/Game/KBJ/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
@@ -100,11 +105,7 @@ void UTP_WeaponComponent::Fire()
 		}
 	}
 
-	if(m_WeaponData.AttackType==EAttackType::Melee)
-	{
-		//트레이스 생성
-	}
-	else if (m_WeaponData.AttackType == EAttackType::Shoot)
+	if (m_WeaponData.AttackType == EAttackType::Shoot)
 	{
 		m_CurArmo -= m_WeaponData.BulletCount;
 		for (int i = 0; i < m_WeaponData.BulletCount; ++i)
@@ -145,12 +146,15 @@ void UTP_WeaponComponent::Fire()
 					UGameplayStatics::SpawnDecalAtLocation(world, m_WeaponData.HitDecalMaterial,
 						FVector(15.), hit.Location, hit.ImpactNormal.Rotation(), 10.f);
 				}
+				auto state = Character->GetPlayerState<ASAC1PlayerState>();
+				if (IsValid(state))
+				{
+					float dmg = (float)state->GetData()->AttackPoint* m_WeaponData.AtkRate;
+					FDamageEvent	dmgEvent;
+					hit.GetActor()->TakeDamage(dmg, dmgEvent, controller, Character);
+				}
 			}
 		}
-	}
-	else if (m_WeaponData.AttackType == EAttackType::Throw)
-	{
-		
 	}
 }
 
@@ -185,6 +189,14 @@ void UTP_WeaponComponent::OnStopFire()
 
 void UTP_WeaponComponent::OnStartReload()
 {
+	if (IsValid(m_WeaponData.ReloadAnimation))
+	{
+		UAnimInstance* animInst = Character->GetMesh()->GetAnimInstance();
+		if (IsValid(animInst) && !animInst->Montage_IsPlaying(m_WeaponData.ReloadAnimation))
+		{
+			animInst->Montage_Play(m_WeaponData.ReloadAnimation, 1.f);
+		}
+	}
 	FTimerHandle reloadHandle;
 	GetWorld()->GetTimerManager().SetTimer(reloadHandle, this,
 		&UTP_WeaponComponent::Reload, m_WeaponData.ReloadTime, false);
@@ -234,6 +246,10 @@ void UTP_WeaponComponent::ReverseRecoil()
 
 void UTP_WeaponComponent::StartTargeting()
 {
+	if (m_WeaponData.AttackType != EAttackType::Shoot)
+	{
+		return;
+	}
 	m_IsTargeting = true;
 }
 
@@ -247,24 +263,29 @@ void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
 	m_WeaponData = *data;
 }
 
-bool UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
+bool UTP_WeaponComponent::TryAttachWeapon(ASAC1Character* TargetCharacter)
 {
 	Character = TargetCharacter;
 	if (!IsValid(Character))
 	{
 		return false;
 	}
-
 	if(!Character->TryAddWeapon(this, m_WeaponData.State))
 	{		
 		return false;
 	}
+	return true;
+}
 
+void UTP_WeaponComponent::AttachWeapon()
+{
 	PickUpArmo(m_WeaponData.ArmoCountWhenPick);
 	Reload();
-	
+
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("hand_r")));
+
+	SetRelativeLocationAndRotation(m_WeaponData.WeaponOffset, m_WeaponData.WeaponRot);
 
 	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(controller->InputComponent);
@@ -277,13 +298,99 @@ bool UTP_WeaponComponent::AttachWeapon(ASAC1Character* TargetCharacter)
 		input->BindAction(controller->m_R, ETriggerEvent::Started, this, &UTP_WeaponComponent::OnStartReload);
 		//controller->SetNewController();
 	}
-	return true;
 }
 
-//const FRotator SpawnRotation = controller->PlayerCameraManager->GetCameraRotation();
-//const FVector SpawnLocation = GetOwner()->GetActorLocation() 
-//	+ SpawnRotation.RotateVector(MuzzleOffset);
-//FActorSpawnParameters ActorSpawnParams;
-//ActorSpawnParams.SpawnCollisionHandlingOverride = 
-//	ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-//world->SpawnActor<ASAC1Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+void UTP_WeaponComponent::MeleeAttack()
+{
+	UWorld* const world = GetWorld();
+	AController* controller= Character->GetController();
+	if (!IsValid(world)|| !IsValid(controller))
+	{
+		return;
+	}
+	FVector	start = Character->GetActorLocation();
+	FVector	end = start+ Character->GetActorForwardVector() * 200.f;
+	TArray<FHitResult>	resultArray;
+	FCollisionQueryParams	param(NAME_None, false, Character);
+	bool isCol = world->SweepMultiByChannel(resultArray, start, end, FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel3, FCollisionShape::MakeSphere(50.f), param);
+
+#if ENABLE_DRAW_DEBUG
+	FColor	drawColor = isCol ? FColor::Red : FColor::Green;
+	DrawDebugSphere(world, (start + end) *0.5f, 50.f,0, drawColor, false, 0.75f);
+#endif
+	if (isCol)
+	{
+		FActorSpawnParameters	actorParam;
+		actorParam.SpawnCollisionHandlingOverride =
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		FHitResult	lineResult;
+		FCollisionQueryParams	param1(NAME_None, false, Character);
+
+		for (auto& result : resultArray)
+		{
+			isCol = world->LineTraceSingleByChannel(lineResult, result.ImpactPoint,
+				result.ImpactPoint - FVector(0.0, 0.0, 200.0),
+				ECollisionChannel::ECC_GameTraceChannel8, param1);
+			if (isCol)
+			{
+				if (IsValid(m_WeaponData.HitEmitter))
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(world, m_WeaponData.HitEmitter, result.Location);
+				}
+				if (IsValid(m_WeaponData.HitDecalMaterial))
+				{
+					UGameplayStatics::SpawnDecalAtLocation(world, m_WeaponData.HitDecalMaterial,
+						FVector(15.), result.Location, result.ImpactNormal.Rotation(), 10.f);
+				}
+				auto state = Character->GetPlayerState<ASAC1PlayerState>();
+				if (IsValid(state))
+				{
+					float dmg = (float)state->GetData()->AttackPoint * m_WeaponData.AtkRate;
+					FDamageEvent	dmgEvent;
+					result.GetActor()->TakeDamage(dmg, dmgEvent, controller, Character);
+				}
+			}
+		}
+	}
+}
+
+void UTP_WeaponComponent::ThrowThing()
+{
+	UWorld* const world = GetWorld();
+	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
+	if (!IsValid(world) || !IsValid(controller))
+	{
+		return;
+	}
+	FRotator spawnRotation = controller->PlayerCameraManager->GetCameraRotation();
+	const FVector spawnLocation =GetComponentLocation()
+		+ spawnRotation.RotateVector(m_WeaponData.MuzzleOffset);
+	FActorSpawnParameters actorSpawnParams;
+	actorSpawnParams.SpawnCollisionHandlingOverride = 
+		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	ASAC1Projectile* thing=world->SpawnActor<ASAC1Projectile>(m_ProjectileClass, 
+		spawnLocation, spawnRotation, actorSpawnParams);
+	thing->SetProjectileMesh(GetSkeletalMeshAsset());
+	thing->SetProjectileParticle(m_WeaponData.HitEmitter);
+	thing->SetProjectileDecal(m_WeaponData.HitDecalMaterial);
+	thing->SetProjectileEndEvent(true);
+	auto state = Character->GetPlayerState<ASAC1PlayerState>();
+	if (IsValid(state))
+	{
+		float dmg = (float)state->GetData()->AttackPoint * m_WeaponData.AtkRate;
+		thing->SetProjectileDamage(dmg);
+	}
+
+	--m_CurArmo;
+}
+
+void UTP_WeaponComponent::EatFood()
+{
+	auto state = Character->GetPlayerState<ASAC1PlayerState>();
+	if (IsValid(state))
+	{
+		state->AddHp(m_WeaponData.BulletCount);
+	}
+}
