@@ -70,6 +70,7 @@ enum class EAttackType : uint8
 	Melee,
 	Shoot,
 	Throw,	
+	Eat,	
 };
 
 UENUM(BlueprintType)
@@ -199,6 +200,12 @@ public:
 	FVector	MuzzleOffset;	//ÃÑ±¸ À§Ä¡
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FVector  WeaponOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FRotator WeaponRot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	ECharacterEquip	State;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -233,12 +240,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EItem	ItemKind;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FVector Offset;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FRotator WeaponRot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMesh> ItemMesh;
