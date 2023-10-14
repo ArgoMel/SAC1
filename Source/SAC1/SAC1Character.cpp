@@ -160,11 +160,11 @@ void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
 			}
 			continue;
 		}
-		weapon->SetActive(false);
+		weapon->SetVisibility(false);
 	}
 	if(m_Weapons[m_CurWeaponIndex])
 	{
-		m_Weapons[m_CurWeaponIndex]->SetActive(true);
+		m_Weapons[m_CurWeaponIndex]->SetVisibility(true);
 		SetCharacterState((ECharacterEquip)(m_CurWeaponIndex+1));
 	}	
 }
