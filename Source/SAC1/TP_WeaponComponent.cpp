@@ -79,7 +79,7 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UTP_WeaponComponent::Fire()
 {	
-	if (!IsValid(Character)|| m_CurArmo <= 0)
+	if (!IsValid(Character) || m_CurArmo <= 0 || !GetVisibleFlag())
 	{
 		OnStopFire();
 		return;
@@ -169,7 +169,7 @@ void UTP_WeaponComponent::PickUpArmo(float value)
 
 void UTP_WeaponComponent::OnStartFire()
 {
-	if (!IsValid(Character) || m_CurArmo <= 0)
+	if (!IsValid(Character) || m_CurArmo <= 0|| !GetVisibleFlag())
 	{
 		OnStopFire();
 		return;
@@ -189,6 +189,10 @@ void UTP_WeaponComponent::OnStopFire()
 
 void UTP_WeaponComponent::OnStartReload()
 {
+	if (!IsValid(Character)|| !GetVisibleFlag())
+	{
+		return;
+	}
 	if (IsValid(m_WeaponData.ReloadAnimation))
 	{
 		UAnimInstance* animInst = Character->GetMesh()->GetAnimInstance();
@@ -246,7 +250,7 @@ void UTP_WeaponComponent::ReverseRecoil()
 
 void UTP_WeaponComponent::StartTargeting()
 {
-	if (m_WeaponData.AttackType != EAttackType::Shoot)
+	if (m_WeaponData.AttackType != EAttackType::Shoot || !GetVisibleFlag())
 	{
 		return;
 	}
@@ -393,4 +397,5 @@ void UTP_WeaponComponent::EatFood()
 	{
 		state->AddHp(m_WeaponData.BulletCount);
 	}
+	--m_CurArmo;
 }

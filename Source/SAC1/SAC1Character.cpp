@@ -24,7 +24,7 @@ ASAC1Character::ASAC1Character()
 
 	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
 	
-	GetCapsuleComponent()->InitCapsuleSize(20.f, height);
+	GetCapsuleComponent()->InitCapsuleSize(50.f, height);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 	SetRootComponent(GetCapsuleComponent());
 
@@ -160,11 +160,11 @@ void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
 			}
 			continue;
 		}
-		weapon->SetActive(false);
+		weapon->SetVisibility(false);
 	}
 	if(m_Weapons[m_CurWeaponIndex])
 	{
-		m_Weapons[m_CurWeaponIndex]->SetActive(true);
+		m_Weapons[m_CurWeaponIndex]->SetVisibility(true);
 		SetCharacterState((ECharacterEquip)(m_CurWeaponIndex+1));
 	}	
 }
