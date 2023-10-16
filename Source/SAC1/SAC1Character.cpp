@@ -44,18 +44,30 @@ ASAC1Character::ASAC1Character()
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Mannequin(TEXT(
-		"/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin"));
-	if (SK_Mannequin.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Belica_Biohazard(TEXT(
+	"/Game/ParagonLtBelica/Characters/Heroes/Belica/Skins/Biohazard/Meshes/Belica_Biohazard.Belica_Biohazard"));
+	if (Belica_Biohazard.Succeeded())
 	{
-		GetMesh()->SetSkeletalMesh(SK_Mannequin.Object);
+		GetMesh()->SetSkeletalMesh(Belica_Biohazard.Object);
 	}
 	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_Player(TEXT(
-		"/Game/AnimStarterPack/Animations/AB_Player.AB_Player_C"));
+		"/Game/ParagonLtBelica/Retargeter/AB_Player.AB_Player_C"));
 	if (AB_Player.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(AB_Player.Class);
 	}
+	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Mannequin(TEXT(
+	//	"/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin"));
+	//if (SK_Mannequin.Succeeded())
+	//{
+	//	GetMesh()->SetSkeletalMesh(SK_Mannequin.Object);
+	//}
+	//static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_Player(TEXT(
+	//	"/Game/AnimStarterPack/Animations/AB_Player.AB_Player_C"));
+	//if (AB_Player.Succeeded())
+	//{
+	//	GetMesh()->SetAnimInstanceClass(AB_Player.Class);
+	//}
 }
 
 void ASAC1Character::BeginPlay()
