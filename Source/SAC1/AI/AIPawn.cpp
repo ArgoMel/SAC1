@@ -46,6 +46,16 @@ AAIPawn::AAIPawn()
 	mDissolveCurrentTime = 0.f;
 	mDissolveTime = 3.f;
 	mDissolveEnable = false;
+
+	BloodEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("BloodEffectComponent"));
+	BloodEffectComponent->SetupAttachment(mBody); 
+	BloodEffectComponent->bAutoActivate = false;
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.Blueprint'/Game/ZombiDecal/BP_BloodEffect.BP_BloodEffect'"));
+	if (ParticleAsset.Succeeded())
+	{
+		BloodEffectComponent->SetTemplate(ParticleAsset.Object);
+	}
 }
 
 void AAIPawn::LoadAIData()
@@ -165,7 +175,7 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		if (IsValid(AI))
 			AI->BrainComponent->StopLogic(TEXT("Death"));
 
-		//mMesh->SetSimulatePhysics(true);
+		//mMesh->SetSimulatePhysics(true);                
 	}
 
 	else
@@ -182,17 +192,22 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 			// 다른 클래스에서는 지원하지 않을 수 있기 때문에
 			// GetWorld()->GetTimerManager() 로 접근한다.
 			GetWorld()->GetTimerManager().SetTimer(mHitTimerHandle, this,
-				&AAIPawn::HitTimer, 0.2f);
+				&AAIPawn::HitTimer, 0.2f);                
 		}
 
-		mHit = true;
+		mHit = true;             
 
 		// MaterialInstance 전체를 반복하며 HitColor를 붉은색으로 변경한다.
 		for (auto& Mtrl : mMaterialArray)
 		{
 			Mtrl->SetVectorParameterValue(TEXT("HitColor"),
-				FVector(1.0, 0.0, 0.0));
+				FVector(1.0, 0.0, 0.0));    
 		}
+	}
+
+	if (BloodEffectComponent)
+	{
+		BloodEffectComponent->Activate();
 	}
 
 	return Dmg;

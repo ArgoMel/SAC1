@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FName		mName;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Blood")
+	class UParticleSystemComponent* BloodEffectComponent;
+
 	TObjectPtr<class UDefaultAIAnimInstance>	mAnim;
 
 	// 생성된 스폰포인트를 알고 있게 해준다.
