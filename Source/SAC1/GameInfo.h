@@ -242,7 +242,10 @@ public:
 	EItem	ItemKind;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> ItemMesh;
+	TObjectPtr<UStaticMesh> ItemStaticMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMesh> ItemSkeletalMesh;
 };
 
 UCLASS()

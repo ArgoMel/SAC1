@@ -16,7 +16,8 @@ ASAC1Character::ASAC1Character()
 	m_CameraSpeed = 50.f;
 	m_MaxWalkSpeed = 75.f;
 	m_MaxSprintSpeed = 375.f;
-	m_CurWeaponIndex = -1;
+	m_CurWeaponIndex = 0;
+	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
 	m_IsInvertY = true;
 	m_CanMove = true;
@@ -135,38 +136,8 @@ void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 
 void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
 {	
-	int value= (int)Value.Get<float>();
-	m_CurWeaponIndex += value;
-	int32 weaponCount = m_Weapons.Num();
-	if(m_CurWeaponIndex<0)
-	{
-		m_CurWeaponIndex = weaponCount - 1;
-	}
-	else if(m_CurWeaponIndex>= weaponCount)
-	{
-		m_CurWeaponIndex = 0;
-	}
-	for (auto weapon : m_Weapons)
-	{
-		if (!weapon)
-		{
-			if(weapon== m_Weapons[m_CurWeaponIndex])
-			{
-				m_CurWeaponIndex = (m_CurWeaponIndex + value)% weaponCount;
-				if(m_CurWeaponIndex<0)
-				{
-					m_CurWeaponIndex = weaponCount - 1;
-				}
-			}
-			continue;
-		}
-		weapon->SetVisibility(false);
-	}
-	if(m_Weapons[m_CurWeaponIndex])
-	{
-		m_Weapons[m_CurWeaponIndex]->SetVisibility(true);
-		SetCharacterState((ECharacterEquip)(m_CurWeaponIndex+1));
-	}	
+	m_WeaponIndexDir = (int)Value.Get<float>();
+	m_AnimInst->ChangeWeapon();
 }
 
 void ASAC1Character::Jump()
@@ -240,6 +211,43 @@ ECharacterEquip ASAC1Character::GetCharacterState()
 	return m_AnimInst->GetCharacterState();
 }
 
+void ASAC1Character::SetCurWeapon()
+{
+	m_CurWeaponIndex += m_WeaponIndexDir;
+	int32 weaponCount = m_Weapons.Num();
+	if (m_CurWeaponIndex < 0)
+	{
+		m_CurWeaponIndex = weaponCount - 1;
+	}
+	else if (m_CurWeaponIndex >= weaponCount)
+	{
+		m_CurWeaponIndex = 0;
+	}
+	for (auto weapon : m_Weapons)
+	{
+		if (!weapon)
+		{
+			if (weapon == m_Weapons[m_CurWeaponIndex])
+			{
+				m_CurWeaponIndex = (m_CurWeaponIndex + m_WeaponIndexDir) % weaponCount;
+				if (m_CurWeaponIndex < 0)
+				{
+					m_CurWeaponIndex = weaponCount - 1;
+				}
+			}
+			continue;
+		}
+		weapon->SetVisibility(false);
+	}
+	m_WeaponIndexDir = 0;
+	if (!IsValid(m_Weapons[m_CurWeaponIndex])) 
+	{
+		return; 
+	}
+	m_Weapons[m_CurWeaponIndex]->SetVisibility(true);
+	SetCharacterState((ECharacterEquip)(m_CurWeaponIndex + 1));
+}
+
 UTP_WeaponComponent* ASAC1Character::GetCurWeapon()
 {
 	return m_Weapons[m_CurWeaponIndex];
@@ -254,7 +262,6 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 	}
 	m_Weapons[index] = weapon;
 	m_CurWeaponIndex = index;
-	FInputActionValue value;
-	ChangeWeapon(value);
+	SetCurWeapon();
 	return true;
 }

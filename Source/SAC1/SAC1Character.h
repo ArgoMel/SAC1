@@ -42,6 +42,7 @@ protected:
 	ETeam		mTeam;
 	float m_CameraSpeed;
 	int m_CurWeaponIndex;
+	int m_WeaponIndexDir;
 	bool m_CanMove;
 	bool m_IsInvertX;
 	bool m_IsInvertY;
@@ -81,6 +82,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Anim)
 	ECharacterEquip GetCharacterState();
 
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void SetCurWeapon();
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	UTP_WeaponComponent* GetCurWeapon();
 
