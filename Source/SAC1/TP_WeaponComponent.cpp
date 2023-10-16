@@ -165,6 +165,7 @@ void UTP_WeaponComponent::PickUpArmo(float value)
 	{
 		m_TotalArmo = m_WeaponData.ArmoMax;
 	}
+	Reload();
 }
 
 void UTP_WeaponComponent::OnStartFire()
@@ -284,7 +285,6 @@ bool UTP_WeaponComponent::TryAttachWeapon(ASAC1Character* TargetCharacter)
 void UTP_WeaponComponent::AttachWeapon()
 {
 	PickUpArmo(m_WeaponData.ArmoCountWhenPick);
-	Reload();
 
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("hand_r")));
@@ -387,7 +387,12 @@ void UTP_WeaponComponent::ThrowThing()
 		thing->SetProjectileDamage(dmg);
 	}
 
-	--m_CurArmo;
+	--m_TotalArmo;
+	if(m_TotalArmo<0)
+	{
+		m_TotalArmo = 0;
+		--m_CurArmo;
+	}
 }
 
 void UTP_WeaponComponent::EatFood()
@@ -397,5 +402,10 @@ void UTP_WeaponComponent::EatFood()
 	{
 		state->AddHp(m_WeaponData.BulletCount);
 	}
-	--m_CurArmo;
+	--m_TotalArmo;
+	if (m_TotalArmo < 0)
+	{
+		m_TotalArmo = 0;
+		--m_CurArmo;
+	}
 }

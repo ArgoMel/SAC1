@@ -13,6 +13,12 @@ USAC1AnimInstance::USAC1AnimInstance()
 	{
 		m_GrabItem=AM_Picking.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_EquipChange(TEXT(
+		"/Game/AnimStarterPack/ECT/AM_EquipChange.AM_EquipChange"));
+	if (AM_EquipChange.Succeeded())
+	{
+		m_EquipChange = AM_EquipChange.Object;
+	}
 }
 
 void USAC1AnimInstance::NativeInitializeAnimation()
@@ -65,5 +71,17 @@ void USAC1AnimInstance::CollectPickUps()
 	if (!Montage_IsPlaying(m_GrabItem))
 	{
 		Montage_Play(m_GrabItem, 2.f);
+	}
+}
+
+void USAC1AnimInstance::ChangeWeapon()
+{
+	if (!IsValid(m_EquipChange))
+	{
+		return;
+	}
+	if (!Montage_IsPlaying(m_EquipChange))
+	{
+		Montage_Play(m_EquipChange, 1.f);
 	}
 }
