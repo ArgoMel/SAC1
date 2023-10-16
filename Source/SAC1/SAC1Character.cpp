@@ -16,7 +16,7 @@ ASAC1Character::ASAC1Character()
 	m_CameraSpeed = 50.f;
 	m_MaxWalkSpeed = 75.f;
 	m_MaxSprintSpeed = 375.f;
-	m_CurWeaponIndex = 0;
+	m_CurWeaponIndex = -1;
 	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
 	m_IsInvertY = true;
@@ -136,6 +136,10 @@ void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 
 void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
 {	
+	if(m_CurWeaponIndex==-1)
+	{
+		return;
+	}
 	m_WeaponIndexDir = (int)Value.Get<float>();
 	m_AnimInst->ChangeWeapon();
 }
@@ -250,6 +254,10 @@ void ASAC1Character::SetCurWeapon()
 
 UTP_WeaponComponent* ASAC1Character::GetCurWeapon()
 {
+	if(m_CurWeaponIndex==-1)
+	{
+		return nullptr;
+	}
 	return m_Weapons[m_CurWeaponIndex];
 }
 

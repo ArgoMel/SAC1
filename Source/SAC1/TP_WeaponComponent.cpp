@@ -50,7 +50,7 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if(m_RecoilTimeline.IsPlaying())
+	if(m_RecoilTimeline.IsPlaying()&& GetVisibleFlag())
 	{
 		m_RecoilTimeline.TickTimeline(DeltaTime);
 	}
@@ -66,7 +66,7 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			return;
 		}	
 		FVector2D vec = Character->GetScreenRotVec();
-		if (abs(vec.Y > 0.005) || abs(vec.X > 0.005))
+		if (abs(vec.Y > 0.005) || abs(vec.X > 0.005)|| !GetVisibleFlag())
 		{
 			m_RecoilTimeline.Stop();
 			return;
