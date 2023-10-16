@@ -86,5 +86,5 @@ void AActor_PickUpWeapon::SetName(const FName& name)
 		return;	
 	}
 	m_ItemState->SetItemInfo(m_Name, data);
-	m_Weapon->SetSkeletalMesh(m_ItemState->GetItemData()->ItemMesh);
+	m_Weapon->SetSkeletalMesh(m_ItemState->GetItemData()->ItemSkeletalMesh);
 }

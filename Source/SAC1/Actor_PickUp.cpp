@@ -17,6 +17,11 @@ AActor_PickUp::AActor_PickUp()
 	m_Particle->SetupAttachment(GetRootComponent());
 }
 
+void AActor_PickUp::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void AActor_PickUp::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
