@@ -22,6 +22,7 @@ ASAC1Character::ASAC1Character()
 	m_IsInvertY = true;
 	m_CanMove = true;
 	m_IsSprinting = false;
+	mTeam = ETeam::Team1;
 
 	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
 	
@@ -56,18 +57,6 @@ ASAC1Character::ASAC1Character()
 	{
 		GetMesh()->SetAnimInstanceClass(AB_Player.Class);
 	}
-	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Mannequin(TEXT(
-	//	"/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin"));
-	//if (SK_Mannequin.Succeeded())
-	//{
-	//	GetMesh()->SetSkeletalMesh(SK_Mannequin.Object);
-	//}
-	//static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_Player(TEXT(
-	//	"/Game/AnimStarterPack/Animations/AB_Player.AB_Player_C"));
-	//if (AB_Player.Succeeded())
-	//{
-	//	GetMesh()->SetAnimInstanceClass(AB_Player.Class);
-	//}
 }
 
 void ASAC1Character::BeginPlay()
