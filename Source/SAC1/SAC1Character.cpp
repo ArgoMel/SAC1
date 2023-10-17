@@ -92,7 +92,7 @@ float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	{
 		if(state->AddHp(-(int)DamageAmount))
 		{
-			//뒤짐
+			OnPlayerDeath();
 		}
 		else
 		{
@@ -291,4 +291,24 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 	m_CurWeaponIndex = index;
 	SetCurWeapon();
 	return true;
+}
+
+void ASAC1Character::OnPlayerDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("afaf"));
+	DetachFromControllerPendingDestroy();
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	SetActorEnableCollision(true);
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
+	
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->SetComponentTickEnabled(false);
+	
+	//이거 넣으면 틱데미지 에러남
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 }

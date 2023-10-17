@@ -2,7 +2,8 @@
 
 ATriggerTickDamage::ATriggerTickDamage()
 {
-	m_Damage = 0;
+	m_Damage = 0.f;
+	m_TickRate = 0.1f;
 }
 
 void ATriggerTickDamage::TriggerOverlap(UPrimitiveComponent* OverlappedComponent,
@@ -34,5 +35,6 @@ void ATriggerTickDamage::SetTriggerSetting(float lifeSpan, FVector extent, float
 	SetLifeSpan(lifeSpan);
 	mBody->SetBoxExtent(extent);
 	m_Damage = damage;
+	m_TickRate = tickRate;
 	GetWorld()->GetTimerManager().SetTimer(m_DamageTimerHandle, this, &ATriggerTickDamage::TickDamage, tickRate, true);
 }

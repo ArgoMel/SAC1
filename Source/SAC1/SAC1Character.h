@@ -91,6 +91,7 @@ public:
 	UTP_WeaponComponent* GetCurWeapon();
 
 	bool TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip);
+	void OnPlayerDeath();
 
 	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
 	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }

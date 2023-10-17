@@ -20,7 +20,7 @@ USAC1AnimInstance::USAC1AnimInstance()
 		m_EquipChange = AM_EquipChange.Object;
 	}
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_RifleHitReact1(TEXT(
-		"/Game/AnimStarterPack/Rifle/AM_RifleHitReact1.AM_RifleHitReact1"));
+		"/Game/ParagonLtBelica/Characters/Heroes/Belica/Animations/Mixamo/AM_HitReact.AM_HitReact"));
 	if (AM_RifleHitReact1.Succeeded())
 	{
 		m_DamagedMontage = AM_RifleHitReact1.Object;

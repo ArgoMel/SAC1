@@ -20,6 +20,7 @@ private:
 	TSet<AActor*> m_ActorSet;
 	FTimerHandle m_DamageTimerHandle;
 	float m_Damage;
+	float m_TickRate;
 
 protected:
 	void TickDamage();

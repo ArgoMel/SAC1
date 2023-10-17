@@ -23,8 +23,6 @@ protected:
 	TObjectPtr<UAnimMontage>	m_EquipChange;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage>	m_DamagedMontage;
-	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
-	//TObjectPtr<UAnimMontage>	m_DeadMontage;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class ASAC1Character> m_Character;
