@@ -16,12 +16,13 @@ ASAC1Character::ASAC1Character()
 	m_CameraSpeed = 50.f;
 	m_MaxWalkSpeed = 75.f;
 	m_MaxSprintSpeed = 375.f;
-	m_CurWeaponIndex = 0;
+	m_CurWeaponIndex = -1;
 	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
 	m_IsInvertY = true;
 	m_CanMove = true;
 	m_IsSprinting = false;
+	mTeam = ETeam::Team1;
 
 	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
 	
@@ -44,14 +45,14 @@ ASAC1Character::ASAC1Character()
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Mannequin(TEXT(
-		"/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin"));
-	if (SK_Mannequin.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Belica_Biohazard(TEXT(
+	"/Game/ParagonLtBelica/Characters/Heroes/Belica/Skins/Biohazard/Meshes/Belica_Biohazard.Belica_Biohazard"));
+	if (Belica_Biohazard.Succeeded())
 	{
-		GetMesh()->SetSkeletalMesh(SK_Mannequin.Object);
+		GetMesh()->SetSkeletalMesh(Belica_Biohazard.Object);
 	}
 	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_Player(TEXT(
-		"/Game/AnimStarterPack/Animations/AB_Player.AB_Player_C"));
+		"/Game/ParagonLtBelica/Retargeter/AB_Player.AB_Player_C"));
 	if (AB_Player.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(AB_Player.Class);
@@ -136,6 +137,10 @@ void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 
 void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
 {	
+	if(m_CurWeaponIndex==-1)
+	{
+		return;
+	}
 	m_WeaponIndexDir = (int)Value.Get<float>();
 	m_AnimInst->ChangeWeapon();
 }
@@ -250,6 +255,10 @@ void ASAC1Character::SetCurWeapon()
 
 UTP_WeaponComponent* ASAC1Character::GetCurWeapon()
 {
+	if(m_CurWeaponIndex==-1)
+	{
+		return nullptr;
+	}
 	return m_Weapons[m_CurWeaponIndex];
 }
 
