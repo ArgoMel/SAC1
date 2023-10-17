@@ -2,71 +2,59 @@
 #include "SAC1Projectile.h"
 #include "SAC1PlayerController.h"
 #include "SAC1AnimInstance.h"
+#include "SAC1PlayerState.h"
 #include "Actor_PickUp.h"
+#include "TP_WeaponComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "Animation/AnimInstance.h"
-#include "Engine/LocalPlayer.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 
 ASAC1Character::ASAC1Character()
 {
-	m_PickUpRadius = 200.f;
-	m_MoveSpeed = 100.f;
-	m_CameraSpeed=50.f;
-	m_ZoomSpeed = 300.f;
-	m_CanMove=true;
+	m_PickUpExtent = FVector(50.f,50.f, 91.f);
+	m_CameraSpeed = 50.f;
+	m_MaxWalkSpeed = 75.f;
+	m_MaxSprintSpeed = 375.f;
+	m_CurWeaponIndex = -1;
+	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
-	m_IsInvertY=true;
-	
-	float height = 96.f;
-	GetCapsuleComponent()->InitCapsuleSize(55.f, height);
-		
-	// Create a CameraComponent	
-	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, height)); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	m_IsInvertY = true;
+	m_CanMove = true;
+	m_IsSprinting = false;
+	m_Team = ETeam::Team1;
 
-	GetMesh()->SetupAttachment(FirstPersonCameraComponent);
-	//GetMesh()->SetRelativeRotation(FRotator(0., 10., 0.));
-	GetMesh()->SetRelativeLocation(FVector(-20., 0., -(height+98.)));
+	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
+	
+	GetCapsuleComponent()->InitCapsuleSize(m_PickUpExtent.X, m_PickUpExtent.Z);
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
+	SetRootComponent(GetCapsuleComponent());
+
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -m_PickUpExtent.Z));
+	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(true);
-	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
-	Mesh1P->bCastDynamicShadow = false;
-	Mesh1P->CastShadow = false;
-	Mesh1P->SetRelativeRotation(FRotator(0.9f, -90.f, 5.2f));
-	Mesh1P->SetRelativeLocation(FVector(-30., -2., -(height + 78.)));
-	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	m_SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	m_SpringArm->SetupAttachment(GetMesh(), TEXT("head"));
+	m_SpringArm->TargetArmLength = 0.f;
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> BrimStone_SkeletonMesh(TEXT(
-		"/Game/KBJ/Brimstone/Anims/BrimStone_SkeletonMesh.BrimStone_SkeletonMesh"));
-	if (BrimStone_SkeletonMesh.Succeeded())
+	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	m_Camera->SetupAttachment(m_SpringArm);
+	m_Camera->SetRelativeLocation(FVector(15., 20., 0.));
+	m_Camera->bUsePawnControlRotation = true;
+
+	GetCharacterMovement()->MaxWalkSpeed = 75.f;
+
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Belica_Biohazard(TEXT(
+	"/Game/ParagonLtBelica/Characters/Heroes/Belica/Skins/Biohazard/Meshes/Belica_Biohazard.Belica_Biohazard"));
+	if (Belica_Biohazard.Succeeded())
 	{
-		GetMesh()->SetSkeletalMesh(BrimStone_SkeletonMesh.Object);
+		GetMesh()->SetSkeletalMesh(Belica_Biohazard.Object);
 	}
-	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_BrimStone(TEXT(
-		"/Game/KBJ/Brimstone/Anims/AB_BrimStone.AB_BrimStone_C"));
-	if (AB_BrimStone.Succeeded())
+	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_Player(TEXT(
+		"/Game/ParagonLtBelica/Retargeter/AB_Player.AB_Player_C"));
+	if (AB_Player.Succeeded())
 	{
-		GetMesh()->SetAnimInstanceClass(AB_BrimStone.Class);
-	}
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Godric_FP_Naked(TEXT(
-		"/Game/_Assets/Meshes/FPArms/Godric_FP_Naked.Godric_FP_Naked"));
-	if(Godric_FP_Naked.Succeeded())
-	{
-		Mesh1P->SetSkeletalMesh(Godric_FP_Naked.Object);
-	}
-	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_FPSArm(TEXT(
-		"/Game/_Assets/AB_FPSArm.AB_FPSArm_C"));
-	if (AB_FPSArm.Succeeded())
-	{
-		Mesh1P->SetAnimInstanceClass(AB_FPSArm.Class);
+		GetMesh()->SetAnimInstanceClass(AB_Player.Class);
 	}
 }
 
@@ -84,13 +72,34 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	if (IsValid(input) && IsValid(controller))
 	{
 		input->BindAction(controller->m_MousePos, ETriggerEvent::Triggered, this, &ASAC1Character::CameraRotation);
-		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::CameraZoom);
+		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::ChangeWeapon);
 		input->BindAction(controller->m_Space, ETriggerEvent::Started, this, &ASAC1Character::Jump);
 		input->BindAction(controller->m_Space, ETriggerEvent::Completed, this, &ASAC1Character::StopJumping);
 		input->BindAction(controller->m_F, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
 		input->BindAction(controller->m_Move, ETriggerEvent::Triggered, this, &ASAC1Character::Move);
+		input->BindAction(controller->m_LShift, ETriggerEvent::Started, this, &ASAC1Character::Sprint);
+		input->BindAction(controller->m_LShift, ETriggerEvent::Completed, this, &ASAC1Character::Sprint);
 		controller->SetNewController();
 	}
+}
+
+float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+	AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	ASAC1PlayerState* state = Cast<ASAC1PlayerState>(GetPlayerState());
+	if (IsValid(state))
+	{
+		if(state->AddHp(-(int)DamageAmount))
+		{
+			OnPlayerDeath();
+		}
+		else
+		{
+			m_AnimInst->HitReaction();
+		}
+	}
+	return DamageAmount;
 }
 
 void ASAC1Character::BodyHit(UPrimitiveComponent* comp, AActor* otherActor, 
@@ -144,10 +153,14 @@ void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 	AddControllerPitchInput(y);
 }
 
-void ASAC1Character::CameraZoom(const FInputActionValue& Value)
-{
-	//double length = Value.Get<float>() * -1 * m_ZoomSpeed * GetWorld()->GetDeltaSeconds();
-	//m_CameraBoom->TargetArmLength += length;
+void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
+{	
+	if(m_CurWeaponIndex==-1)
+	{
+		return;
+	}
+	m_WeaponIndexDir = (int)Value.Get<float>();
+	m_AnimInst->ChangeWeapon();
 }
 
 void ASAC1Character::Jump()
@@ -160,14 +173,28 @@ void ASAC1Character::StopJumping()
 	Super::StopJumping();
 }
 
+void ASAC1Character::Sprint()
+{
+	m_IsSprinting = !m_IsSprinting;
+	if (m_IsSprinting)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = m_MaxSprintSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = m_MaxWalkSpeed;
+	}
+}
+
 void ASAC1Character::CollectPickUps()
 {
 	TArray<FHitResult> results;
-	FVector traceStart = GetActorLocation();
-	//FVector traceEnd = GetActorLocation() + GetActorForwardVector() * 60.;
+	FVector traceStart = GetActorLocation() + GetActorForwardVector() * m_PickUpExtent.X-GetActorUpVector()* m_PickUpExtent.Z*0.5;
+	FVector traceEnd = traceStart + GetActorForwardVector() * m_PickUpExtent.X;
 	FCollisionQueryParams param(NAME_None, false, this);
-	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceStart, FQuat::Identity,
-		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(m_PickUpRadius), param);
+	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
+		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeBox(m_PickUpExtent), param);
+		//ECollisionChannel::ECC_GameTraceChannel5, FCollisionShape::MakeBox(m_PickUpExtent), param);
 #if ENABLE_DRAW_DEBUG
 	FColor drawColor;
 	if (isCol)
@@ -178,17 +205,20 @@ void ASAC1Character::CollectPickUps()
 	{
 		drawColor = FColor::Green;
 	}
-	DrawDebugSphere(GetWorld(), traceStart, m_PickUpRadius, 0, drawColor, false, 0.5f);
+	DrawDebugBox(GetWorld(), (traceStart+ traceEnd)*0.5, m_PickUpExtent, drawColor, false, 0.5f);
 #endif
 	if (isCol)
-	{
+	{		
 		for (auto& result : results)
 		{
 			AActor_PickUp* const pickUP = Cast<AActor_PickUp>(result.GetActor());
 			if (IsValid(pickUP) && pickUP->GetActive())
 			{
-				pickUP->PickedUpBy(this);
-				pickUP->SetActive(false);
+				if(pickUP->PickedUpBy(this))
+				{
+					m_AnimInst->CollectPickUps();
+					break;
+				}
 			}
 		}
 	}
@@ -202,4 +232,83 @@ void ASAC1Character::SetCharacterState(ECharacterEquip state)
 ECharacterEquip ASAC1Character::GetCharacterState()
 {
 	return m_AnimInst->GetCharacterState();
+}
+
+void ASAC1Character::SetCurWeapon()
+{
+	m_CurWeaponIndex += m_WeaponIndexDir;
+	int32 weaponCount = m_Weapons.Num();
+	if (m_CurWeaponIndex < 0)
+	{
+		m_CurWeaponIndex = weaponCount - 1;
+	}
+	else if (m_CurWeaponIndex >= weaponCount)
+	{
+		m_CurWeaponIndex = 0;
+	}
+	for (auto weapon : m_Weapons)
+	{
+		if (!weapon)
+		{
+			if (weapon == m_Weapons[m_CurWeaponIndex])
+			{
+				m_CurWeaponIndex = (m_CurWeaponIndex + m_WeaponIndexDir) % weaponCount;
+				if (m_CurWeaponIndex < 0)
+				{
+					m_CurWeaponIndex = weaponCount - 1;
+				}
+			}
+			continue;
+		}
+		weapon->SetVisibility(false);
+	}
+	m_WeaponIndexDir = 0;
+	if (!IsValid(m_Weapons[m_CurWeaponIndex])) 
+	{
+		return; 
+	}
+	m_Weapons[m_CurWeaponIndex]->SetVisibility(true);
+	SetCharacterState((ECharacterEquip)(m_CurWeaponIndex + 1));
+}
+
+UTP_WeaponComponent* ASAC1Character::GetCurWeapon()
+{
+	if(m_CurWeaponIndex==-1)
+	{
+		return nullptr;
+	}
+	return m_Weapons[m_CurWeaponIndex];
+}
+
+bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip)
+{
+	int32 index = (int)equip - 1;
+	if(m_Weapons[index])
+	{
+		return false;
+	}
+	m_Weapons[index] = weapon;
+	m_CurWeaponIndex = index;
+	SetCurWeapon();
+	return true;
+}
+
+void ASAC1Character::OnPlayerDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("afaf"));
+	DetachFromControllerPendingDestroy();
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	SetActorEnableCollision(true);
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
+	
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->SetComponentTickEnabled(false);
+	
+	//이거 넣으면 틱데미지 에러남
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 }

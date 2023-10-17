@@ -9,17 +9,18 @@ AActor_PickUpWeapon::AActor_PickUpWeapon()
 {
 	SetReplicateMovement(true);
 
+	GetStaticMeshComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+
 	m_Name = TEXT("Rifle");
 
 	//닿는 순간 ui 출력
 	m_Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	SetRootComponent(m_Collider);
+	m_Collider->SetGenerateOverlapEvents(true);
+	m_Collider->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
 	m_Weapon = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("WeaponComponent"));
 	m_Weapon->SetupAttachment(m_Collider);
-
-	m_WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	m_WeaponMesh->SetupAttachment(m_Weapon);
 
 	m_ItemState = CreateDefaultSubobject<UAC_ItemState>(TEXT("ItemState"));
 }
@@ -38,17 +39,25 @@ void AActor_PickUpWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 void AActor_PickUpWeapon::WasCollected()
 {
 	Super::WasCollected();
-	ASAC1Character* player = Cast<ASAC1Character>(m_PickUpInstigator);
-	if(IsValid(player)&& m_ItemState->GetItemData()->ItemKind==EItem::Weapon)
+	if(m_IsActive)
 	{
-		m_Weapon->SetWeaponData(m_ItemState->GetWeaponData());
-		m_Weapon->AttachWeapon(player);
+		return;
 	}
+	m_Collider->SetGenerateOverlapEvents(false);
+	m_Collider->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
-void AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
+bool AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
 {
+	ASAC1Character* player = Cast<ASAC1Character>(pawn);
+	if (IsValid(player) && m_ItemState->GetItemData()->ItemKind == EItem::Weapon)
+	{
+		m_Weapon->SetName(m_Name);
+		m_Weapon->SetWeaponData(m_ItemState->GetWeaponData());
+		m_IsActive= !m_Weapon->TryAttachWeapon(player);
+	}
 	Super::PickedUpBy(pawn);
+	return !m_IsActive;
 }
 
 FItemData* AActor_PickUpWeapon::FindItemData(const FName& Name)
@@ -78,6 +87,6 @@ void AActor_PickUpWeapon::SetName(const FName& name)
 		return;	
 	}
 	m_ItemState->SetItemInfo(m_Name, data);
-	m_WeaponMesh->SetSkeletalMesh(m_ItemState->GetItemData()->ItemMesh);
-	m_WeaponMesh->SetRelativeRotation(m_ItemState->GetItemData()->WeaponRot);
+	m_Weapon->SetName(m_Name);
+	m_Weapon->SetSkeletalMesh(m_ItemState->GetItemData()->ItemSkeletalMesh);
 }

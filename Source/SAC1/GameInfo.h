@@ -43,6 +43,7 @@ enum class ECharacterEquip : uint8
 	Pistrol,
 	Knife,
 	Granade,
+	FireBottle,
 	Food,
 };
 
@@ -61,6 +62,15 @@ enum class EItem : uint8
 	Weapon,
 	Consumable,
 	Interaction,	//안없어지고 상호작용만(예-스위치)	
+};
+
+UENUM(BlueprintType)
+enum class EAttackType : uint8
+{
+	Melee,
+	Shoot,
+	Throw,	
+	Eat,	
 };
 
 UENUM(BlueprintType)
@@ -184,7 +194,16 @@ public:
 	float	AtkRate;	//데미지 비율(플레이어 공격력*this= 최종 공격력)
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EAttackType	AttackType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FVector	MuzzleOffset;	//총구 위치
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FVector  WeaponOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FRotator WeaponRot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	ECharacterEquip	State;
@@ -223,14 +242,51 @@ public:
 	EItem	ItemKind;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FVector Offset;
+	TObjectPtr<UStaticMesh> ItemStaticMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FRotator WeaponRot;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> ItemMesh;
+	TObjectPtr<USkeletalMesh> ItemSkeletalMesh;
 };
+
+USTRUCT(BlueprintType)
+struct FProjectileData : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool	IsBounce;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool	HasHitEvent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool	HasDestroyEvent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float	LifeSpan=-1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float	CollisionRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float	ExplosionRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float	InitSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float	MaxSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USoundBase> DestroySound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UParticleSystem> DestroyParticle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UMaterialInstance> DestroyDecalMaterial;
+};
+
 
 UCLASS()
 class SAC1_API UGameInfo : public UObject

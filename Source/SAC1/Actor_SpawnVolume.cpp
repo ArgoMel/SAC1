@@ -1,5 +1,6 @@
 #include "Actor_SpawnVolume.h"
 #include "Actor_PickUp.h"
+#include "AI/AIPawn.h"
 
 AActor_SpawnVolume::AActor_SpawnVolume()
 {
@@ -17,6 +18,9 @@ AActor_SpawnVolume::AActor_SpawnVolume()
 
 		m_SpawnArea = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnVolume"));
 		SetRootComponent(m_SpawnArea);
+		m_SpawnArea->SetCollisionProfileName(TEXT("NoCollision"));
+		m_SpawnArea->SetGenerateOverlapEvents(false);
+		m_SpawnArea->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 	}
 }
 
@@ -28,7 +32,6 @@ void AActor_SpawnVolume::OnConstruction(const FTransform& Transform)
 void AActor_SpawnVolume::BeginPlay()
 {
 	Super::BeginPlay();
-	SetSpawningActive(true);
 }
 
 void AActor_SpawnVolume::Tick(float DeltaTime)
@@ -62,15 +65,22 @@ void AActor_SpawnVolume::SpawnPickUp()
 		int32 randIndex = FMath::Rand() % m_SpawnThings.Num();
 		AActor* const spawnedActor =
 			world->SpawnActor<AActor>(m_SpawnThings[randIndex], spawnLoc, spawnRot, spawnParams);
+		SetSpawningActive(true);
+		++m_SpawnCount;
+
+		AAIPawn* spawnedPawn = Cast<AAIPawn>(spawnedActor);
+		if (IsValid(spawnedPawn))
+		{
+			spawnLoc.Z = spawnedPawn->GetHalfHeight();
+			spawnedPawn->SetActorLocation(spawnLoc);
+		}
+
 		AActor_PickUp* spawnedPickUp = Cast<AActor_PickUp>(spawnedActor);
 		if(IsValid(spawnedPickUp) && !m_Names.IsEmpty())
 		{
 			randIndex = FMath::Rand()% m_Names.Num();
 			spawnedPickUp->SetName(m_Names[randIndex]);
 		}	
-		SetSpawningActive(true);
-
-		++m_SpawnCount;
 	}
 }
 

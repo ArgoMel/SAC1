@@ -17,6 +17,11 @@ AActor_PickUp::AActor_PickUp()
 	m_Particle->SetupAttachment(GetRootComponent());
 }
 
+void AActor_PickUp::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void AActor_PickUp::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
@@ -62,11 +67,12 @@ void AActor_PickUp::WasCollected()
 	UE_LOG(LogTemp, Log, TEXT("WasCollected_Implementation : %s"), *GetName());
 }
 
-void AActor_PickUp::PickedUpBy(APawn* pawn)
+bool AActor_PickUp::PickedUpBy(APawn* pawn)
 {
 	//if(GetLocalRole()==ROLE_Authority)
 	//{
 		m_PickUpInstigator = pawn;
 		ClientOnPickedUpBy(pawn);
 	//}
+	return true;
 }

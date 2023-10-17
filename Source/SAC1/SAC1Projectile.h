@@ -1,8 +1,5 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
-
-#include "CoreMinimal.h"
+#include "GameInfo.h"
 #include "GameFramework/Actor.h"
 #include "SAC1Projectile.generated.h"
 
@@ -15,24 +12,51 @@ class ASAC1Projectile : public AActor
 	GENERATED_BODY()
 public:
 	ASAC1Projectile();
+	virtual void OnConstruction(const FTransform& Transform);
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
 protected:
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	static TObjectPtr<UDataTable>	m_ProjectTileDataTable;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
 	TObjectPtr<USphereComponent> CollisionComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMeshComponent> m_ProjectileMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAC_Projectile>	m_ProjectileState;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	FName		m_Name;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	float		m_Damage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> m_StaticMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitEvent", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UParticleSystem> m_HitEmitter;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitEvent", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UMaterialInstance> m_HitDecalMaterial;
+
+private:
+	void FireBottle();
+	
+protected:
+	static FProjectileData* FindProjectileData(const FName& Name);
 
 public:
+	static void LoadProjectileData();
+
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	virtual void SetName(const FName& name);
+	void SetProjectileMesh(USkeletalMesh* mesh);
+	void SetProjectileParticle(UParticleSystem* particle);
+	void SetProjectileDecal(UMaterialInstance* decal);
+	void SetProjectileDamage(float damage);
+
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
-	UStaticMeshComponent* GetProjectileMesh() const { return m_StaticMesh; }
+	USkeletalMeshComponent* GetProjectileMesh() const { return m_ProjectileMesh; }
 };
 
