@@ -34,15 +34,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
 	bool m_IsSprinting;
 
-	TArray<TObjectPtr<class UTP_WeaponComponent>> m_Weapons;
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
 	TObjectPtr<class USAC1AnimInstance>	m_AnimInst;
 	FVector2D m_ScreenRotVec;
 	FVector m_PickUpExtent;
 	ETeam		mTeam;
 	float m_CameraSpeed;
-	int m_CurWeaponIndex;
-	int m_WeaponIndexDir;
+	float m_ZoomSpeed;
 	bool m_CanMove;
 	bool m_IsInvertX;
 	bool m_IsInvertY;
@@ -60,7 +58,7 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void CameraRotation(const FInputActionValue& Value);
-	void ChangeWeapon(const FInputActionValue& Value);
+	void CameraZoom(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
 	void Sprint();
@@ -68,6 +66,10 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void CollectPickUps();
 public:
+	FVector2D GetScreenRotVec()
+	{
+		return m_ScreenRotVec;
+	}
 	ETeam GetTeam()
 	{
 		return mTeam;
@@ -82,14 +84,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Anim)
 	ECharacterEquip GetCharacterState();
 
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void SetCurWeapon();
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	UTP_WeaponComponent* GetCurWeapon();
-
-	bool TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip);
-
-	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
 	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }
 };
 

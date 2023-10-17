@@ -9,9 +9,6 @@ class SAC1_API AActor_PickUp : public AStaticMeshActor
 	GENERATED_BODY()
 public:
 	AActor_PickUp();
-protected:
-	virtual void BeginPlay() override;
-public:
 	virtual void OnConstruction(const FTransform& Transform);
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -20,7 +17,7 @@ protected:
 	APawn* m_PickUpInstigator;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Pickup")
 	TObjectPtr<UParticleSystemComponent> m_Particle;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
 	FName		m_Name;
 
 	UPROPERTY(ReplicatedUsing = "OnRep_GetActive")
@@ -49,5 +46,5 @@ public:
 	//둘중에 1개만 작성해야 한다.
 	//virtual void WasCollected_Implementation();
 	UFUNCTION(BlueprintAuthorityOnly, Category = "Pickup")
-	virtual bool PickedUpBy(APawn* pawn);
+	virtual void PickedUpBy(APawn* pawn);
 };

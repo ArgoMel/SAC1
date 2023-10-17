@@ -20,21 +20,21 @@ private:
 	FTimerHandle m_AutoFireHandle;
 	FTimeline m_RecoilTimeline;
 	FRotator m_StartRot;
+	int32 m_CurArmo;
+	int32 m_TotalArmo;
 	bool m_IsTargeting;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class ASAC1Projectile> m_ProjectileClass;
+	/** Projectile class to spawn */
+	//UPROPERTY(EditDefaultsOnly, Category=Projectile)
+	//TSubclassOf<class ASAC1Projectile> ProjectileClass;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|Curves")
 	TObjectPtr<UCurveFloat> m_HorizontalCurve;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Recoil|Curves")
 	TObjectPtr<UCurveFloat> m_VerticalCurve;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
 	FWeaponData m_WeaponData;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
-	int32 m_CurArmo;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
-	int32 m_TotalArmo;
 
 private:
 	void OnStartFire();
@@ -54,18 +54,12 @@ private:
 public:
 	void SetWeaponData(FWeaponData* data);
 
+	/** Attaches the actor to a FirstPersonCharacter */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
-	bool TryAttachWeapon(ASAC1Character* TargetCharacter);
+	void AttachWeapon(ASAC1Character* TargetCharacter);
+
+	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void AttachWeapon();
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void MeleeAttack();
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void ThrowThing();
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void EatFood();
-
 	void PickUpArmo(float value);
 };

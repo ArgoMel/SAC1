@@ -43,7 +43,6 @@ enum class ECharacterEquip : uint8
 	Pistrol,
 	Knife,
 	Granade,
-	FireBottle,
 	Food,
 };
 
@@ -62,15 +61,6 @@ enum class EItem : uint8
 	Weapon,
 	Consumable,
 	Interaction,	//안없어지고 상호작용만(예-스위치)	
-};
-
-UENUM(BlueprintType)
-enum class EAttackType : uint8
-{
-	Melee,
-	Shoot,
-	Throw,	
-	Eat,	
 };
 
 UENUM(BlueprintType)
@@ -173,6 +163,9 @@ struct FWeaponData :	public FTableRowBase
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool	IsMelee;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	int32	Armo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -194,16 +187,7 @@ public:
 	float	AtkRate;	//데미지 비율(플레이어 공격력*this= 최종 공격력)
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	EAttackType	AttackType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FVector	MuzzleOffset;	//총구 위치
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FVector  WeaponOffset;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FRotator WeaponRot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	ECharacterEquip	State;
@@ -242,10 +226,13 @@ public:
 	EItem	ItemKind;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMesh> ItemStaticMesh;
+	FVector Offset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMesh> ItemSkeletalMesh;
+	FRotator WeaponRot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMesh> ItemMesh;
 };
 
 UCLASS()

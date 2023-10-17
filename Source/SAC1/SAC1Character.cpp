@@ -3,30 +3,29 @@
 #include "SAC1PlayerController.h"
 #include "SAC1AnimInstance.h"
 #include "Actor_PickUp.h"
-#include "TP_WeaponComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Animation/AnimInstance.h"
+#include "Engine/LocalPlayer.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ASAC1Character::ASAC1Character()
 {
-	float height = 91.f;
+	float height = 96.f;
 
 	m_PickUpExtent = FVector(50.f,50.f, height);
 	m_CameraSpeed = 50.f;
+	m_ZoomSpeed = 200.f;
 	m_MaxWalkSpeed = 75.f;
 	m_MaxSprintSpeed = 375.f;
-	m_CurWeaponIndex = -1;
-	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
 	m_IsInvertY = true;
 	m_CanMove = true;
 	m_IsSprinting = false;
-	mTeam = ETeam::Team1;
-
-	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
 	
-	GetCapsuleComponent()->InitCapsuleSize(50.f, height);
+	GetCapsuleComponent()->InitCapsuleSize(20.f, height);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 	SetRootComponent(GetCapsuleComponent());
 
@@ -40,19 +39,19 @@ ASAC1Character::ASAC1Character()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm);
-	m_Camera->SetRelativeLocation(FVector(15., 20., 0.));
+	m_Camera->SetRelativeLocation(FVector(5., 15., 0.));
 	m_Camera->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Belica_Biohazard(TEXT(
-	"/Game/ParagonLtBelica/Characters/Heroes/Belica/Skins/Biohazard/Meshes/Belica_Biohazard.Belica_Biohazard"));
-	if (Belica_Biohazard.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SKM_Manny(TEXT(
+		"/Game/ControlRig/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn"));
+	if (SKM_Manny.Succeeded())
 	{
-		GetMesh()->SetSkeletalMesh(Belica_Biohazard.Object);
+		GetMesh()->SetSkeletalMesh(SKM_Manny.Object);
 	}
 	static ConstructorHelpers::FClassFinder<UAnimInstance>	AB_Player(TEXT(
-		"/Game/ParagonLtBelica/Retargeter/AB_Player.AB_Player_C"));
+		"/Game/ControlRig/Characters/Mannequins/Animations/AB_Player.AB_Player_C"));
 	if (AB_Player.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(AB_Player.Class);
@@ -73,7 +72,7 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	if (IsValid(input) && IsValid(controller))
 	{
 		input->BindAction(controller->m_MousePos, ETriggerEvent::Triggered, this, &ASAC1Character::CameraRotation);
-		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::ChangeWeapon);
+		input->BindAction(controller->m_MouseWheel, ETriggerEvent::Triggered, this, &ASAC1Character::CameraZoom);
 		input->BindAction(controller->m_Space, ETriggerEvent::Started, this, &ASAC1Character::Jump);
 		input->BindAction(controller->m_Space, ETriggerEvent::Completed, this, &ASAC1Character::StopJumping);
 		input->BindAction(controller->m_F, ETriggerEvent::Started, this, &ASAC1Character::CollectPickUps);
@@ -135,14 +134,10 @@ void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 	AddControllerPitchInput(y);
 }
 
-void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
-{	
-	if(m_CurWeaponIndex==-1)
-	{
-		return;
-	}
-	m_WeaponIndexDir = (int)Value.Get<float>();
-	m_AnimInst->ChangeWeapon();
+void ASAC1Character::CameraZoom(const FInputActionValue& Value)
+{
+	//double length = Value.Get<float>() * -1 * m_ZoomSpeed * GetWorld()->GetDeltaSeconds();
+	//m_CameraBoom->TargetArmLength += length;
 }
 
 void ASAC1Character::Jump()
@@ -190,17 +185,14 @@ void ASAC1Character::CollectPickUps()
 	DrawDebugBox(GetWorld(), (traceStart+ traceEnd)*0.5, m_PickUpExtent, drawColor, false, 0.5f);
 #endif
 	if (isCol)
-	{		
+	{
 		for (auto& result : results)
 		{
 			AActor_PickUp* const pickUP = Cast<AActor_PickUp>(result.GetActor());
 			if (IsValid(pickUP) && pickUP->GetActive())
 			{
-				if(pickUP->PickedUpBy(this))
-				{
-					m_AnimInst->CollectPickUps();
-					break;
-				}
+				pickUP->PickedUpBy(this);
+				pickUP->SetActive(false);
 			}
 		}
 	}
@@ -214,63 +206,4 @@ void ASAC1Character::SetCharacterState(ECharacterEquip state)
 ECharacterEquip ASAC1Character::GetCharacterState()
 {
 	return m_AnimInst->GetCharacterState();
-}
-
-void ASAC1Character::SetCurWeapon()
-{
-	m_CurWeaponIndex += m_WeaponIndexDir;
-	int32 weaponCount = m_Weapons.Num();
-	if (m_CurWeaponIndex < 0)
-	{
-		m_CurWeaponIndex = weaponCount - 1;
-	}
-	else if (m_CurWeaponIndex >= weaponCount)
-	{
-		m_CurWeaponIndex = 0;
-	}
-	for (auto weapon : m_Weapons)
-	{
-		if (!weapon)
-		{
-			if (weapon == m_Weapons[m_CurWeaponIndex])
-			{
-				m_CurWeaponIndex = (m_CurWeaponIndex + m_WeaponIndexDir) % weaponCount;
-				if (m_CurWeaponIndex < 0)
-				{
-					m_CurWeaponIndex = weaponCount - 1;
-				}
-			}
-			continue;
-		}
-		weapon->SetVisibility(false);
-	}
-	m_WeaponIndexDir = 0;
-	if (!IsValid(m_Weapons[m_CurWeaponIndex])) 
-	{
-		return; 
-	}
-	m_Weapons[m_CurWeaponIndex]->SetVisibility(true);
-	SetCharacterState((ECharacterEquip)(m_CurWeaponIndex + 1));
-}
-
-UTP_WeaponComponent* ASAC1Character::GetCurWeapon()
-{
-	if(m_CurWeaponIndex==-1)
-	{
-		return nullptr;
-	}
-	return m_Weapons[m_CurWeaponIndex];
-}
-
-bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip)
-{
-	int32 index = (int)equip - 1;
-	if(m_Weapons[index])
-	{
-		return false;
-	}
-	m_Weapons[index] = weapon;
-	m_CurWeaponIndex = index;
-	SetCurWeapon();
-	return true;
 }

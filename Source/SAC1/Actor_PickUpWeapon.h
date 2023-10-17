@@ -11,7 +11,7 @@ public:
 	virtual void OnConstruction(const FTransform& Transform);
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void WasCollected() override;
-	bool PickedUpBy(APawn* pawn) override;
+	void PickedUpBy(APawn* pawn) override;
 
 protected:
 	static TObjectPtr<UDataTable>	ItemDataTable;
