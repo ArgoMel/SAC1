@@ -1,13 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Trigger.h"
 #include "../Effect/DefaultEffect.h"
 
-// Sets default values
 ATrigger::ATrigger()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	mBody = CreateDefaultSubobject<UBoxComponent>(TEXT("Body"));
@@ -22,8 +17,8 @@ ATrigger::ATrigger()
 
 	mBody->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
-	mBody->OnComponentBeginOverlap.AddDynamic(this,
-		&ATrigger::OverlapBegin);
+	mBody->OnComponentBeginOverlap.AddDynamic(this, &ATrigger::OverlapBegin);
+	mBody->OnComponentEndOverlap.AddDynamic(this, &ATrigger::OverlapEnd);
 
 	mTriggerType = EUserTriggerType::AllObject;
 }
@@ -80,7 +75,17 @@ void ATrigger::OverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	Effect->SetAudioAsset(TEXT("/Script/Engine.SoundWave'/Game/Sound/Fire1.Fire1'"));*/
 }
 
-void ATrigger::TriggerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ATrigger::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 index)
+{
+	TriggerOverlapEnd(comp, otherActor, otherComp, index);
+}
+
+void ATrigger::TriggerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+}
+
+void ATrigger::TriggerOverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 index)
 {
 }
 

@@ -4,8 +4,7 @@ TObjectPtr<UDataTable> UAC_ItemState::WeaponDataTable;
 
 UAC_ItemState::UAC_ItemState()
 {
-	PrimaryComponentTick.bCanEverTick = true;
-
+	PrimaryComponentTick.bCanEverTick = false;
 	LoadWeaponData();
 }
 
@@ -46,11 +45,11 @@ void UAC_ItemState::SetItemInfo(const FName& name, FItemData* data)
 	m_ItemData = *data;
 	if(m_ItemData.ItemKind==EItem::Weapon)
 	{
-		FWeaponData* weaponData = FindWeaponData(name);
-		if(weaponData)
-		{
-			m_WeaponData = *weaponData;
-		}
+		  FWeaponData* weaponData = FindWeaponData(name);
+		  if(weaponData)
+		  {
+			  m_WeaponData = *weaponData;
+		  }
 	}
 }
 

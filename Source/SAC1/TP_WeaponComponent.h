@@ -20,6 +20,7 @@ private:
 	FTimerHandle m_AutoFireHandle;
 	FTimeline m_RecoilTimeline;
 	FRotator m_StartRot;
+	FName		m_Name;
 	bool m_IsTargeting;
 	
 protected:
@@ -52,6 +53,7 @@ private:
 	void StopTargeting();
 
 public:
+	void SetName(const FName& name);
 	void SetWeaponData(FWeaponData* data);
 
 	UFUNCTION(BlueprintCallable, Category="Weapon")

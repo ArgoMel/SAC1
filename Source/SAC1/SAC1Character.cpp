@@ -2,6 +2,7 @@
 #include "SAC1Projectile.h"
 #include "SAC1PlayerController.h"
 #include "SAC1AnimInstance.h"
+#include "SAC1PlayerState.h"
 #include "Actor_PickUp.h"
 #include "TP_WeaponComponent.h"
 #include "EnhancedInputComponent.h"
@@ -10,9 +11,7 @@
 
 ASAC1Character::ASAC1Character()
 {
-	float height = 91.f;
-
-	m_PickUpExtent = FVector(50.f,50.f, height);
+	m_PickUpExtent = FVector(50.f,50.f, 91.f);
 	m_CameraSpeed = 50.f;
 	m_MaxWalkSpeed = 75.f;
 	m_MaxSprintSpeed = 375.f;
@@ -22,15 +21,15 @@ ASAC1Character::ASAC1Character()
 	m_IsInvertY = true;
 	m_CanMove = true;
 	m_IsSprinting = false;
-	mTeam = ETeam::Team1;
+	m_Team = ETeam::Team1;
 
 	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
 	
-	GetCapsuleComponent()->InitCapsuleSize(50.f, height);
+	GetCapsuleComponent()->InitCapsuleSize(m_PickUpExtent.X, m_PickUpExtent.Z);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 	SetRootComponent(GetCapsuleComponent());
 
-	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -height));
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -m_PickUpExtent.Z));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -82,6 +81,25 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		input->BindAction(controller->m_LShift, ETriggerEvent::Completed, this, &ASAC1Character::Sprint);
 		controller->SetNewController();
 	}
+}
+
+float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+	AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	ASAC1PlayerState* state = Cast<ASAC1PlayerState>(GetPlayerState());
+	if (IsValid(state))
+	{
+		if(state->AddHp(-(int)DamageAmount))
+		{
+			OnPlayerDeath();
+		}
+		else
+		{
+			m_AnimInst->HitReaction();
+		}
+	}
+	return DamageAmount;
 }
 
 void ASAC1Character::BodyHit(UPrimitiveComponent* comp, AActor* otherActor, 
@@ -171,8 +189,8 @@ void ASAC1Character::Sprint()
 void ASAC1Character::CollectPickUps()
 {
 	TArray<FHitResult> results;
-	FVector traceStart = GetActorLocation()-GetActorUpVector()* m_PickUpExtent.Z*0.5;
-	FVector traceEnd = traceStart + GetActorForwardVector() * m_PickUpExtent.Y;
+	FVector traceStart = GetActorLocation() + GetActorForwardVector() * m_PickUpExtent.X-GetActorUpVector()* m_PickUpExtent.Z*0.5;
+	FVector traceEnd = traceStart + GetActorForwardVector() * m_PickUpExtent.X;
 	FCollisionQueryParams param(NAME_None, false, this);
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
 		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeBox(m_PickUpExtent), param);
@@ -273,4 +291,24 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 	m_CurWeaponIndex = index;
 	SetCurWeapon();
 	return true;
+}
+
+void ASAC1Character::OnPlayerDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("afaf"));
+	DetachFromControllerPendingDestroy();
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	SetActorEnableCollision(true);
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
+	
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->SetComponentTickEnabled(false);
+	
+	//이거 넣으면 틱데미지 에러남
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
