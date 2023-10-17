@@ -263,6 +263,11 @@ void UTP_WeaponComponent::StopTargeting()
 	m_IsTargeting = false;
 }
 
+void UTP_WeaponComponent::SetName(const FName& name)
+{
+	m_Name = name;
+}
+
 void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
 {
 	m_WeaponData = *data;
@@ -376,10 +381,10 @@ void UTP_WeaponComponent::ThrowThing()
 
 	ASAC1Projectile* thing=world->SpawnActor<ASAC1Projectile>(m_ProjectileClass, 
 		spawnLocation, spawnRotation, actorSpawnParams);
+	thing->SetName(m_Name);
 	thing->SetProjectileMesh(GetSkeletalMeshAsset());
 	thing->SetProjectileParticle(m_WeaponData.HitEmitter);
 	thing->SetProjectileDecal(m_WeaponData.HitDecalMaterial);
-	thing->SetProjectileEndEvent(true);
 	auto state = Character->GetPlayerState<ASAC1PlayerState>();
 	if (IsValid(state))
 	{

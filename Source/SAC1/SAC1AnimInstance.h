@@ -21,6 +21,8 @@ protected:
 	TObjectPtr<UAnimMontage>	m_GrabItem;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage>	m_EquipChange;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage>	m_DamagedMontage;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class ASAC1Character> m_Character;
@@ -42,8 +44,8 @@ public:
 	}
 
 	void CollectPickUps();
-
 	void ChangeWeapon();
+	void HitReaction();
 
 	//UFUNCTION()
 	//void AnimNotify_TransitionFall();
