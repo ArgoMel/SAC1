@@ -39,21 +39,24 @@ void AActor_PickUpWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 void AActor_PickUpWeapon::WasCollected()
 {
 	Super::WasCollected();
-	ASAC1Character* player = Cast<ASAC1Character>(m_PickUpInstigator);
-	if(IsValid(player)&& m_ItemState->GetItemData()->ItemKind==EItem::Weapon)
+	if(m_IsActive)
 	{
-		m_Collider->SetGenerateOverlapEvents(false);
-		m_Collider->SetCollisionProfileName(TEXT("NoCollision"));
-		m_Weapon->SetWeaponData(m_ItemState->GetWeaponData());
-		m_Weapon->AttachWeapon(player);
-		FItemData* itemData= m_ItemState->GetItemData();
-		m_Weapon->SetRelativeLocationAndRotation(itemData->Offset, itemData->WeaponRot);
+		return;
 	}
+	m_Collider->SetGenerateOverlapEvents(false);
+	m_Collider->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
-void AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
+bool AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
 {
+	ASAC1Character* player = Cast<ASAC1Character>(pawn);
+	if (IsValid(player) && m_ItemState->GetItemData()->ItemKind == EItem::Weapon)
+	{
+		m_Weapon->SetWeaponData(m_ItemState->GetWeaponData());
+		m_IsActive= !m_Weapon->TryAttachWeapon(player);
+	}
 	Super::PickedUpBy(pawn);
+	return !m_IsActive;
 }
 
 FItemData* AActor_PickUpWeapon::FindItemData(const FName& Name)
@@ -83,5 +86,5 @@ void AActor_PickUpWeapon::SetName(const FName& name)
 		return;	
 	}
 	m_ItemState->SetItemInfo(m_Name, data);
-	m_Weapon->SetSkeletalMesh(m_ItemState->GetItemData()->ItemMesh);
+	m_Weapon->SetSkeletalMesh(m_ItemState->GetItemData()->ItemSkeletalMesh);
 }
