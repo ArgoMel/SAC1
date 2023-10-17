@@ -20,6 +20,9 @@ public:
 protected:
 	virtual void BeginPlay();
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+	virtual float TakeDamage(float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator, AActor* DamageCauser);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
@@ -39,7 +42,7 @@ protected:
 	TObjectPtr<class USAC1AnimInstance>	m_AnimInst;
 	FVector2D m_ScreenRotVec;
 	FVector m_PickUpExtent;
-	ETeam		mTeam;
+	ETeam		m_Team;
 	float m_CameraSpeed;
 	int m_CurWeaponIndex;
 	int m_WeaponIndexDir;
@@ -70,11 +73,11 @@ protected:
 public:
 	ETeam GetTeam()
 	{
-		return mTeam;
+		return m_Team;
 	}
 	void SetTeam(ETeam Team)
 	{
-		mTeam = Team;
+		m_Team = Team;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = Anim)

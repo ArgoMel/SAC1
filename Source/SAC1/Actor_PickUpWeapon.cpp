@@ -52,6 +52,7 @@ bool AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
 	ASAC1Character* player = Cast<ASAC1Character>(pawn);
 	if (IsValid(player) && m_ItemState->GetItemData()->ItemKind == EItem::Weapon)
 	{
+		m_Weapon->SetName(m_Name);
 		m_Weapon->SetWeaponData(m_ItemState->GetWeaponData());
 		m_IsActive= !m_Weapon->TryAttachWeapon(player);
 	}
@@ -86,5 +87,6 @@ void AActor_PickUpWeapon::SetName(const FName& name)
 		return;	
 	}
 	m_ItemState->SetItemInfo(m_Name, data);
+	m_Weapon->SetName(m_Name);
 	m_Weapon->SetSkeletalMesh(m_ItemState->GetItemData()->ItemSkeletalMesh);
 }

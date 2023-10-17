@@ -19,6 +19,12 @@ USAC1AnimInstance::USAC1AnimInstance()
 	{
 		m_EquipChange = AM_EquipChange.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_RifleHitReact1(TEXT(
+		"/Game/AnimStarterPack/Rifle/AM_RifleHitReact1.AM_RifleHitReact1"));
+	if (AM_RifleHitReact1.Succeeded())
+	{
+		m_DamagedMontage = AM_RifleHitReact1.Object;
+	}
 }
 
 void USAC1AnimInstance::NativeInitializeAnimation()
@@ -83,5 +89,17 @@ void USAC1AnimInstance::ChangeWeapon()
 	if (!Montage_IsPlaying(m_EquipChange))
 	{
 		Montage_Play(m_EquipChange, 1.f);
+	}
+}
+
+void USAC1AnimInstance::HitReaction()
+{
+	if (!IsValid(m_DamagedMontage))
+	{
+		return;
+	}
+	if (!Montage_IsPlaying(m_DamagedMontage))
+	{
+		Montage_Play(m_DamagedMontage, 1.f);
 	}
 }
