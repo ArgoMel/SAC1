@@ -20,27 +20,32 @@ public:
 protected:
 	virtual void BeginPlay();
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+	virtual float TakeDamage(float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator, AActor* DamageCauser);
 
 protected:
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	TObjectPtr<USkeletalMeshComponent> Mesh1P;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
+	TObjectPtr<USpringArmComponent> m_SpringArm;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
+	TObjectPtr<UCameraComponent> m_Camera;
 
-	/** First person camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	float m_MaxWalkSpeed;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	float m_MaxSprintSpeed;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	bool m_IsSprinting;
 
-
+	TArray<TObjectPtr<class UTP_WeaponComponent>> m_Weapons;
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
 	TObjectPtr<class USAC1AnimInstance>	m_AnimInst;
 	FVector2D m_ScreenRotVec;
-	FVector m_ClimbLoc;
-	FRotator m_ClimRot;
-	ETeam		mTeam;
-	float m_PickUpRadius;
-	float m_MoveSpeed;
+	FVector m_PickUpExtent;
+	ETeam		m_Team;
 	float m_CameraSpeed;
-	float m_ZoomSpeed;
+	int m_CurWeaponIndex;
+	int m_WeaponIndexDir;
 	bool m_CanMove;
 	bool m_IsInvertX;
 	bool m_IsInvertY;
@@ -58,24 +63,21 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void CameraRotation(const FInputActionValue& Value);
-	void CameraZoom(const FInputActionValue& Value);
+	void ChangeWeapon(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
+	void Sprint();
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void CollectPickUps();
 public:
-	FVector2D GetScreenRotVec()
-	{
-		return m_ScreenRotVec;
-	}
 	ETeam GetTeam()
 	{
-		return mTeam;
+		return m_Team;
 	}
 	void SetTeam(ETeam Team)
 	{
-		mTeam = Team;
+		m_Team = Team;
 	}
 
 	UFUNCTION(BlueprintCallable, Category = Anim)
@@ -83,9 +85,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Anim)
 	ECharacterEquip GetCharacterState();
 
-	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-	/** Returns FirstPersonCameraComponent subobject **/
-	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void SetCurWeapon();
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	UTP_WeaponComponent* GetCurWeapon();
+
+	bool TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip);
+	void OnPlayerDeath();
+
+	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
+	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }
 };
 

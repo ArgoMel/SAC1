@@ -33,7 +33,7 @@ void ASAC1GameMode::PostLogin(APlayerController* NewPlayer)
 	auto state = NewPlayer->GetPlayerState<ASAC1PlayerState>();
 	if (IsValid(state))
 	{
-		state->InitPlayerData(TEXT("Archer"));
+		state->InitPlayerData(TEXT("FPS"));
 	}
 }
 

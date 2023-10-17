@@ -4,7 +4,7 @@
 #include "BTService_TargetDetect.h"
 #include "../AIPawn.h"
 #include "../AIState.h"
-#include "AIController.h"
+#include "../DefaultAIController.h"
 
 UBTService_TargetDetect::UBTService_TargetDetect()
 {
@@ -38,7 +38,7 @@ void UBTService_TargetDetect::TickNode(UBehaviorTreeComponent& OwnerComp,
 	bool Collision = GetWorld()->SweepSingleByChannel(result,
 		AILoc, AILoc,
 		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel8,
+		ECollisionChannel::ECC_GameTraceChannel4,
 		FCollisionShape::MakeSphere(AIPawn->GetAIState()->GetData()->InteractionDistance),
 		param);
 

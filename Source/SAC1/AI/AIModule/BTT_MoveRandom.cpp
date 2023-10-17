@@ -1,5 +1,5 @@
 #include "BTT_MoveRandom.h"
-#include "AIController.h"
+#include "../DefaultAIController.h"
 #include "NavigationSystem.h"
 #include "../AIPawn.h"
 #include "../AIState.h"

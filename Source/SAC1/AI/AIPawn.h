@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -39,6 +39,9 @@ protected:
 
 	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FName		mName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Blood")
+	class UParticleSystemComponent* BloodEffectComponent;
 
 	TObjectPtr<class UDefaultAIAnimInstance>	mAnim;
 
