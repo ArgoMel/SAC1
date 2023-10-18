@@ -62,7 +62,7 @@ void ASAC1Projectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (IsValid(data->DestroyDecalMaterial))
 	{
 		UGameplayStatics::SpawnDecalAtLocation(GetWorld(), data->DestroyDecalMaterial,
-			FVector(15.), traceStart, FRotator::ZeroRotator, 10.f);
+			FVector(data->ExplosionRadius), traceStart, FRotator::ZeroRotator, 10.f);
 	}
 
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
@@ -109,7 +109,7 @@ void ASAC1Projectile::FireBottle()
 	if (IsValid(data->DestroyDecalMaterial))
 	{
 		UGameplayStatics::SpawnDecalAtLocation(GetWorld(), data->DestroyDecalMaterial,
-			FVector(15.), loc, FRotator::ZeroRotator, 10.f);
+			FVector(data->ExplosionRadius), loc, FRotator(-90.,0.,0.), 10.f);
 	}
 
 	FActorSpawnParameters	ActorParam;

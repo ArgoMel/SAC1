@@ -32,6 +32,7 @@ ASAC1Character::ASAC1Character()
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -m_PickUpExtent.Z));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->bReceivesDecals=false;
 
 	m_SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	m_SpringArm->SetupAttachment(GetMesh(), TEXT("head"));
@@ -39,7 +40,7 @@ ASAC1Character::ASAC1Character()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm);
-	m_Camera->SetRelativeLocation(FVector(15., 20., 0.));
+	m_Camera->SetRelativeLocation(FVector(5., 20., 0.));
 	m_Camera->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
@@ -62,6 +63,13 @@ void ASAC1Character::BeginPlay()
 {
 	Super::BeginPlay();
 	m_AnimInst = Cast<USAC1AnimInstance>(GetMesh()->GetAnimInstance());
+
+	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Controller);
+	if (IsValid(controller)&& IsValid(controller->PlayerCameraManager))
+	{
+		controller->PlayerCameraManager->ViewPitchMax = 70.f;
+		controller->PlayerCameraManager->ViewPitchMin = -70.f;
+	}
 }
 
 void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
