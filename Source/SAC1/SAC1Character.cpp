@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Effect/DecalEffect.h"
 
 ASAC1Character::ASAC1Character()
 {
@@ -67,6 +68,12 @@ ASAC1Character::ASAC1Character()
 			m_DeadSounds.Add(DeadSound.Object);
 		}
 	}
+	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MIBloodDecalRE(TEXT(
+		"/Game/ZombiDecal/RE/MIBloodDecalRE.MIBloodDecalRE"));
+	if (MIBloodDecalRE.Succeeded())
+	{
+		m_HitMaterial= MIBloodDecalRE.Object;
+	}
 }
 
 void ASAC1Character::BeginPlay()
@@ -78,7 +85,7 @@ void ASAC1Character::BeginPlay()
 	if (IsValid(controller)&& IsValid(controller->PlayerCameraManager))
 	{
 		controller->PlayerCameraManager->ViewPitchMax = 70.f;
-		controller->PlayerCameraManager->ViewPitchMin = -70.f;
+		controller->PlayerCameraManager->ViewPitchMin = -50.f;
 	}
 }
 
@@ -105,6 +112,16 @@ float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	FActorSpawnParameters	actorParam;
+	actorParam.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FVector loc = GetActorLocation();
+	loc.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0.,90.,0.), actorParam);
+	decal->SetDecalMaterial(m_HitMaterial);
+	decal->SetLifeSpan(10.f);
+	decal->SetDecalSize(FVector(GetCapsuleComponent()->GetScaledCapsuleRadius()));
+
 	ASAC1PlayerState* state = Cast<ASAC1PlayerState>(GetPlayerState());
 	if (IsValid(state))
 	{
@@ -206,6 +223,10 @@ void ASAC1Character::Sprint()
 
 void ASAC1Character::CollectPickUps()
 {
+	if(m_AnimInst->IsAnyMontagePlaying())
+	{
+		return;
+	}
 	TArray<FHitResult> results;
 	FVector traceStart = GetActorLocation() + GetActorForwardVector() * m_PickUpExtent.X-GetActorUpVector()* m_PickUpExtent.Z*0.5;
 	FVector traceEnd = traceStart + GetActorForwardVector() * m_PickUpExtent.X;

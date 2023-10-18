@@ -37,8 +37,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
 	bool m_IsSprinting;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Sound", meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
 	TArray<TObjectPtr<USoundBase>> m_DeadSounds;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UMaterialInstance> m_HitMaterial;
 
 	TArray<TObjectPtr<class UTP_WeaponComponent>> m_Weapons;
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
