@@ -60,17 +60,13 @@ void ASAC1Projectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), data->DestroyParticle, traceStart);
 	}
-	if (IsValid(data->DestroyDecalMaterial))
-	{
-		UGameplayStatics::SpawnDecalAtLocation(GetWorld(), data->DestroyDecalMaterial,
-			FVector(data->ExplosionRadius), traceStart, FRotator::ZeroRotator, 10.f);
-	}
-	//FActorSpawnParameters	actorParam;
-	//actorParam.SpawnCollisionHandlingOverride =
-	//	ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	//ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(traceStart, FRotator::ZeroRotator, actorParam);
-	//decal->SetDecalMaterial(data->DestroyDecalMaterial);
-	//decal->SetLifeSpan(5.f);
+	FActorSpawnParameters	actorParam;
+	actorParam.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(traceStart, FRotator::ZeroRotator, actorParam);
+	decal->SetDecalMaterial(data->DestroyDecalMaterial);
+	decal->SetLifeSpan(15.f);
+	decal->SetDecalSize(FVector(data->ExplosionRadius));
 
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
 		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(data->ExplosionRadius), param);
