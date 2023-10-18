@@ -1,7 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "../GameInfo.h"
 #include "GameFramework/Actor.h"
 #include "DecalEffect.generated.h"
@@ -10,10 +7,12 @@ UCLASS()
 class SAC1_API ADecalEffect : public AActor
 {
 	GENERATED_BODY()
-	
 public:	
-	// Sets default values for this actor's properties
 	ADecalEffect();
+protected:
+	virtual void BeginPlay() override;
+public:
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -22,6 +21,7 @@ protected:
 	TObjectPtr<UMaterialInstanceDynamic>	mDecalMaterial;
 
 	float	mTime;
+	float	m_FadeTime;
 
 	UPROPERTY(Category = Data, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool	mFadeEnable;
@@ -31,15 +31,14 @@ public:
 	{
 		mFadeEnable = Enable;
 	}
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-public:
+	void SetFadeTime(float fadeTime)
+	{
+		m_FadeTime = fadeTime;
+	}
+	void SetDecalSize(FVector extent)
+	{
+		mDecal->DecalSize = extent;
+	}
 	void SetDecalMaterial(const FString& Path);
+	void SetDecalMaterial(UMaterialInterface* material);
 };
