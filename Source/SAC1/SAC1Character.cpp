@@ -57,6 +57,16 @@ ASAC1Character::ASAC1Character()
 	{
 		GetMesh()->SetAnimInstanceClass(AB_Player.Class);
 	}
+	for (int i = 1; i <= 7;++i) 
+	{
+		const FString string = FString::Printf(TEXT(
+			"/Game/KBJ/Audios/LtBelica_Death_0%d0.LtBelica_Death_0%d0"), i, i);
+		ConstructorHelpers::FObjectFinder<USoundBase>	DeadSound(*string);
+		if (DeadSound.Succeeded())
+		{
+			m_DeadSounds.Add(DeadSound.Object);
+		}
+	}
 }
 
 void ASAC1Character::BeginPlay()
@@ -303,7 +313,6 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 
 void ASAC1Character::OnPlayerDeath()
 {
-	UE_LOG(LogTemp, Warning, TEXT("afaf"));
 	DetachFromControllerPendingDestroy();
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	SetActorEnableCollision(true);
@@ -319,4 +328,11 @@ void ASAC1Character::OnPlayerDeath()
 	//이거 넣으면 틱데미지 에러남
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	if(m_DeadSounds.IsEmpty())
+	{
+		return;
+	}
+	int32 randIndex = FMath::Rand() % m_DeadSounds.Num();
+	UGameplayStatics::PlaySoundAtLocation(this, m_DeadSounds[randIndex], GetActorLocation());
 }
