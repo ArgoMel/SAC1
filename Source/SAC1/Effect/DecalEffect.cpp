@@ -1,12 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "DecalEffect.h"
 
-// Sets default values
 ADecalEffect::ADecalEffect()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	mDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("Decal"));
@@ -19,17 +14,15 @@ ADecalEffect::ADecalEffect()
 	mDecal->SetRelativeRotation(FRotator(-90.0, 0.0, 0.0));
 
 	mTime = 0.f;
-
+	m_FadeTime = 3.f;
 	mFadeEnable = true;
 }
 
-// Called when the game starts or when spawned
 void ADecalEffect::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-// Called every frame
 void ADecalEffect::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -37,10 +30,11 @@ void ADecalEffect::Tick(float DeltaTime)
 	if (mFadeEnable && IsValid(mDecalMaterial))
 	{
 		mTime += DeltaTime;
-
-		float	Opacity = 1.f - mTime / InitialLifeSpan;
-
-		mDecalMaterial->SetScalarParameterValue(TEXT("Opacity"), Opacity);
+		if(mTime+ m_FadeTime > InitialLifeSpan)
+		{
+			float	opacity = (InitialLifeSpan - mTime) / m_FadeTime;
+			mDecalMaterial->SetScalarParameterValue(TEXT("Opacity"), opacity);
+		}
 	}
 }
 
@@ -52,6 +46,15 @@ void ADecalEffect::SetDecalMaterial(const FString& Path)
 	{
 		mDecal->SetDecalMaterial(Material);
 
+		mDecalMaterial = mDecal->CreateDynamicMaterialInstance();
+	}
+}
+
+void ADecalEffect::SetDecalMaterial(UMaterialInterface* material)
+{
+	if (IsValid(material))
+	{
+		mDecal->SetDecalMaterial(material);
 		mDecalMaterial = mDecal->CreateDynamicMaterialInstance();
 	}
 }

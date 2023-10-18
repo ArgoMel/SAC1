@@ -1,6 +1,7 @@
 #include "SAC1Projectile.h"
 #include "AC_Projectile.h"
 #include "Trigger/TriggerTickDamage.h"
+#include "Effect/DecalEffect.h"
 
 TObjectPtr<UDataTable> ASAC1Projectile::m_ProjectTileDataTable;
 
@@ -64,6 +65,12 @@ void ASAC1Projectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		UGameplayStatics::SpawnDecalAtLocation(GetWorld(), data->DestroyDecalMaterial,
 			FVector(data->ExplosionRadius), traceStart, FRotator::ZeroRotator, 10.f);
 	}
+	//FActorSpawnParameters	actorParam;
+	//actorParam.SpawnCollisionHandlingOverride =
+	//	ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	//ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(traceStart, FRotator::ZeroRotator, actorParam);
+	//decal->SetDecalMaterial(data->DestroyDecalMaterial);
+	//decal->SetLifeSpan(5.f);
 
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
 		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(data->ExplosionRadius), param);
@@ -106,18 +113,19 @@ void ASAC1Projectile::FireBottle()
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), data->DestroyParticle, loc);
 	}
-	if (IsValid(data->DestroyDecalMaterial))
-	{
-		UGameplayStatics::SpawnDecalAtLocation(GetWorld(), data->DestroyDecalMaterial,
-			FVector(data->ExplosionRadius), loc, FRotator(-90.,0.,0.), 10.f);
-	}
 
-	FActorSpawnParameters	ActorParam;
-	ActorParam.SpawnCollisionHandlingOverride =
+
+	FActorSpawnParameters	actorParam;
+	actorParam.SpawnCollisionHandlingOverride =
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator::ZeroRotator, actorParam);
+	decal->SetDecalMaterial(data->DestroyDecalMaterial);
+	decal->SetLifeSpan(15.f);
+	decal->SetDecalSize(FVector(data->ExplosionRadius));
+
 	ATriggerTickDamage* trigger= GetWorld()->SpawnActor<ATriggerTickDamage>(
-		loc, FRotator::ZeroRotator, ActorParam);
+		loc, FRotator::ZeroRotator, actorParam);
 	trigger->SetTriggerSetting(10.f,
 		FVector(data->ExplosionRadius, data->ExplosionRadius,10.f),m_Damage,1.f);
 	Destroy();
