@@ -13,5 +13,5 @@ public:
 
 private:
 	TSubclassOf<UUserWidget>	m_HUDClass;
-	TObjectPtr<class UUserWidget>	m_HUD;
+	TObjectPtr<class UUW_Main>	m_HUD;
 };

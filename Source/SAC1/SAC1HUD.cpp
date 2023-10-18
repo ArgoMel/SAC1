@@ -1,4 +1,5 @@
 #include "SAC1HUD.h"
+#include "UI/UW_Main.h"
 #include "Blueprint/UserWidget.h"
 
 ASAC1HUD::ASAC1HUD()
@@ -16,7 +17,7 @@ void ASAC1HUD::BeginPlay()
 	Super::BeginPlay();
 	if (IsValid(m_HUDClass))
 	{
-		m_HUD = CreateWidget<UUserWidget>(GetWorld(), m_HUDClass);
+		m_HUD = CreateWidget<UUW_Main>(GetWorld(), m_HUDClass);
 		if (IsValid(m_HUD))
 		{
 			m_HUD->AddToViewport();
