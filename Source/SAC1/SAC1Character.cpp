@@ -3,6 +3,7 @@
 #include "SAC1PlayerController.h"
 #include "SAC1AnimInstance.h"
 #include "SAC1PlayerState.h"
+#include "SAC1HUD.h"
 #include "Actor_PickUp.h"
 #include "TP_WeaponComponent.h"
 #include "EnhancedInputComponent.h"
@@ -332,6 +333,12 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 
 void ASAC1Character::OnPlayerDeath()
 {
+	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Controller);
+	if (IsValid(controller))
+	{
+		controller->SetShowMouseCursor(true);
+	}
+
 	DetachFromControllerPendingDestroy();
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	SetActorEnableCollision(true);
@@ -347,6 +354,12 @@ void ASAC1Character::OnPlayerDeath()
 	//이거 넣으면 틱데미지 에러남
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	ASAC1HUD* hud = Cast<ASAC1HUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
+	if (IsValid(hud))
+	{
+		hud->SetPlayerDeadUI(ESlateVisibility::Visible);
+	}
 
 	if(m_DeadSounds.IsEmpty())
 	{
