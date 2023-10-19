@@ -24,3 +24,13 @@ void ASAC1HUD::BeginPlay()
 		}
 	}
 }
+
+void ASAC1HUD::SetReloadingImage(ESlateVisibility visible)
+{
+	m_HUD->SetReloadingImage(visible);
+}
+
+void ASAC1HUD::SetPlayerDeadUI(ESlateVisibility visible)
+{
+	m_HUD->SetPlayerDeadUI(visible);
+}

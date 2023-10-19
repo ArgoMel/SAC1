@@ -14,4 +14,8 @@ public:
 private:
 	TSubclassOf<UUserWidget>	m_HUDClass;
 	TObjectPtr<class UUW_Main>	m_HUD;
+
+public:
+	void SetReloadingImage(ESlateVisibility visible);
+	void SetPlayerDeadUI(ESlateVisibility visible);
 };

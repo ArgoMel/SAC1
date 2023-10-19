@@ -3,6 +3,7 @@
 #include "SAC1PlayerState.h"
 #include "SAC1Projectile.h"
 #include "SAC1PlayerController.h"
+#include "SAC1HUD.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -45,6 +46,7 @@ void UTP_WeaponComponent::BeginPlay()
 		m_RecoilTimeline.AddInterpFloat(m_HorizontalCurve, recoilXCurve);
 		m_RecoilTimeline.AddInterpFloat(m_VerticalCurve, recoilYCurve);
 	}
+	m_HUD= Cast<ASAC1HUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
 }
 
 void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
@@ -194,6 +196,11 @@ void UTP_WeaponComponent::OnStartReload()
 	{
 		return;
 	}
+	if(IsValid(m_HUD))
+	{
+		m_HUD->SetReloadingImage(ESlateVisibility::Visible);
+	}
+
 	if (IsValid(m_WeaponData.ReloadAnimation))
 	{
 		UAnimInstance* animInst = Character->GetMesh()->GetAnimInstance();
@@ -209,6 +216,10 @@ void UTP_WeaponComponent::OnStartReload()
 
 void UTP_WeaponComponent::Reload()
 {
+	if (IsValid(m_HUD))
+	{
+		m_HUD->SetReloadingImage(ESlateVisibility::Collapsed);
+	}
 	if(m_TotalArmo==-1)
 	{
 		m_CurArmo = m_WeaponData.Armo;
