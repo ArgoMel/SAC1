@@ -165,9 +165,6 @@ void ASAC1Character::Move(const FInputActionValue& Value)
 	const FVector rightDir = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
 	AddMovementInput(forwardDir, movementVector.X);
 	AddMovementInput(rightDir, movementVector.Y);
-
-	//AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-	//AddMovementInput(GetActorRightVector(), MovementVector.X);
 }
 
 void ASAC1Character::CameraRotation(const FInputActionValue& Value)
@@ -255,6 +252,7 @@ void ASAC1Character::CollectPickUps()
 			{
 				if(pickUP->PickedUpBy(this))
 				{
+					pickUP->SetActive(false);
 					m_AnimInst->CollectPickUps();
 					break;
 				}
@@ -356,4 +354,18 @@ void ASAC1Character::OnPlayerDeath()
 	}
 	int32 randIndex = FMath::Rand() % m_DeadSounds.Num();
 	UGameplayStatics::PlaySoundAtLocation(this, m_DeadSounds[randIndex], GetActorLocation());
+}
+
+void ASAC1Character::PickUpArmo(ECharacterEquip equip, float value)
+{
+	int index = (int)equip - 1;
+	if(index<0|| index>=m_Weapons.Num())
+	{
+		return;
+	}
+	if (!IsValid(m_Weapons[index]))
+	{
+		return;
+	}
+	m_Weapons[index]->PickUpArmo(value);
 }

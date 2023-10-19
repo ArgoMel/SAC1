@@ -50,7 +50,8 @@ void AActor_SpawnVolume::SpawnPickUp()
 		}
 		if(m_SpawnCountMax!=-1&& m_SpawnCount>= m_SpawnCountMax)
 		{
-			SetSpawningActive(false);
+			GetWorldTimerManager().ClearTimer(m_SpawnTimer);
+			Destroy();
 			return;
 		}
 		FActorSpawnParameters spawnParams;
