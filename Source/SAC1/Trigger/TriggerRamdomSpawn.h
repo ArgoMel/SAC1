@@ -17,7 +17,7 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Trigger", meta = (AllowPrivateAccess = true))
-	TObjectPtr<class AActor_SpawnVolume>	m_SpawnVolume;
+	TArray<TObjectPtr<class AActor_SpawnVolume>>	m_SpawnVolumes;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Trigger", meta = (AllowPrivateAccess = true))
 	bool m_DestroyWhenTrigger;
 };

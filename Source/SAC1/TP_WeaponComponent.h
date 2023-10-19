@@ -22,6 +22,7 @@ private:
 	FRotator m_StartRot;
 	FName		m_Name;
 	bool m_IsTargeting;
+	bool m_IsAttached;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")

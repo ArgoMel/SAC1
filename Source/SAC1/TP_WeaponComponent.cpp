@@ -10,10 +10,11 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
+	m_ProjectileClass = ASAC1Projectile::StaticClass();
 	m_CurArmo = 0;
 	m_TotalArmo = 0;
 	m_IsTargeting = false;
-	m_ProjectileClass = ASAC1Projectile::StaticClass();
+	m_IsAttached = false;
 
 	SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
@@ -165,7 +166,6 @@ void UTP_WeaponComponent::PickUpArmo(float value)
 	{
 		m_TotalArmo = m_WeaponData.ArmoMax;
 	}
-	Reload();
 }
 
 void UTP_WeaponComponent::OnStartFire()
@@ -209,7 +209,11 @@ void UTP_WeaponComponent::OnStartReload()
 
 void UTP_WeaponComponent::Reload()
 {
-	if(m_TotalArmo>m_WeaponData.Armo)
+	if(m_TotalArmo==-1)
+	{
+		m_CurArmo = m_WeaponData.Armo;
+	}
+	else if(m_TotalArmo>m_WeaponData.Armo)
 	{
 		m_CurArmo = m_WeaponData.Armo;
 		m_TotalArmo -= m_WeaponData.Armo;
@@ -289,11 +293,15 @@ bool UTP_WeaponComponent::TryAttachWeapon(ASAC1Character* TargetCharacter)
 
 void UTP_WeaponComponent::AttachWeapon()
 {
-	PickUpArmo(m_WeaponData.ArmoCountWhenPick);
+	if(m_IsAttached)
+	{
+		return;
+	}
 
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("hand_r")));
-
+	m_IsAttached=AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("hand_r")));
+	PickUpArmo(m_WeaponData.ArmoCountWhenPick);
+	Reload();
 	SetRelativeLocationAndRotation(m_WeaponData.WeaponOffset, m_WeaponData.WeaponRot);
 
 	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
