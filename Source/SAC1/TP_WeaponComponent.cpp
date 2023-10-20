@@ -159,6 +159,7 @@ void UTP_WeaponComponent::Fire()
 			}
 		}
 	}
+	m_HUD->SetWeaponUI(ESlateVisibility::Visible, m_Name, m_CurArmo, m_TotalArmo);
 }
 
 void UTP_WeaponComponent::PickUpArmo(float value)
@@ -168,6 +169,7 @@ void UTP_WeaponComponent::PickUpArmo(float value)
 	{
 		m_TotalArmo = m_WeaponData.ArmoMax;
 	}
+	m_HUD->SetWeaponUI(ESlateVisibility::Visible, m_Name, m_CurArmo, m_TotalArmo);
 }
 
 void UTP_WeaponComponent::OnStartFire()
@@ -234,6 +236,7 @@ void UTP_WeaponComponent::Reload()
 		m_CurArmo = m_TotalArmo;
 		m_TotalArmo = 0;
 	}
+	m_HUD->SetWeaponUI(ESlateVisibility::Visible, m_Name, m_CurArmo, m_TotalArmo);
 }
 
 void UTP_WeaponComponent::StartHorizontalRecoil(float value)

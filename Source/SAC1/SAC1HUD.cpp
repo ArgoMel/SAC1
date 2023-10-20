@@ -34,3 +34,13 @@ void ASAC1HUD::SetPlayerDeadUI(ESlateVisibility visible)
 {
 	m_HUD->SetPlayerDeadUI(visible);
 }
+
+void ASAC1HUD::SetWeaponUI(ESlateVisibility visible, const FName& name, int32 curArmo, int32 totalArmo)
+{
+	m_HUD->SetWeaponUI(visible, name, curArmo, totalArmo);
+}
+
+void ASAC1HUD::SetMainUIText(int32 progress,const FString& text)
+{
+	m_HUD->SetMainUIText(progress,text);
+}

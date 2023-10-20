@@ -26,6 +26,9 @@ protected:
 	UPROPERTY(Category = Trigger, EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EUserTriggerType	mTriggerType;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Trigger", meta = (AllowPrivateAccess = true))
+	bool m_DestroyWhenTrigger;
+
 public:
 	void SetTriggerType(EUserTriggerType Type)
 	{

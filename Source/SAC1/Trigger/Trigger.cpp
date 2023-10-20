@@ -21,6 +21,8 @@ ATrigger::ATrigger()
 	mBody->OnComponentEndOverlap.AddDynamic(this, &ATrigger::OverlapEnd);
 
 	mTriggerType = EUserTriggerType::AllObject;
+
+	m_DestroyWhenTrigger = false;
 }
 
 void ATrigger::OnConstruction(const FTransform& Transform)
@@ -83,6 +85,10 @@ void ATrigger::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, UPrimit
 void ATrigger::TriggerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (m_DestroyWhenTrigger)
+	{
+		Destroy();
+	}
 }
 
 void ATrigger::TriggerOverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 index)

@@ -1,14 +1,13 @@
 #pragma once
-#include "../GameInfo.h"
 #include "Trigger.h"
-#include "TriggerRamdomSpawn.generated.h"
+#include "TriggerMainUI.generated.h"
 
 UCLASS()
-class SAC1_API ATriggerRamdomSpawn : public ATrigger
+class SAC1_API ATriggerMainUI : public ATrigger
 {
 	GENERATED_BODY()
 public:
-	ATriggerRamdomSpawn();
+	ATriggerMainUI();
 protected:
 	virtual void TriggerOverlap(UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -17,5 +16,7 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Trigger", meta = (AllowPrivateAccess = true))
-	TArray<TObjectPtr<class AActor_SpawnVolume>>	m_SpawnVolumes;
+	FString m_UIText;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Trigger", meta = (AllowPrivateAccess = true))
+	int32 m_Progress;
 };
