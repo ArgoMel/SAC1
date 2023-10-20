@@ -40,8 +40,8 @@ protected:
 	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FName		mName;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UMaterialInstance> mBloodDecal;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Blood")
+	//class UParticleSystemComponent* BloodEffectComponent;
 
 	TObjectPtr<class UDefaultAIAnimInstance>	mAnim;
 
