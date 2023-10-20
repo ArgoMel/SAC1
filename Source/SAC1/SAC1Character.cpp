@@ -92,7 +92,7 @@ void ASAC1Character::BeginPlay()
 	if (IsValid(controller)&& IsValid(controller->PlayerCameraManager))
 	{
 		controller->PlayerCameraManager->ViewPitchMax = 70.f;
-		controller->PlayerCameraManager->ViewPitchMin = -50.f;
+		controller->PlayerCameraManager->ViewPitchMin = -40.f;
 	}
 }
 
@@ -142,9 +142,8 @@ float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 			if (IsValid(m_BloodFill))
 			{
-				//UNiagaraFunctionLibrary::SpawnSystemAttached(m_BloodFill, GetMesh(), NAME_None, 
-				//	FVector(0.f), FRotator(0.f), EAttachLocation::Type::KeepRelativeOffset, true);
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_BloodFill, GetActorLocation(), FRotator::ZeroRotator);
+				UNiagaraFunctionLibrary::SpawnSystemAttached(m_BloodFill, GetMesh(), NAME_None, 
+					FVector(0.f), FRotator(0.,90.,0.), EAttachLocation::Type::KeepRelativeOffset, true);
 				//niagaraComp->SetNiagaraVariableFloat(FString("StrengthCoef"), CoefStrength);
 			}
 		}
