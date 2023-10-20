@@ -47,15 +47,15 @@ AAIPawn::AAIPawn()
 	mDissolveTime = 3.f;
 	mDissolveEnable = false;
 
-	BloodEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("BloodEffectComponent"));
-	BloodEffectComponent->SetupAttachment(mBody); 
-	BloodEffectComponent->bAutoActivate = false;
+	//BloodEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("BloodEffectComponent"));
+	//BloodEffectComponent->SetupAttachment(mBody); 
+	//BloodEffectComponent->bAutoActivate = false;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.Blueprint'/Game/ZombiDecal/BP_BloodEffect.BP_BloodEffect'"));
-	if (ParticleAsset.Succeeded())
-	{
-		BloodEffectComponent->SetTemplate(ParticleAsset.Object);
-	}
+	//static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.Blueprint'/Game/ZombiDecal/BP_BloodEffect.BP_BloodEffect'"));
+	//if (ParticleAsset.Succeeded())
+	//{
+	//	BloodEffectComponent->SetTemplate(ParticleAsset.Object);
+	//}
 }
 
 void AAIPawn::LoadAIData()
@@ -205,10 +205,10 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		}
 	}
 
-	if (BloodEffectComponent)
-	{
-		BloodEffectComponent->Activate();
-	}
+	//if (BloodEffectComponent)
+	//{
+	//	BloodEffectComponent->Activate();
+	//}
 
 	return Dmg;
 }
