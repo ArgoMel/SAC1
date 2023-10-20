@@ -1,7 +1,9 @@
+#include "../GameInfo.h"
 #include "AIPawn.h"
 #include "AISpawnPoint.h"
 #include "DefaultAIController.h"
 #include "AIState.h"
+#include "../Effect/DecalEffect.h"
 #include "PatrolPoint.h"
 #include "DefaultAIAnimInstance.h"
 
@@ -56,6 +58,13 @@ AAIPawn::AAIPawn()
 	//{
 	//	BloodEffectComponent->SetTemplate(ParticleAsset.Object);
 	//}
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MIBloodDecalRE(TEXT(
+		"/Script/Engine.MaterialInstanceConstant'/Game/ZombiDecal/RE/MIBloodDecalRE.MIBloodDecalRE'"));
+	if (MIBloodDecalRE.Succeeded())
+	{
+		mBloodDecal = MIBloodDecalRE.Object;
+	}
 }
 
 void AAIPawn::LoadAIData()
@@ -161,7 +170,19 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 	float Dmg = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator,
 		DamageCauser);
 
+	FActorSpawnParameters	actorParam;
+	actorParam.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FVector loc = GetActorLocation();
+	loc.Z -= mBody->GetScaledCapsuleHalfHeight();
+	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
+	decal->SetDecalMaterial(mBloodDecal);
+	decal->SetLifeSpan(5.f);
+	decal->SetDecalSize(FVector(300));
+
+
 	bool Death = mAIState->AddHP((int32)Dmg);
+
 
 	if (Death)
 	{
@@ -192,16 +213,16 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 			// 다른 클래스에서는 지원하지 않을 수 있기 때문에
 			// GetWorld()->GetTimerManager() 로 접근한다.
 			GetWorld()->GetTimerManager().SetTimer(mHitTimerHandle, this,
-				&AAIPawn::HitTimer, 0.2f);                
+				&AAIPawn::HitTimer, 0.2f);
 		}
 
-		mHit = true;             
+		mHit = true;
 
 		// MaterialInstance 전체를 반복하며 HitColor를 붉은색으로 변경한다.
 		for (auto& Mtrl : mMaterialArray)
 		{
 			Mtrl->SetVectorParameterValue(TEXT("HitColor"),
-				FVector(1.0, 0.0, 0.0));    
+				FVector(1.0, 0.0, 0.0));
 		}
 	}
 
