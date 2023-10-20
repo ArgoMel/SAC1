@@ -18,4 +18,6 @@ private:
 public:
 	void SetReloadingImage(ESlateVisibility visible);
 	void SetPlayerDeadUI(ESlateVisibility visible);
+	void SetWeaponUI(ESlateVisibility visible, const FName& name,int32 curArmo, int32 totalArmo);
+	void SetMainUIText(int32 progress,const FString& text);
 };

@@ -338,8 +338,8 @@ void ASAC1Character::OnPlayerDeath()
 	{
 		controller->SetShowMouseCursor(true);
 	}
-
 	DetachFromControllerPendingDestroy();
+
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	SetActorEnableCollision(true);
 	GetMesh()->SetAllBodiesSimulatePhysics(true);

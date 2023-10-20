@@ -5,6 +5,8 @@
 
 class UImage;
 class UButton;
+class UTextBlock;
+class UBorder;
 
 UCLASS()
 class SAC1_API UUW_Main : public UUserWidget
@@ -18,6 +20,13 @@ private:
 	UImage* m_ReloadingImage;
 	UButton* m_RestartBtn;
 	UButton* m_ExitBtn;
+	UTextBlock* m_InfoText;
+	UTextBlock* m_ArmoText;
+	UBorder* m_ArmoBorder;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Progress", meta = (AllowPrivateAccess = true))
+	int32 m_Progress;
 
 private:
 	UFUNCTION()
@@ -30,4 +39,8 @@ public:
 	void SetReloadingImage(ESlateVisibility visible);
 	UFUNCTION()
 	void SetPlayerDeadUI(ESlateVisibility visible);
+	UFUNCTION()
+	void SetWeaponUI(ESlateVisibility visible, const FName& name, int32 curArmo, int32 totalArmo);
+	UFUNCTION()
+	void SetMainUIText(int32 progress,const FString& text);
 };
