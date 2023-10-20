@@ -41,6 +41,8 @@ protected:
 	TArray<TObjectPtr<USoundBase>> m_DeadSounds;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UMaterialInstance> m_HitMaterial;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UNiagaraSystem> m_BloodFill;
 
 	TArray<TObjectPtr<class UTP_WeaponComponent>> m_Weapons;
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
