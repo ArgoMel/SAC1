@@ -42,7 +42,7 @@ ASAC1Character::ASAC1Character()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm);
-	m_Camera->SetRelativeLocation(FVector(5., 20., 0.));
+	m_Camera->SetRelativeLocation(FVector(15., 20., 0.));
 	m_Camera->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
