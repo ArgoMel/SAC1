@@ -22,7 +22,6 @@ ASelfdestructZombi::ASelfdestructZombi()
 	mMesh->SetRelativeLocation(FVector(0.0, 0.0, -110.0));
 	mMesh->SetRelativeRotation(FRotator(0.0, -90.0, 0.0));
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimAsset(TEXT("/Script/Engine.AnimBlueprint'/Game/Zombi/AB_selfdestructZombi.AB_selfdestructZombi_C'"));
 
 	if (AnimAsset.Succeeded())
 		mMesh->SetAnimInstanceClass(AnimAsset.Class);
