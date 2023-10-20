@@ -97,6 +97,7 @@ public:
 
 	bool TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip equip);
 	void OnPlayerDeath();
+	void PickUpArmo(ECharacterEquip equip,float value);
 
 	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
 	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }

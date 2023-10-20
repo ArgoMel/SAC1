@@ -3,6 +3,7 @@
 #include "SAC1PlayerController.h"
 #include "SAC1AnimInstance.h"
 #include "SAC1PlayerState.h"
+#include "SAC1HUD.h"
 #include "Actor_PickUp.h"
 #include "TP_WeaponComponent.h"
 #include "EnhancedInputComponent.h"
@@ -41,7 +42,7 @@ ASAC1Character::ASAC1Character()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm);
-	m_Camera->SetRelativeLocation(FVector(5., 20., 0.));
+	m_Camera->SetRelativeLocation(FVector(15., 20., 0.));
 	m_Camera->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
@@ -165,9 +166,6 @@ void ASAC1Character::Move(const FInputActionValue& Value)
 	const FVector rightDir = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
 	AddMovementInput(forwardDir, movementVector.X);
 	AddMovementInput(rightDir, movementVector.Y);
-
-	//AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-	//AddMovementInput(GetActorRightVector(), MovementVector.X);
 }
 
 void ASAC1Character::CameraRotation(const FInputActionValue& Value)
@@ -255,6 +253,7 @@ void ASAC1Character::CollectPickUps()
 			{
 				if(pickUP->PickedUpBy(this))
 				{
+					pickUP->SetActive(false);
 					m_AnimInst->CollectPickUps();
 					break;
 				}
@@ -334,6 +333,12 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 
 void ASAC1Character::OnPlayerDeath()
 {
+	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Controller);
+	if (IsValid(controller))
+	{
+		controller->SetShowMouseCursor(true);
+	}
+
 	DetachFromControllerPendingDestroy();
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	SetActorEnableCollision(true);
@@ -350,10 +355,30 @@ void ASAC1Character::OnPlayerDeath()
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 
+	ASAC1HUD* hud = Cast<ASAC1HUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
+	if (IsValid(hud))
+	{
+		hud->SetPlayerDeadUI(ESlateVisibility::Visible);
+	}
+
 	if(m_DeadSounds.IsEmpty())
 	{
 		return;
 	}
 	int32 randIndex = FMath::Rand() % m_DeadSounds.Num();
 	UGameplayStatics::PlaySoundAtLocation(this, m_DeadSounds[randIndex], GetActorLocation());
+}
+
+void ASAC1Character::PickUpArmo(ECharacterEquip equip, float value)
+{
+	int index = (int)equip - 1;
+	if(index<0|| index>=m_Weapons.Num())
+	{
+		return;
+	}
+	if (!IsValid(m_Weapons[index]))
+	{
+		return;
+	}
+	m_Weapons[index]->PickUpArmo(value);
 }

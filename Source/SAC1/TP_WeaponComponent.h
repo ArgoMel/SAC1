@@ -17,11 +17,13 @@ public:
 
 private:
 	TObjectPtr<ASAC1Character> Character;
+	TObjectPtr<class ASAC1HUD> m_HUD;
 	FTimerHandle m_AutoFireHandle;
 	FTimeline m_RecoilTimeline;
 	FRotator m_StartRot;
 	FName		m_Name;
 	bool m_IsTargeting;
+	bool m_IsAttached;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
