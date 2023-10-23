@@ -15,8 +15,8 @@ ASAC1Character::ASAC1Character()
 {
 	m_PickUpExtent = FVector(50.f,50.f, 91.f);
 	m_CameraSpeed = 50.f;
-	m_MaxWalkSpeed = 75.f;
-	m_MaxSprintSpeed = 375.f;
+	m_MaxWalkSpeed = 150.f;
+	m_MaxSprintSpeed = 750.f;
 	m_CurWeaponIndex = -1;
 	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
