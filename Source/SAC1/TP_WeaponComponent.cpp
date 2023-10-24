@@ -169,7 +169,10 @@ void UTP_WeaponComponent::PickUpArmo(float value)
 	{
 		m_TotalArmo = m_WeaponData.ArmoMax;
 	}
-	SetWeaponUI(ESlateVisibility::Visible);
+	if (GetVisibleFlag())
+	{
+		SetWeaponUI(ESlateVisibility::Visible);
+	}
 }
 
 void UTP_WeaponComponent::SetWeaponUI(ESlateVisibility visible)
