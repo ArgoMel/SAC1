@@ -42,7 +42,7 @@ ASAC1Character::ASAC1Character()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm);
-	m_Camera->SetRelativeLocation(FVector(15., 20., 0.));
+	m_Camera->SetRelativeLocation(FVector(20., 15., 0.));
 	m_Camera->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
@@ -319,6 +319,7 @@ void ASAC1Character::SetCurWeapon()
 		return; 
 	}
 	m_Weapons[m_CurWeaponIndex]->SetVisibility(true);
+	m_Weapons[m_CurWeaponIndex]->SetWeaponUI(ESlateVisibility::Visible);
 	SetCharacterState((ECharacterEquip)(m_CurWeaponIndex + 1));
 }
 
