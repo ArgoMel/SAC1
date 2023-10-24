@@ -21,6 +21,7 @@ USAC1AnimInstance::USAC1AnimInstance()
 	m_RHandEffectorLoc = FVector(-1,-4.,2.);
 	m_RHandJointTargetLoc = FVector(-45.,-27.,18.);
 	m_RHandRotIntensity = 10.f;
+	m_TurnInPlaceLimit = 90.f;
 	m_LHandIK = 1.f;
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Picking(TEXT(
@@ -127,9 +128,9 @@ void USAC1AnimInstance::HitReaction()
 
 void USAC1AnimInstance::AimOffset(float DeltaSeconds)
 {
-	FRotator curRot = FRotator(0.f, m_PitchInput, m_YawInput);
+	FRotator curRot = FRotator(m_PitchInput, m_YawInput, 0.f);
 	FRotator delta = UKismetMathLibrary::NormalizedDeltaRotator(
-		m_Character->GetControlRotation(), m_Character->GetActorRotation());
+		m_Character->GetControlRotation(),m_Character->GetActorRotation());
 	FRotator interpolate = FMath::RInterpTo(curRot, delta, DeltaSeconds, 20.f);
 	m_PitchInput = FMath::ClampAngle(interpolate.Pitch, -90., 90.);
 	m_YawInput = FMath::ClampAngle(interpolate.Yaw, -90., 90.);
@@ -148,7 +149,8 @@ void USAC1AnimInstance::TurnInChange()
 	{
 		m_RootYawOffset = FRotator::NormalizeAxis(m_YawFrameChange+ m_RootYawOffset);
 	}
-	if(FMath::IsNearlyEqual(GetCurveValue(TEXT("IsTurning")), 1.f,0.001f))
+	float curveValue = GetCurveValue(TEXT("IsTurning"));
+	if(FMath::IsNearlyEqual(curveValue, 1.f,0.001f))
 	{
 		if(!m_DoOnce)
 		{

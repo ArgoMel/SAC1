@@ -62,7 +62,15 @@ void UUW_Main::SetPlayerDeadUI(ESlateVisibility visible)
 void UUW_Main::SetWeaponUI(ESlateVisibility visible, const FName& name, int32 curArmo, int32 totalArmo)
 {
 	m_ArmoBorder->SetVisibility(visible);
-	FString temp = name.ToString()+TEXT(" : ")+ FString::FromInt(curArmo)+ TEXT(" / ") + FString::FromInt(totalArmo);
+	FString temp = name.ToString() + TEXT(" : ") + FString::FromInt(curArmo) + TEXT(" / ");
+	if(totalArmo==-1)
+	{
+		temp+= TEXT("INF");
+	}
+	else
+	{
+		temp += FString::FromInt(totalArmo);
+	}
 	FText text = FText::FromString(temp);
 	m_ArmoText->SetText(text);
 }
