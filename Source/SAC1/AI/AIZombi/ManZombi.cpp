@@ -10,16 +10,22 @@ AManZombi::AManZombi()
 
 	mName = TEXT("ManZombi");
 
-	mBody->SetCapsuleHalfHeight(98.f);
+	mBody->SetCapsuleHalfHeight(80.f);
 	mBody->SetCapsuleRadius(33.f);
+
+	mHead->SetCapsuleHalfHeight(25.f);
+	mHead->SetCapsuleRadius(22.f);
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh>	MeshAsset(TEXT("/Script/Engine.SkeletalMesh'/Game/Zombi/ManZombi/Ch10_nonPBR.Ch10_nonPBR'"));
 
 	if (MeshAsset.Succeeded())
 		mMesh->SetSkeletalMesh(MeshAsset.Object);
 
-	mMesh->SetRelativeLocation(FVector(0.0, 0.0, -98.0));
+	mMesh->SetRelativeLocation(FVector(0.0, 0.0, -80.0));
 	mMesh->SetRelativeRotation(FRotator(0.0, -90.0, 0.0));
+
+	mHead->SetRelativeLocation(FVector(20.0, 0.0, 100.0));
+	mHead->SetRelativeRotation(FRotator(0.0, -90.0, 0.0));
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance>	AnimAsset(TEXT("/Script/Engine.AnimBlueprint'/Game/Zombi/AB_ManZombi.AB_ManZombi_C'"));
 

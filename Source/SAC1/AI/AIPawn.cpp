@@ -1,4 +1,3 @@
-//#include "../GameInfo.h"
 #include "AIPawn.h"
 #include "AISpawnPoint.h"
 #include "DefaultAIController.h"
@@ -6,6 +5,7 @@
 #include "../Effect/DecalEffect.h"
 #include "PatrolPoint.h"
 #include "../SAC1Character.h"
+#include "../SAC1PlayerState.h"
 #include "DefaultAIAnimInstance.h"
 
 TObjectPtr<UDataTable> AAIPawn::mAIDataTable;
@@ -22,6 +22,7 @@ AAIPawn::AAIPawn()
 	//bUseControllerRotationYaw = true;
 
 	mBody = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Body"));
+	mHead = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Head"));
 	mMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	mMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement"));
 	mAIState = CreateDefaultSubobject<UAIState>(TEXT("AIState"));
@@ -29,8 +30,12 @@ AAIPawn::AAIPawn()
 	SetRootComponent(mBody);
 
 	mMesh->SetupAttachment(mBody);
+	mHead->SetupAttachment(mBody);
 
 	mMovement->SetUpdatedComponent(mBody);
+
+	mHead->OnComponentHit.AddDynamic(this,
+		&AAIPawn::BodyHit);
 
 	mBody->SetCollisionProfileName(TEXT("AI"));
 
@@ -139,7 +144,7 @@ void AAIPawn::OnConstruction(const FTransform& Transform)
 void AAIPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	mAnim = Cast<UDefaultAIAnimInstance>(mMesh->GetAnimInstance());
 
 	// SpawnPoint 없이 바로 배치해서 사용하며 PatrolPoint를 넣어준 경우
@@ -207,7 +212,7 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 			AI->BrainComponent->StopLogic(TEXT("Death"));
 
 		//mMesh->SetSimulatePhysics(true);         
-		
+
 		mDeath = true;
 	}
 
@@ -244,6 +249,93 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 	//}
 
 	return Dmg;
+}
+
+void AAIPawn::BodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+
+	ASAC1Character* player = Cast<ASAC1Character>(OtherActor);
+	if (!IsValid(player))
+	{
+		return;
+	}
+
+	ASAC1PlayerState* state = Cast<ASAC1PlayerState>(GetPlayerState());
+	if (!IsValid(state))
+	{
+		return;
+	}
+
+
+
+	float Dmg = state->GetData()->AttackPoint;
+
+	FActorSpawnParameters	actorParam;
+	actorParam.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FVector loc = GetActorLocation();
+	loc.Z -= mBody->GetScaledCapsuleHalfHeight();
+	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
+	decal->SetDecalMaterial(mBloodDecal);
+	decal->SetLifeSpan(5.f);
+	decal->SetDecalSize(FVector(200));
+
+
+	if (IsValid(m_BloodFill))
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(m_BloodFill, mMesh, NAME_None, FVector(0.0, 0.0, 75.0), FRotator(0., 90., 0), EAttachLocation::Type::KeepRelativeOffset, true);
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_BloodFill, GetActorLocation(), FRotator::ZeroRotator);
+		//niagaraComp->SetNiagaraVariableFloat(FString("StrengthCoef"), CoefStrength);
+	}
+
+
+	bool Death = mAIState->AddHP((int32)Dmg);
+
+
+	if (Death)
+	{
+		if (mAnim)
+			mAnim->ChangeAnim(EAIAnimType::Death);
+
+		mBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		AAIController* AI = Cast<AAIController>(GetController());
+
+		if (IsValid(AI))
+			AI->BrainComponent->StopLogic(TEXT("Death"));
+
+		//mMesh->SetSimulatePhysics(true);         
+
+		mDeath = true;
+	}
+
+	else
+	{
+		/*
+		언리얼엔진 타이머
+		글로벌타이머 매니저를 가지고 있고 매니저에서 타이머들을 관리한다.
+		FTimerManager의 SetTimer 함수를 이용하여 타이머를 생성한다.
+		*/
+		// 타이머 핸들이 없을 때 타이머를 생성한다.
+		if (!mHitTimerHandle.IsValid())
+		{
+			// Actor클래스는 GetWorldTimerManager() 함수를 지원해주고 있지만
+			// 다른 클래스에서는 지원하지 않을 수 있기 때문에
+			// GetWorld()->GetTimerManager() 로 접근한다.
+			GetWorld()->GetTimerManager().SetTimer(mHitTimerHandle, this,
+				&AAIPawn::HitTimer, 0.2f);
+		}
+
+		mHit = true;
+
+		// MaterialInstance 전체를 반복하며 HitColor를 붉은색으로 변경한다.
+		for (auto& Mtrl : mMaterialArray)
+		{
+			Mtrl->SetVectorParameterValue(TEXT("HitColor"),
+				FVector(1.0, 0.0, 0.0));
+		}
+	}
+
 }
 
 // Called every frame
@@ -291,12 +383,12 @@ void AAIPawn::HitTimer()
 
 void AAIPawn::Attack()
 {
-	
+
 
 	FHitResult	result;
 
 
-		// 현재 캐릭터의 위치에서 50cm 앞을 시작점으로 잡아준다.
+	// 현재 캐릭터의 위치에서 50cm 앞을 시작점으로 잡아준다.
 	FVector	Start = GetActorLocation() + GetActorForwardVector() * 50.f;
 
 	// 끝점은 시작점으로부터 2m 전방으로 잡아준다.
@@ -320,7 +412,7 @@ void AAIPawn::Attack()
 	// 의 앞쪽으로 만들어주는 회전 행렬을 구한다.(FMatrix로 결과가 나온다)
 	// 그래서 .ToQuat() 을 이용해서 FQuat(회전값)으로 변환한다.
 	DrawDebugCircle(GetWorld(), (Start + End) / 2.f, 50.f,
-		0,DrawColor, false, 1.f);
+		0, DrawColor, false, 1.f);
 #endif
 
 	if (Collision)
@@ -353,7 +445,7 @@ void AAIPawn::Attack()
 		//	//Decal->SetLifeSpan(5.f);
 		//}
 
-	
+
 		//피해량 설정
 		float	Dmg = 0.f;
 
