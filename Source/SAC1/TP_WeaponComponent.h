@@ -72,4 +72,5 @@ public:
 	void EatFood();
 
 	void PickUpArmo(float value);
+	void SetWeaponUI(ESlateVisibility visible);
 };

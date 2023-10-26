@@ -37,6 +37,9 @@ protected:
 	float m_PitchInput;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Offset", meta = (AllowPrivateAccess = true))
 	float m_YawInput;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	float m_TurnInPlaceLimit;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
 	float m_YawFrameChange;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
