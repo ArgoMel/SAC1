@@ -303,7 +303,7 @@ void AAIPawn::Attack()
 
 	bool Collision = GetWorld()->SweepSingleByChannel(result,
 		Start, End, FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel3,
+		ECollisionChannel::ECC_GameTraceChannel4,
 		FCollisionShape::MakeSphere(50.f), param);
 
 	// 디버깅 용(에디터)으로 출력한다.
