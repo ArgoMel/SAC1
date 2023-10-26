@@ -167,11 +167,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
 public:
 	void SetCollisionProfile(const FName& Name);
 
 	UFUNCTION()
 	void HitTimer();
 
+	UFUNCTION(BlueprintCallable)
+	void Attack();
 	void DeathEnd();
 };
