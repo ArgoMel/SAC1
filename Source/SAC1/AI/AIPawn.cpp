@@ -178,7 +178,15 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
 	decal->SetDecalMaterial(mBloodDecal);
 	decal->SetLifeSpan(5.f);
-	decal->SetDecalSize(FVector(300));
+	decal->SetDecalSize(FVector(200));
+
+
+	if (IsValid(m_BloodFill))
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(m_BloodFill, mMesh, NAME_None, FVector(0.0, 0.0, 75.0), FRotator(0., 90., 0), EAttachLocation::Type::KeepRelativeOffset, true);
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_BloodFill, GetActorLocation(), FRotator::ZeroRotator);
+		//niagaraComp->SetNiagaraVariableFloat(FString("StrengthCoef"), CoefStrength);
+	}
 
 
 	bool Death = mAIState->AddHP((int32)Dmg);
