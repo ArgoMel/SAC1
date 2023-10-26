@@ -13,7 +13,7 @@
 
 ASAC1Character::ASAC1Character()
 {
-	m_PickUpExtent = FVector(50.f,50.f, 91.f);
+	m_PickUpExtent = FVector(1.f,1.f, 91.f);
 	m_CameraSpeed = 50.f;
 	m_MaxWalkSpeed = 150.f;
 	m_MaxSprintSpeed = 750.f;
@@ -239,7 +239,7 @@ void ASAC1Character::CollectPickUps()
 		return;
 	}
 	TArray<FHitResult> results;
-	FVector traceStart = GetActorLocation() + GetActorForwardVector() * m_PickUpExtent.X-GetActorUpVector()* m_PickUpExtent.Z*0.5;
+	FVector traceStart = GetActorLocation() -GetActorUpVector()* m_PickUpExtent.Z*0.5;
 	FVector traceEnd = traceStart + GetActorForwardVector() * m_PickUpExtent.X;
 	FCollisionQueryParams param(NAME_None, false, this);
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,

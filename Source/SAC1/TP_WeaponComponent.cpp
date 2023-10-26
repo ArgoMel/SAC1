@@ -19,6 +19,8 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 
 	SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+	bRenderCustomDepth = true;
+	SetCustomDepthStencilValue(0);
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>	Curve_HorizontalRecoil(TEXT(
 		"/Game/KBJ/Curves/Curve_HorizontalRecoil.Curve_HorizontalRecoil"));
