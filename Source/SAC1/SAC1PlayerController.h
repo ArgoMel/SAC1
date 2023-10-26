@@ -21,8 +21,8 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	UPROPERTY(EditAnywhere, Category = "Input")
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Input")
 	TObjectPtr<class UInputMappingContext> m_IMC;
 
 public:
@@ -48,6 +48,14 @@ public:
 	TObjectPtr<class UInputAction> m_Move;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> m_LShift;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<class UInputAction> AIHold;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<class UInputAction> AIFollow;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<class UInputAction> AIRecon;
+
 
 private:
 	static void MoveModifier(UInputMappingContext* IMC, UInputAction* IA, FKey key,
