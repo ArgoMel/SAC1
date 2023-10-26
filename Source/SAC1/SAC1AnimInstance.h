@@ -33,6 +33,43 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
 	bool m_IsInAir;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Offset", meta = (AllowPrivateAccess = true))
+	float m_PitchInput;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Offset", meta = (AllowPrivateAccess = true))
+	float m_YawInput;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	float m_TurnInPlaceLimit;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	float m_YawFrameChange;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	float m_YawLastTick;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	float m_Yaw;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	float m_RootYawOffset;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	float m_DistanceCurveValueLastFrame;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	float m_DistanceCurveValue;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	bool m_IsAccerelating;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "TurnInChange", meta = (AllowPrivateAccess = true))
+	bool m_DoOnce;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	FTransform m_LHandTransform;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	FVector m_RHandEffectorLoc;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	FVector m_RHandJointTargetLoc;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	FRotator m_RHandRot;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	float m_RHandRotIntensity;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	float m_LHandIK;
+
 public:
 	void SetCharacterState(ECharacterEquip state)
 	{
@@ -46,6 +83,11 @@ public:
 	void CollectPickUps();
 	void ChangeWeapon();
 	void HitReaction();
+	
+	void AimOffset(float DeltaSeconds);
+	void TurnInChange();
+	void SnapLHandToWeapon();
+	void WeaponSway();
 
 	//UFUNCTION()
 	//void AnimNotify_TransitionFall();

@@ -64,6 +64,16 @@ void ASAC1PlayerController::SetupInputComponent()
 	m_LShift->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(m_LShift, EKeys::LeftShift);
 
+	AIHold = NewObject<UInputAction>(this);
+	AIHold->ValueType = EInputActionValueType::Boolean;
+	m_IMC->MapKey(AIHold, EKeys::Z);
+	AIFollow = NewObject<UInputAction>(this);
+	AIFollow->ValueType = EInputActionValueType::Boolean;
+	m_IMC->MapKey(AIFollow, EKeys::X);
+	AIRecon = NewObject<UInputAction>(this);
+	AIRecon->ValueType = EInputActionValueType::Boolean;
+	m_IMC->MapKey(AIRecon, EKeys::C);
+
 	m_Move = NewObject<UInputAction>(this);
 	m_Move->ValueType = EInputActionValueType::Axis3D;
 	MoveModifier(m_IMC, m_Move, EKeys::W);

@@ -12,6 +12,9 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"

@@ -20,7 +20,8 @@ public class SAC1 : ModuleRules
             "UMG",
             "CinematicCamera",
             "HeadMountedDisplay", 
-			"EnhancedInput"
-		});
+			"EnhancedInput",
+            "Niagara"
+        });
 	}
 }

@@ -1,4 +1,4 @@
-#include "../GameInfo.h"
+//#include "../GameInfo.h"
 #include "AIPawn.h"
 #include "AISpawnPoint.h"
 #include "DefaultAIController.h"

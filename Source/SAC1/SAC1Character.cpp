@@ -15,8 +15,8 @@ ASAC1Character::ASAC1Character()
 {
 	m_PickUpExtent = FVector(50.f,50.f, 91.f);
 	m_CameraSpeed = 50.f;
-	m_MaxWalkSpeed = 75.f;
-	m_MaxSprintSpeed = 375.f;
+	m_MaxWalkSpeed = 150.f;
+	m_MaxSprintSpeed = 750.f;
 	m_CurWeaponIndex = -1;
 	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
@@ -42,7 +42,7 @@ ASAC1Character::ASAC1Character()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm);
-	m_Camera->SetRelativeLocation(FVector(15., 20., 0.));
+	m_Camera->SetRelativeLocation(FVector(20., 15., 0.));
 	m_Camera->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
@@ -75,6 +75,12 @@ ASAC1Character::ASAC1Character()
 	{
 		m_HitMaterial= MIBloodDecalRE.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NS_BloodEffect(TEXT(
+		"/Game/ZombiDecal/NS_BloodEffect.NS_BloodEffect"));
+	if (NS_BloodEffect.Succeeded())
+	{
+		m_BloodFill = NS_BloodEffect.Object;
+	}
 }
 
 void ASAC1Character::BeginPlay()
@@ -86,7 +92,7 @@ void ASAC1Character::BeginPlay()
 	if (IsValid(controller)&& IsValid(controller->PlayerCameraManager))
 	{
 		controller->PlayerCameraManager->ViewPitchMax = 70.f;
-		controller->PlayerCameraManager->ViewPitchMin = -50.f;
+		controller->PlayerCameraManager->ViewPitchMin = -40.f;
 	}
 }
 
@@ -113,16 +119,6 @@ float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	FActorSpawnParameters	actorParam;
-	actorParam.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	FVector loc = GetActorLocation();
-	loc.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0.,90.,0.), actorParam);
-	decal->SetDecalMaterial(m_HitMaterial);
-	decal->SetLifeSpan(10.f);
-	decal->SetDecalSize(FVector(GetCapsuleComponent()->GetScaledCapsuleRadius()));
-
 	ASAC1PlayerState* state = Cast<ASAC1PlayerState>(GetPlayerState());
 	if (IsValid(state))
 	{
@@ -133,6 +129,23 @@ float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		else
 		{
 			m_AnimInst->HitReaction();
+
+			FActorSpawnParameters	actorParam;
+			actorParam.SpawnCollisionHandlingOverride =
+				ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			FVector loc = GetActorLocation();
+			loc.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+			ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
+			decal->SetDecalMaterial(m_HitMaterial);
+			decal->SetLifeSpan(10.f);
+			decal->SetDecalSize(FVector(GetCapsuleComponent()->GetScaledCapsuleRadius()));
+
+			if (IsValid(m_BloodFill))
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAttached(m_BloodFill, GetMesh(), NAME_None, 
+					FVector(0.f), FRotator(0.,90.,0.), EAttachLocation::Type::KeepRelativeOffset, true);
+				//niagaraComp->SetNiagaraVariableFloat(FString("StrengthCoef"), CoefStrength);
+			}
 		}
 	}
 	return DamageAmount;
@@ -306,6 +319,7 @@ void ASAC1Character::SetCurWeapon()
 		return; 
 	}
 	m_Weapons[m_CurWeaponIndex]->SetVisibility(true);
+	m_Weapons[m_CurWeaponIndex]->SetWeaponUI(ESlateVisibility::Visible);
 	SetCharacterState((ECharacterEquip)(m_CurWeaponIndex + 1));
 }
 

@@ -1,11 +1,28 @@
 #include "SAC1AnimInstance.h"
 #include "SAC1Character.h"
+#include "TP_WeaponComponent.h"
 
 USAC1AnimInstance::USAC1AnimInstance()
 {
 	m_CharState=ECharacterEquip::None;
 	m_Speed =0.f;
 	m_IsInAir = false;
+	m_PitchInput = 0.f;
+	m_YawInput = 0.f;
+	m_YawFrameChange = 0.f;
+	m_YawLastTick = 0.f;
+	m_Yaw = 0.f;
+	m_RootYawOffset = 0.f;
+	m_DistanceCurveValueLastFrame = 0.f;
+	m_DistanceCurveValue = 0.f;
+	m_IsAccerelating = false;
+	m_DoOnce = false;
+
+	m_RHandEffectorLoc = FVector(-1,-4.,2.);
+	m_RHandJointTargetLoc = FVector(-45.,-27.,18.);
+	m_RHandRotIntensity = 10.f;
+	m_TurnInPlaceLimit = 90.f;
+	m_LHandIK = 1.f;
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Picking(TEXT(
 		"/Game/AnimStarterPack/ECT/AM_Picking.AM_Picking"));
@@ -46,6 +63,11 @@ void USAC1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 	m_IsInAir = m_Character->GetMovementComponent()->IsFalling();
 	m_Speed = m_Character->GetVelocity().Length();
+
+	AimOffset(DeltaSeconds);
+	TurnInChange();
+	SnapLHandToWeapon();
+	WeaponSway();
 }
 
 void USAC1AnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
@@ -102,4 +124,71 @@ void USAC1AnimInstance::HitReaction()
 	{
 		Montage_Play(m_DamagedMontage, 1.f);
 	}
+}
+
+void USAC1AnimInstance::AimOffset(float DeltaSeconds)
+{
+	FRotator curRot = FRotator(m_PitchInput, m_YawInput, 0.f);
+	FRotator delta = UKismetMathLibrary::NormalizedDeltaRotator(
+		m_Character->GetControlRotation(),m_Character->GetActorRotation());
+	FRotator interpolate = FMath::RInterpTo(curRot, delta, DeltaSeconds, 20.f);
+	m_PitchInput = FMath::ClampAngle(interpolate.Pitch, -90., 90.);
+	m_YawInput = FMath::ClampAngle(interpolate.Yaw, -90., 90.);
+}
+
+void USAC1AnimInstance::TurnInChange()
+{
+	m_YawLastTick = m_Yaw;
+	m_Yaw = m_Character->GetControlRotation().Yaw;
+	m_YawFrameChange = m_YawLastTick - m_Yaw;
+	if(IsAnyMontagePlaying()||m_IsAccerelating)
+	{
+		m_RootYawOffset = 0.f;
+	}
+	else
+	{
+		m_RootYawOffset = FRotator::NormalizeAxis(m_YawFrameChange+ m_RootYawOffset);
+	}
+	float curveValue = GetCurveValue(TEXT("IsTurning"));
+	if(FMath::IsNearlyEqual(curveValue, 1.f,0.001f))
+	{
+		if(!m_DoOnce)
+		{
+			m_DoOnce = true;
+			m_DistanceCurveValue = m_RootYawOffset;
+		}
+		m_DistanceCurveValueLastFrame = m_RootYawOffset;
+		m_DistanceCurveValue = FMath::Clamp(GetCurveValue(TEXT("DistanceCurve")),-90.f,0.f);
+		float mul = 1.f;
+		if(m_RootYawOffset>0.f)
+		{
+			mul = -1.f;
+		}
+		m_RootYawOffset-=(m_DistanceCurveValueLastFrame - m_DistanceCurveValue)* mul;
+	}
+	else
+	{
+		m_DoOnce = false;
+	}
+}
+
+void USAC1AnimInstance::SnapLHandToWeapon()
+{
+	UTP_WeaponComponent* weapon= m_Character->GetCurWeapon();
+	if(!IsValid(weapon))
+	{
+		return;
+	}
+	FTransform weaponTransform = weapon->GetSocketTransform(TEXT("LeftHandPlacement"));
+	FVector outLoc;
+	FRotator outRot;
+	m_Character->GetMesh()->TransformToBoneSpace(TEXT("hand_r"), weaponTransform.GetLocation(), 
+		weaponTransform.Rotator(), outLoc, outRot);
+	m_LHandTransform.SetLocation(outLoc);
+	m_LHandTransform.SetRotation(outRot.Quaternion());
+}
+
+void USAC1AnimInstance::WeaponSway()
+{
+	//¡‹¿Œ ¡‹æ∆øÙ æ÷¥œ∏ﬁ¿Ãº«
 }
