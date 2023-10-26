@@ -81,12 +81,14 @@ void AActor_PickUpWeapon::OverlapBegin(UPrimitiveComponent* comp, AActor* otherA
 	UPrimitiveComponent* otherComp, int32 index, bool bFromSweep, const FHitResult& result)
 {
 	m_HUD->SetInteractionText(ESlateVisibility::Visible, m_ItemState->GetItemData()->UIText);
+	m_Weapon->SetCustomDepthStencilValue(15);
 }
 
 void AActor_PickUpWeapon::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, 
 	UPrimitiveComponent* otherComp, int32 index)
 {
 	m_HUD->SetInteractionText(ESlateVisibility::Collapsed, m_ItemState->GetItemData()->UIText);
+	m_Weapon->SetCustomDepthStencilValue(0);
 }
 
 void AActor_PickUpWeapon::LoadItemData()

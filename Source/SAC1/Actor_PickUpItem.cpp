@@ -12,6 +12,7 @@ AActor_PickUpItem::AActor_PickUpItem()
 	m_Name = TEXT("RiflePack");
 
 	GetStaticMeshComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+	GetStaticMeshComponent()->bRenderCustomDepth = true;
 
 	m_Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	m_Collider->SetupAttachment(GetStaticMeshComponent());
@@ -103,12 +104,14 @@ void AActor_PickUpItem::OverlapBegin(UPrimitiveComponent* comp, AActor* otherAct
 	UPrimitiveComponent* otherComp, int32 index, bool bFromSweep, const FHitResult& result)
 {
 	m_HUD->SetInteractionText(ESlateVisibility::Visible, m_ItemState->GetItemData()->UIText);
+	GetStaticMeshComponent()->SetCustomDepthStencilValue(15);
 }
 
 void AActor_PickUpItem::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, 
 	UPrimitiveComponent* otherComp, int32 index)
 {
 	m_HUD->SetInteractionText(ESlateVisibility::Collapsed, m_ItemState->GetItemData()->UIText);
+	GetStaticMeshComponent()->SetCustomDepthStencilValue(0);
 }
 
 void AActor_PickUpItem::LoadItemData()
