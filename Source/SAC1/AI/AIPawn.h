@@ -57,6 +57,9 @@ protected:
 	bool	mAttackEnd;
 	bool	mInteractionEnd;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
+	bool    mDeath;
+
 	ETeam		mTeam;
 
 	UPROPERTY(Category = Component, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -175,6 +178,6 @@ public:
 	void HitTimer();
 
 	UFUNCTION(BlueprintCallable)
-	void Attack();
+	virtual void Attack();
 	void DeathEnd();
 };
