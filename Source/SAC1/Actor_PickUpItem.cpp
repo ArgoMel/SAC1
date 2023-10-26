@@ -1,6 +1,7 @@
 #include "Actor_PickUpItem.h"
 #include "AC_ItemState.h"
 #include "SAC1Character.h"
+#include "SAC1HUD.h"
 
 TObjectPtr<UDataTable> AActor_PickUpItem::ItemDataTable;
 
@@ -8,14 +9,16 @@ AActor_PickUpItem::AActor_PickUpItem()
 {
 	SetReplicateMovement(true);
 
-	m_Name = TEXT("BulletPack");
+	m_Name = TEXT("RiflePack");
 
 	GetStaticMeshComponent()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	m_Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	m_Collider->SetupAttachment(GetStaticMeshComponent());
 	m_Collider->SetGenerateOverlapEvents(true);
-	m_Collider->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	m_Collider->SetCollisionProfileName(TEXT("PlayerTrigger"));
+	m_Collider->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+	m_Collider->SetSphereRadius(100.f);
 
 	m_ItemState = CreateDefaultSubobject<UAC_ItemState>(TEXT("ItemState"));
 }
@@ -23,6 +26,10 @@ AActor_PickUpItem::AActor_PickUpItem()
 void AActor_PickUpItem::BeginPlay()
 {
 	Super::BeginPlay();
+	m_Collider->OnComponentBeginOverlap.AddDynamic(this, &AActor_PickUpItem::OverlapBegin);
+	m_Collider->OnComponentEndOverlap.AddDynamic(this, &AActor_PickUpItem::OverlapEnd);
+
+	m_HUD = Cast<ASAC1HUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
 }
 
 void AActor_PickUpItem::OnConstruction(const FTransform& Transform)
@@ -54,9 +61,13 @@ bool AActor_PickUpItem::PickedUpBy(APawn* pawn)
 			//ai È¸º¹
 			//player->PickUpArmo(0, data->Value);
 		}
-		else if (m_Name == FName(TEXT("BulletPack")))
+		else if (m_Name == FName(TEXT("RiflePack")))
 		{
 			player->PickUpArmo(ECharacterEquip::Rifle, data->Value);
+		}
+		else if (m_Name == FName(TEXT("PistolPack")))
+		{
+			player->PickUpArmo(ECharacterEquip::Pistrol, data->Value);
 		}
 		else if (m_Name == FName(TEXT("FirePack")))
 		{
@@ -86,6 +97,18 @@ bool AActor_PickUpItem::PickedUpBy(APawn* pawn)
 FItemData* AActor_PickUpItem::FindItemData(const FName& Name)
 {
 	return ItemDataTable->FindRow<FItemData>(Name, TEXT(""));
+}
+
+void AActor_PickUpItem::OverlapBegin(UPrimitiveComponent* comp, AActor* otherActor, 
+	UPrimitiveComponent* otherComp, int32 index, bool bFromSweep, const FHitResult& result)
+{
+	m_HUD->SetInteractionText(ESlateVisibility::Visible, m_ItemState->GetItemData()->UIText);
+}
+
+void AActor_PickUpItem::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, 
+	UPrimitiveComponent* otherComp, int32 index)
+{
+	m_HUD->SetInteractionText(ESlateVisibility::Collapsed, m_ItemState->GetItemData()->UIText);
 }
 
 void AActor_PickUpItem::LoadItemData()

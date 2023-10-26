@@ -243,8 +243,8 @@ void ASAC1Character::CollectPickUps()
 	FVector traceEnd = traceStart + GetActorForwardVector() * m_PickUpExtent.X;
 	FCollisionQueryParams param(NAME_None, false, this);
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
-		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeBox(m_PickUpExtent), param);
-		//ECollisionChannel::ECC_GameTraceChannel5, FCollisionShape::MakeBox(m_PickUpExtent), param);
+		//ECollisionChannel::ECC_Visibility, FCollisionShape::MakeBox(m_PickUpExtent), param);
+		ECollisionChannel::ECC_GameTraceChannel2, FCollisionShape::MakeBox(m_PickUpExtent), param);
 #if ENABLE_DRAW_DEBUG
 	FColor drawColor;
 	if (isCol)

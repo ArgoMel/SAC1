@@ -20,7 +20,7 @@ AActor_PickUpWeapon::AActor_PickUpWeapon()
 	m_Collider->SetGenerateOverlapEvents(true);
 	m_Collider->SetCollisionProfileName(TEXT("PlayerTrigger"));
 	m_Collider->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
-	m_Collider->SetSphereRadius(50.f);
+	m_Collider->SetSphereRadius(100.f);
 
 	m_Weapon = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("WeaponComponent"));
 	m_Weapon->SetupAttachment(m_Collider);
