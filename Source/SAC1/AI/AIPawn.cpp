@@ -16,6 +16,7 @@ AAIPawn::AAIPawn()
 
 	mAttackEnd = false;
 	mInteractionEnd = false;
+	mDeath = false;
 
 	// Controller의 Yaw 회전에 매칭한다.
 	//bUseControllerRotationYaw = true;
@@ -205,7 +206,9 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		if (IsValid(AI))
 			AI->BrainComponent->StopLogic(TEXT("Death"));
 
-		//mMesh->SetSimulatePhysics(true);                
+		//mMesh->SetSimulatePhysics(true);         
+		
+		mDeath = true;
 	}
 
 	else
@@ -288,7 +291,7 @@ void AAIPawn::HitTimer()
 
 void AAIPawn::Attack()
 {
-	LOG(TEXT("zombi attack"));
+	
 
 	FHitResult	result;
 
@@ -316,10 +319,8 @@ void AAIPawn::Attack()
 	// FRotationMatrix::MakeFromZ(GetActorForwardVector()) : Z축을 캐릭터
 	// 의 앞쪽으로 만들어주는 회전 행렬을 구한다.(FMatrix로 결과가 나온다)
 	// 그래서 .ToQuat() 을 이용해서 FQuat(회전값)으로 변환한다.
-	DrawDebugCapsule(GetWorld(), (Start + End) / 2.f, 100.f,
-		50.f, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
-		DrawColor, false, 1.f);
-
+	DrawDebugCircle(GetWorld(), (Start + End) / 2.f, 50.f,
+		0,DrawColor, false, 1.f);
 #endif
 
 	if (Collision)
