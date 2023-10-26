@@ -28,6 +28,9 @@ protected:
 	TObjectPtr<UCapsuleComponent>	mBody;
 
 	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCapsuleComponent>	mHead;
+
+	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent>	mMesh;
 
 	UPROPERTY(Category = Component, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -165,6 +168,10 @@ public:
 	virtual float TakeDamage(float DamageAmount, 
 		struct FDamageEvent const& DamageEvent,
 		class AController* EventInstigator, AActor* DamageCauser);
+
+	private:
+		UFUNCTION()
+		void BodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 public:	
 	// Called every frame
