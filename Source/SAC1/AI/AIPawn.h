@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UMaterialInstance> mBloodDecal;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UNiagaraSystem> m_BloodFill;
+
 	TObjectPtr<class UDefaultAIAnimInstance>	mAnim;
 
 	// 생성된 스폰포인트를 알고 있게 해준다.
@@ -164,11 +167,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
 public:
 	void SetCollisionProfile(const FName& Name);
 
 	UFUNCTION()
 	void HitTimer();
 
+	UFUNCTION(BlueprintCallable)
+	void Attack();
 	void DeathEnd();
 };
