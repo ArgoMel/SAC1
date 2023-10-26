@@ -37,6 +37,9 @@ void ASelfdestructZombi::BeginPlay()
 void ASelfdestructZombi::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+
+
 }
 
 void ASelfdestructZombi::Tick(float DeltaTime)
