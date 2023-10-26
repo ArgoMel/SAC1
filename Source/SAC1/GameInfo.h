@@ -191,13 +191,13 @@ public:
 	int32	MaxHP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float	MoveSpeed;
+	int32	CurrentAmmo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float	AttackDistance;
+	int32	MaxMagAmmo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float	InteractionDistance;
+	int32	TotalAmmo;
 };
 
 
