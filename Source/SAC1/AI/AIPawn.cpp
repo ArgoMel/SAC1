@@ -5,6 +5,7 @@
 #include "AIState.h"
 #include "../Effect/DecalEffect.h"
 #include "PatrolPoint.h"
+#include "../SAC1Character.h"
 #include "DefaultAIAnimInstance.h"
 
 TObjectPtr<UDataTable> AAIPawn::mAIDataTable;
@@ -178,7 +179,15 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
 	decal->SetDecalMaterial(mBloodDecal);
 	decal->SetLifeSpan(5.f);
-	decal->SetDecalSize(FVector(300));
+	decal->SetDecalSize(FVector(200));
+
+
+	if (IsValid(m_BloodFill))
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(m_BloodFill, mMesh, NAME_None, FVector(0.0, 0.0, 75.0), FRotator(0., 90., 0), EAttachLocation::Type::KeepRelativeOffset, true);
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_BloodFill, GetActorLocation(), FRotator::ZeroRotator);
+		//niagaraComp->SetNiagaraVariableFloat(FString("StrengthCoef"), CoefStrength);
+	}
 
 
 	bool Death = mAIState->AddHP((int32)Dmg);
@@ -275,6 +284,86 @@ void AAIPawn::HitTimer()
 	}
 
 	GetWorld()->GetTimerManager().ClearTimer(mHitTimerHandle);
+}
+
+void AAIPawn::Attack()
+{
+	LOG(TEXT("zombi attack"));
+
+	FHitResult	result;
+
+
+		// 현재 캐릭터의 위치에서 50cm 앞을 시작점으로 잡아준다.
+	FVector	Start = GetActorLocation() + GetActorForwardVector() * 50.f;
+
+	// 끝점은 시작점으로부터 2m 전방으로 잡아준다.
+	FVector	End = Start + GetActorForwardVector() * 200.f;
+
+	FCollisionQueryParams	param(NAME_None, false, this);
+
+	bool Collision = GetWorld()->SweepSingleByChannel(result,
+		Start, End, FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel3,
+		FCollisionShape::MakeSphere(50.f), param);
+
+	// 디버깅 용(에디터)으로 출력한다.
+#if ENABLE_DRAW_DEBUG
+
+	// Collision 값에 따라 true일 경우 red, false일 경우 green으로
+	// 출력한다.
+	FColor	DrawColor = Collision ? FColor::Red : FColor::Green;
+
+	// FRotationMatrix::MakeFromZ(GetActorForwardVector()) : Z축을 캐릭터
+	// 의 앞쪽으로 만들어주는 회전 행렬을 구한다.(FMatrix로 결과가 나온다)
+	// 그래서 .ToQuat() 을 이용해서 FQuat(회전값)으로 변환한다.
+	DrawDebugCapsule(GetWorld(), (Start + End) / 2.f, 100.f,
+		50.f, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
+		DrawColor, false, 1.f);
+
+#endif
+
+	if (Collision)
+	{
+		FActorSpawnParameters	ActorParam;
+		ActorParam.SpawnCollisionHandlingOverride =
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		//ADefaultEffect* Effect = GetWorld()->SpawnActor<ADefaultEffect>(
+		//	result.ImpactPoint,
+		//	FRotator::ZeroRotator, ActorParam);
+
+		FHitResult	LineResult;
+
+		FCollisionQueryParams	param1(NAME_None, false, this);
+
+		bool LineCollision = GetWorld()->LineTraceSingleByChannel(LineResult,
+			result.ImpactPoint,
+			result.ImpactPoint - FVector(0.0, 0.0, 200.0),
+			ECollisionChannel::ECC_GameTraceChannel8, param1);
+
+		//if (LineCollision)
+		//{
+		//	//ADecalEffect* Decal = GetWorld()->SpawnActor<ADecalEffect>(
+		//	//	LineResult.ImpactPoint,
+		//	//	FRotator::ZeroRotator, ActorParam);
+
+		//	//Decal->SetDecalMaterial(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/ZombiDecal/RE/MIBloodDecalRE.MIBloodDecalRE'"));
+		//	//// 액터의 생명주기를 지정한다. 5.f를 지정하면 생성되고 5초 뒤에 제거된다.
+		//	//Decal->SetLifeSpan(5.f);
+		//}
+
+	
+		//피해량 설정
+		float	Dmg = 0.f;
+
+		if (IsValid(mAIState))
+			Dmg = (float)mAIState->GetData()->AttackPoint;
+
+		//피해이벤트 생성
+		FDamageEvent	DmgEvent;
+		result.GetActor()->TakeDamage(Dmg, DmgEvent, GetController(),
+			this);
+	}
 }
 
 void AAIPawn::DeathEnd()

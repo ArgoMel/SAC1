@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(Category = Anim, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EAIAnimType	mAnimType;
 
+	UPROPERTY(Category = Anim, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class AAIPawn>	AIPawn;
+
 public:
 	void ChangeAnim(EAIAnimType Type)
 	{

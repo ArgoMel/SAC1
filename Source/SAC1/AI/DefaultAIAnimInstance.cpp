@@ -32,6 +32,11 @@ void UDefaultAIAnimInstance::NativePostEvaluateAnimation()
 void UDefaultAIAnimInstance::NativeUninitializeAnimation()
 {
 	Super::NativeUninitializeAnimation();
+
+	 AIPawn = Cast<AAIPawn>(TryGetPawnOwner());
+
+
+
 }
 
 void UDefaultAIAnimInstance::NativeBeginPlay()
@@ -45,7 +50,7 @@ void UDefaultAIAnimInstance::AnimNotify_Attack()
 
 void UDefaultAIAnimInstance::AnimNotify_AttackEnd()
 {
-	AAIPawn* AIPawn = Cast<AAIPawn>(TryGetPawnOwner());
+	//AAIPawn* AIPawn = Cast<AAIPawn>(TryGetPawnOwner());
 
 	// IsValid : 객체가 유효한지 판단한다.
 	// nullptr일 경우 유효한 객체가 아니다.
@@ -57,7 +62,7 @@ void UDefaultAIAnimInstance::AnimNotify_AttackEnd()
 
 void UDefaultAIAnimInstance::AnimNotify_InteractionEnd()
 {
-	AAIPawn* AIPawn = Cast<AAIPawn>(TryGetPawnOwner());
+	//AAIPawn* AIPawn = Cast<AAIPawn>(TryGetPawnOwner());
 
 	// IsValid : 객체가 유효한지 판단한다.
 	// nullptr일 경우 유효한 객체가 아니다.
@@ -69,7 +74,7 @@ void UDefaultAIAnimInstance::AnimNotify_InteractionEnd()
 
 void UDefaultAIAnimInstance::AnimNotify_DeathEnd()
 {
-	AAIPawn* AIPawn = Cast<AAIPawn>(TryGetPawnOwner());
+	//AAIPawn* AIPawn = Cast<AAIPawn>(TryGetPawnOwner());
 
 	// IsValid : 객체가 유효한지 판단한다.
 	// nullptr일 경우 유효한 객체가 아니다.
