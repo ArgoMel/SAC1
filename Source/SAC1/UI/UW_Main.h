@@ -22,11 +22,8 @@ private:
 	UButton* m_ExitBtn;
 	UTextBlock* m_InfoText;
 	UTextBlock* m_ArmoText;
+	UTextBlock* m_InteractText;
 	UBorder* m_ArmoBorder;
-
-protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Progress", meta = (AllowPrivateAccess = true))
-	int32 m_Progress;
 
 private:
 	UFUNCTION()
@@ -43,4 +40,6 @@ public:
 	void SetWeaponUI(ESlateVisibility visible, const FName& name, int32 curArmo, int32 totalArmo);
 	UFUNCTION()
 	void SetMainUIText(int32 progress,const FString& text);
+	UFUNCTION()
+	void SetInteractionText(ESlateVisibility visible, const FName& name);
 };

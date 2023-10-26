@@ -4,6 +4,8 @@
 
 ASAC1HUD::ASAC1HUD()
 {
+	m_Progress = 0;
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> WBP_HUD
 	(TEXT("/Game/UI/WBP_HUD.WBP_HUD_C"));
 	if (WBP_HUD.Succeeded())
@@ -42,5 +44,15 @@ void ASAC1HUD::SetWeaponUI(ESlateVisibility visible, const FName& name, int32 cu
 
 void ASAC1HUD::SetMainUIText(int32 progress,const FString& text)
 {
+	if (m_Progress > progress)
+	{
+		return;
+	}
+	m_Progress = progress;
 	m_HUD->SetMainUIText(progress,text);
+}
+
+void ASAC1HUD::SetInteractionText(ESlateVisibility visible, const FName& name)
+{
+	m_HUD->SetInteractionText(visible, name);
 }

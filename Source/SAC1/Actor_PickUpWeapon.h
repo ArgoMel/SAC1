@@ -8,10 +8,16 @@ class SAC1_API AActor_PickUpWeapon : public AActor_PickUp
 	GENERATED_BODY()
 public:
 	AActor_PickUpWeapon();
+protected:
+	virtual void BeginPlay() override;
+public:
 	virtual void OnConstruction(const FTransform& Transform);
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void WasCollected() override;
 	bool PickedUpBy(APawn* pawn) override;
+
+private:
+	TObjectPtr<class ASAC1HUD> m_HUD;
 
 protected:
 	static TObjectPtr<UDataTable>	ItemDataTable;
@@ -25,6 +31,13 @@ protected:
 
 protected:
 	static FItemData* FindItemData(const FName& Name);
+
+	UFUNCTION()
+	virtual void OverlapBegin(UPrimitiveComponent* comp, AActor* otherActor,
+		UPrimitiveComponent* otherComp, int32 index, bool bFromSweep, const FHitResult& result);
+	UFUNCTION()
+	virtual void OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor,
+		UPrimitiveComponent* otherComp, int32 index);
 
 public:
 	static void LoadItemData();

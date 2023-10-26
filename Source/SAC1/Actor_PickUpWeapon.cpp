@@ -2,6 +2,7 @@
 #include "TP_WeaponComponent.h"
 #include "AC_ItemState.h"
 #include "SAC1Character.h"
+#include "SAC1HUD.h"
 
 TObjectPtr<UDataTable> AActor_PickUpWeapon::ItemDataTable;
 
@@ -9,20 +10,30 @@ AActor_PickUpWeapon::AActor_PickUpWeapon()
 {
 	SetReplicateMovement(true);
 
-	GetStaticMeshComponent()->SetCollisionProfileName(TEXT("NoCollision"));
-
 	m_Name = TEXT("Rifle");
 
-	//닿는 순간 ui 출력
+	GetStaticMeshComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+	GetStaticMeshComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+
 	m_Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	SetRootComponent(m_Collider);
 	m_Collider->SetGenerateOverlapEvents(true);
-	m_Collider->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	m_Collider->SetCollisionProfileName(TEXT("PlayerTrigger"));
+	m_Collider->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
 	m_Weapon = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("WeaponComponent"));
 	m_Weapon->SetupAttachment(m_Collider);
 
 	m_ItemState = CreateDefaultSubobject<UAC_ItemState>(TEXT("ItemState"));
+}
+
+void AActor_PickUpWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+	m_Collider->OnComponentBeginOverlap.AddDynamic(this, &AActor_PickUpWeapon::OverlapBegin);
+	m_Collider->OnComponentEndOverlap.AddDynamic(this, &AActor_PickUpWeapon::OverlapEnd);
+
+	m_HUD = Cast<ASAC1HUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD());
 }
 
 void AActor_PickUpWeapon::OnConstruction(const FTransform& Transform)
@@ -63,6 +74,18 @@ bool AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
 FItemData* AActor_PickUpWeapon::FindItemData(const FName& Name)
 {	
 	return ItemDataTable->FindRow<FItemData>(Name, TEXT(""));
+}
+
+void AActor_PickUpWeapon::OverlapBegin(UPrimitiveComponent* comp, AActor* otherActor, 
+	UPrimitiveComponent* otherComp, int32 index, bool bFromSweep, const FHitResult& result)
+{
+	m_HUD->SetInteractionText(ESlateVisibility::Visible, m_ItemState->GetItemData()->UIText);
+}
+
+void AActor_PickUpWeapon::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor, 
+	UPrimitiveComponent* otherComp, int32 index)
+{
+	m_HUD->SetInteractionText(ESlateVisibility::Collapsed, m_ItemState->GetItemData()->UIText);
 }
 
 void AActor_PickUpWeapon::LoadItemData()

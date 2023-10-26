@@ -10,8 +10,6 @@
 void UUW_Main::NativeConstruct()
 {
 	Super::NativeConstruct();
-	m_Progress = 0;
-
     m_ReloadingImage = Cast<UImage>(GetWidgetFromName(TEXT("ReloadingImage")));
 
 	m_RestartBtn = Cast<UButton>(GetWidgetFromName(TEXT("RestartBtn")));
@@ -22,6 +20,7 @@ void UUW_Main::NativeConstruct()
 
 	m_InfoText = Cast<UTextBlock>(GetWidgetFromName(TEXT("InfoText")));
 	m_ArmoText = Cast<UTextBlock>(GetWidgetFromName(TEXT("ArmoText")));
+	m_InteractText = Cast<UTextBlock>(GetWidgetFromName(TEXT("InteractText")));
 
 	m_ArmoBorder = Cast<UBorder>(GetWidgetFromName(TEXT("ArmoBorder")));
 }
@@ -77,10 +76,11 @@ void UUW_Main::SetWeaponUI(ESlateVisibility visible, const FName& name, int32 cu
 
 void UUW_Main::SetMainUIText(int32 progress, const FString& text)
 {
-	if(m_Progress> progress)
-	{
-		return;
-	}
-	m_Progress = progress;
 	m_InfoText->SetText(FText::FromString(text));
+}
+
+void UUW_Main::SetInteractionText(ESlateVisibility visible, const FName& name)
+{
+	m_InteractText->SetVisibility(visible);
+	m_InteractText->SetText(FText::FromName(name));
 }
