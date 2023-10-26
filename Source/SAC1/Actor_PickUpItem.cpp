@@ -19,7 +19,7 @@ AActor_PickUpItem::AActor_PickUpItem()
 	m_Collider->SetGenerateOverlapEvents(true);
 	m_Collider->SetCollisionProfileName(TEXT("PlayerTrigger"));
 	m_Collider->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
-	m_Collider->SetSphereRadius(100.f);
+	m_Collider->SetSphereRadius(150.f);
 
 	m_ItemState = CreateDefaultSubobject<UAC_ItemState>(TEXT("ItemState"));
 }
