@@ -27,7 +27,7 @@ ASAC1Character::ASAC1Character()
 
 	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
 	
-	GetCapsuleComponent()->InitCapsuleSize(m_PickUpExtent.X, m_PickUpExtent.Z);
+	GetCapsuleComponent()->InitCapsuleSize(40.f, m_PickUpExtent.Z);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 	SetRootComponent(GetCapsuleComponent());
 
