@@ -65,6 +65,12 @@ protected:
 
 	ETeam		mTeam;
 
+	//ETag		mTag;
+
+	//UPROPERTY(Category = Tags, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//ETag  mTag;
+
+
 	UPROPERTY(Category = Component, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TArray<TObjectPtr<class APatrolPoint>>	mPatrolPointArray;
 
@@ -102,6 +108,16 @@ public:
 	{
 		mTeam = Team;
 	}
+
+	/*ETag GetTag()
+	{
+		return mTag;
+	}
+
+	void SetTag(ETag Tag)
+	{
+		mTag = Tag;
+	}*/
 
 	const FVector GetTargetLoc()	const
 	{

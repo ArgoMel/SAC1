@@ -85,6 +85,14 @@ enum class ETeam : uint8
 	Team3
 };
 
+//
+//UENUM(BlueprintType)
+//enum class ETag : uint8
+//{
+//	Enemy,
+//	Player
+//};
+
 // FTableRowBase 구조체를 상속받아야 데이터테이블 용 구조체를 만들 수 있다.
 USTRUCT(BlueprintType)
 struct FPlayerDataTable	:

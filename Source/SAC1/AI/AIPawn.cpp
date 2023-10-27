@@ -17,6 +17,7 @@ AAIPawn::AAIPawn()
 	mAttackEnd = false;
 	mInteractionEnd = false;
 	mDeath = false;
+	//mTag = ETag::Enemy;
 
 	// Controller의 Yaw 회전에 매칭한다.
 	//bUseControllerRotationYaw = true;
@@ -45,6 +46,8 @@ AAIPawn::AAIPawn()
 	AIControllerClass = ADefaultAIController::StaticClass();
 
 	mTeam = ETeam::Team2;
+
+	//mTag = ETag::Enemy;
 
 	mHit = false;
 
