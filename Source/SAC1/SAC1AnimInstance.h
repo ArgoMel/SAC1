@@ -69,6 +69,8 @@ protected:
 	float m_RHandRotIntensity;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	float m_LHandIK;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	bool m_IsADS;
 
 public:
 	void SetCharacterState(ECharacterEquip state)
@@ -84,10 +86,11 @@ public:
 	void ChangeWeapon();
 	void HitReaction();
 	
+	void BaseVariableSetting();
 	void AimOffset(float DeltaSeconds);
 	void TurnInChange();
 	void SnapLHandToWeapon();
-	void WeaponSway();
+	void WeaponSway(float DeltaSeconds);
 
 	//UFUNCTION()
 	//void AnimNotify_TransitionFall();

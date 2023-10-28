@@ -19,10 +19,10 @@ private:
 	TObjectPtr<ASAC1Character> Character;
 	TObjectPtr<class ASAC1HUD> m_HUD;
 	FTimerHandle m_AutoFireHandle;
+	FTimerHandle m_TargetingHandle;
 	FTimeline m_RecoilTimeline;
 	FRotator m_StartRot;
 	FName		m_Name;
-	bool m_IsTargeting;
 	bool m_IsAttached;
 	
 protected:
@@ -39,6 +39,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Recoil|Data", meta = (AllowPrivateAccess = true))
 	int32 m_TotalArmo;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "ADS", meta = (AllowPrivateAccess = true))
+	float m_FOVMax;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "ADS", meta = (AllowPrivateAccess = true))
+	float m_FOVMin;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "ADS", meta = (AllowPrivateAccess = true))
+	float m_CurTargetingValue;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "ADS", meta = (AllowPrivateAccess = true))
+	bool m_IsTargeting;
+
 private:
 	void OnStartFire();
 	void OnStopFire();
@@ -51,13 +60,13 @@ private:
 	void StartVerticalRecoil(float value);
 	void StartRecoil();
 	void ReverseRecoil();
+
 	void StartTargeting();
 	void StopTargeting();
+	void Targeting();
+	void UnTargeting();
 
 public:
-	void SetName(const FName& name);
-	void SetWeaponData(FWeaponData* data);
-
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	bool TryAttachWeapon(ASAC1Character* TargetCharacter);
 	UFUNCTION(BlueprintCallable, Category="Weapon")
@@ -72,5 +81,9 @@ public:
 	void EatFood();
 
 	void PickUpArmo(float value);
+
+	bool GetIsADS();
+	void SetName(const FName& name);
+	void SetWeaponData(FWeaponData* data);
 	void SetWeaponUI(ESlateVisibility visible);
 };

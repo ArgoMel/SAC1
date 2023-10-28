@@ -9,12 +9,14 @@ class USceneComponent;
 class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
+class USAC1AnimInstance;
 struct FInputActionValue;
 
 UCLASS(config=Game)
 class ASAC1Character : public ACharacter
 {
 	GENERATED_BODY()	
+	friend USAC1AnimInstance;
 public:
 	ASAC1Character();
 protected:
@@ -30,12 +32,18 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
 	TObjectPtr<UCameraComponent> m_Camera;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	float m_MoveForwardValue;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	float m_MoveRightValue;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
 	float m_MaxWalkSpeed;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
 	float m_MaxSprintSpeed;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
 	bool m_IsSprinting;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	bool m_CanMove;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
 	TArray<TObjectPtr<USoundBase>> m_DeadSounds;
@@ -44,18 +52,23 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UNiagaraSystem> m_BloodFill;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = true))
+	FVector m_StartCamRelativeLoc;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = true))
+	FVector2D m_ScreenRotVec;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = true))
+	float m_CameraSpeed;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = true))
+	bool m_IsInvertX;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = true))
+	bool m_IsInvertY;
+
 	TArray<TObjectPtr<class UTP_WeaponComponent>> m_Weapons;
 	TArray<TObjectPtr<UMaterialInstanceDynamic>>	m_MaterialArray;
-	TObjectPtr<class USAC1AnimInstance>	m_AnimInst;
-	FVector2D m_ScreenRotVec;
-	FVector m_PickUpExtent;
+	TObjectPtr<USAC1AnimInstance>	m_AnimInst;
 	ETeam		m_Team;
-	float m_CameraSpeed;
 	int m_CurWeaponIndex;
 	int m_WeaponIndexDir;
-	bool m_CanMove;
-	bool m_IsInvertX;
-	bool m_IsInvertY;
 	
 protected:
 	UFUNCTION()
@@ -101,6 +114,8 @@ public:
 	void OnPlayerDeath();
 	void PickUpArmo(ECharacterEquip equip,float value);
 
+	bool GetIsADS();
+	FVector GetStartCamRelativeLoc() { return m_StartCamRelativeLoc; }
 	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
 	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }
 };

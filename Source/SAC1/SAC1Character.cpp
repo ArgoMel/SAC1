@@ -13,25 +13,29 @@
 
 ASAC1Character::ASAC1Character()
 {
-	m_PickUpExtent = FVector(1.f,1.f, 91.f);
-	m_CameraSpeed = 50.f;
+	m_MoveForwardValue = 0.f;
+	m_MoveRightValue = 0.f;
 	m_MaxWalkSpeed = 150.f;
 	m_MaxSprintSpeed = 750.f;
+	m_IsSprinting = false;
+	m_CanMove = true;
+
+	m_CameraSpeed = 50.f;
 	m_CurWeaponIndex = -1;
 	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
 	m_IsInvertY = true;
-	m_CanMove = true;
-	m_IsSprinting = false;
 	m_Team = ETeam::Team1;
+	m_StartCamRelativeLoc = FVector(20., 15., 0.);
 
 	m_Weapons.Init(nullptr,(int32)ECharacterEquip::Food);
 	
-	GetCapsuleComponent()->InitCapsuleSize(40.f, m_PickUpExtent.Z);
+	GetCapsuleComponent()->InitCapsuleSize(40.f, 91.f);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 	SetRootComponent(GetCapsuleComponent());
 
-	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -m_PickUpExtent.Z));
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, 
+		-GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->bReceivesDecals=false;
@@ -42,7 +46,7 @@ ASAC1Character::ASAC1Character()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_Camera->SetupAttachment(m_SpringArm);
-	m_Camera->SetRelativeLocation(FVector(20., 15., 0.));
+	m_Camera->SetRelativeLocation(m_StartCamRelativeLoc);
 	m_Camera->bUsePawnControlRotation = true;
 
 	GetCharacterMovement()->MaxWalkSpeed = 75.f;
@@ -169,6 +173,8 @@ void ASAC1Character::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor,
 void ASAC1Character::Move(const FInputActionValue& Value)
 {
 	FVector movementVector = Value.Get<FVector>();
+	m_MoveForwardValue = movementVector.X;
+	m_MoveRightValue = movementVector.Y;
 	if (!m_CanMove || !Controller)
 	{
 		return;
@@ -177,8 +183,8 @@ void ASAC1Character::Move(const FInputActionValue& Value)
 	const FRotator yawRotation(0, rotation.Yaw, 0);
 	const FVector forwardDir = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
 	const FVector rightDir = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
-	AddMovementInput(forwardDir, movementVector.X);
-	AddMovementInput(rightDir, movementVector.Y);
+	AddMovementInput(forwardDir, m_MoveForwardValue);
+	AddMovementInput(rightDir, m_MoveRightValue);
 }
 
 void ASAC1Character::CameraRotation(const FInputActionValue& Value)
@@ -239,12 +245,13 @@ void ASAC1Character::CollectPickUps()
 		return;
 	}
 	TArray<FHitResult> results;
-	FVector traceStart = GetActorLocation() -GetActorUpVector()* m_PickUpExtent.Z*0.5;
-	FVector traceEnd = traceStart + GetActorForwardVector() * m_PickUpExtent.X;
+	FVector extent = FVector(GetCapsuleComponent()->GetScaledCapsuleRadius());
+	extent.Z = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FVector traceStart = GetActorLocation() -GetActorUpVector()* extent.Z*0.5;
+	FVector traceEnd = traceStart + GetActorForwardVector() * extent.X;
 	FCollisionQueryParams param(NAME_None, false, this);
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
-		//ECollisionChannel::ECC_Visibility, FCollisionShape::MakeBox(m_PickUpExtent), param);
-		ECollisionChannel::ECC_GameTraceChannel2, FCollisionShape::MakeBox(m_PickUpExtent), param);
+		ECollisionChannel::ECC_GameTraceChannel2, FCollisionShape::MakeBox(extent), param);
 #if ENABLE_DRAW_DEBUG
 	FColor drawColor;
 	if (isCol)
@@ -255,7 +262,7 @@ void ASAC1Character::CollectPickUps()
 	{
 		drawColor = FColor::Green;
 	}
-	DrawDebugBox(GetWorld(), (traceStart+ traceEnd)*0.5, m_PickUpExtent, drawColor, false, 0.5f);
+	DrawDebugBox(GetWorld(), (traceStart+ traceEnd)*0.5, extent, drawColor, false, 0.5f);
 #endif
 	if (isCol)
 	{		
@@ -395,4 +402,13 @@ void ASAC1Character::PickUpArmo(ECharacterEquip equip, float value)
 		return;
 	}
 	m_Weapons[index]->PickUpArmo(value);
+}
+
+bool ASAC1Character::GetIsADS()
+{
+	if (!IsValid(GetCurWeapon()))
+	{
+		return false;
+	}
+	return GetCurWeapon()->GetIsADS();
 }

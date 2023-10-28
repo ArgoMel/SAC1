@@ -17,6 +17,7 @@ USAC1AnimInstance::USAC1AnimInstance()
 	m_DistanceCurveValue = 0.f;
 	m_IsAccerelating = false;
 	m_DoOnce = false;
+	m_IsADS = false;
 
 	m_RHandEffectorLoc = FVector(-1,-4.,2.);
 	m_RHandJointTargetLoc = FVector(-45.,-27.,18.);
@@ -61,13 +62,11 @@ void USAC1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		return;
 	}
-	m_IsInAir = m_Character->GetMovementComponent()->IsFalling();
-	m_Speed = m_Character->GetVelocity().Length();
-
+	BaseVariableSetting();
 	AimOffset(DeltaSeconds);
 	TurnInChange();
 	SnapLHandToWeapon();
-	WeaponSway();
+	WeaponSway(DeltaSeconds);
 }
 
 void USAC1AnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
@@ -124,6 +123,19 @@ void USAC1AnimInstance::HitReaction()
 	{
 		Montage_Play(m_DamagedMontage, 1.f);
 	}
+}
+
+void USAC1AnimInstance::BaseVariableSetting()
+{
+	FVector velocity = m_Character->GetVelocity();
+	m_Speed = velocity.Length();
+	//m_Dir = UKismetAnimationLibrary::CalculateDirection(velocity, m_Character->GetActorRotation());
+	UCharacterMovementComponent* moveComp = m_Character->GetCharacterMovement();
+	m_IsAccerelating = moveComp->GetCurrentAcceleration().Length() > 0.f;
+	//m_IsCrouching = m_Character->m_IsCrouching;
+	m_IsInAir = moveComp->IsFalling();
+	//m_IsSprinting = m_Character->m_IsSprinting;
+	m_IsADS = m_Character->GetIsADS();
 }
 
 void USAC1AnimInstance::AimOffset(float DeltaSeconds)
@@ -188,7 +200,13 @@ void USAC1AnimInstance::SnapLHandToWeapon()
 	m_LHandTransform.SetRotation(outRot.Quaternion());
 }
 
-void USAC1AnimInstance::WeaponSway()
+void USAC1AnimInstance::WeaponSway(float DeltaSeconds)
 {
-	//ÁÜÀÎ ÁÜ¾Æ¿ô ¾Ö´Ï¸ÞÀÌ¼Ç
+	if (!m_IsADS)
+	{
+		float clamp = FMath::Clamp(m_Character->m_MoveRightValue * m_RHandRotIntensity, -7.f, 7.f);
+		m_RHandRot = FMath::RInterpTo(m_RHandRot, FRotator(clamp, 0., 0.), DeltaSeconds, 6.f);
+		return;
+	}
+	m_RHandRot = FMath::RInterpTo(m_RHandRot, FRotator::ZeroRotator, DeltaSeconds, 6.f);
 }
