@@ -14,8 +14,10 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	m_ProjectileClass = ASAC1Projectile::StaticClass();
 	m_CurArmo = 0;
 	m_TotalArmo = 0;
-	m_IsTargeting = false;
 	m_IsAttached = false;
+
+	m_CurTargetingValue = 0.f;
+	m_IsTargeting = false;
 
 	SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
@@ -177,11 +179,6 @@ void UTP_WeaponComponent::PickUpArmo(float value)
 	}
 }
 
-void UTP_WeaponComponent::SetWeaponUI(ESlateVisibility visible)
-{
-	m_HUD->SetWeaponUI(visible, m_Name, m_CurArmo, m_TotalArmo);
-}
-
 void UTP_WeaponComponent::OnStartFire()
 {
 	if (!IsValid(Character) || m_CurArmo <= 0|| !GetVisibleFlag())
@@ -279,35 +276,72 @@ void UTP_WeaponComponent::ReverseRecoil()
 
 void UTP_WeaponComponent::StartTargeting()
 {
-	if (m_WeaponData.AttackType != EAttackType::Shoot || !GetVisibleFlag())
+	if (!GetVisibleFlag()||m_WeaponData.AttackType!=EAttackType::Shoot)
 	{
+		GetWorld()->GetTimerManager().ClearTimer(m_TargetingHandle);
 		return;
 	}
 	m_IsTargeting = true;
+	GetWorld()->GetTimerManager().SetTimer(m_TargetingHandle, this,
+		&UTP_WeaponComponent::Targeting, 0.01f, true);
 }
 
 void UTP_WeaponComponent::StopTargeting()
 {
+	if (!GetVisibleFlag() || m_WeaponData.AttackType != EAttackType::Shoot)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(m_TargetingHandle);
+		return;
+	}
 	m_IsTargeting = false;
+	GetWorld()->GetTimerManager().SetTimer(m_TargetingHandle, this,
+		&UTP_WeaponComponent::UnTargeting, 0.01f, true);
 }
 
-void UTP_WeaponComponent::SetName(const FName& name)
+void UTP_WeaponComponent::Targeting()
 {
-	m_Name = name;
+	FVector ironSightLoc = GetSocketTransform(TEXT("Ironsight")).GetLocation();
+	UCameraComponent* cam = Character->GetFirstPersonCameraComponent();
+	cam->SetWorldLocation(FMath::VInterpTo(cam->GetComponentLocation(),
+		ironSightLoc, GetWorld()->DeltaTimeSeconds, 4.f));
+	if (cam->GetComponentLocation().Equals(ironSightLoc))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(m_TargetingHandle);
+	}
+
+	m_CurTargetingValue -= 0.5f;
+	if (m_CurTargetingValue < m_FOVMin)
+	{
+		m_CurTargetingValue = m_FOVMin;
+	}
+	cam->SetFieldOfView(m_CurTargetingValue);
 }
 
-void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
+void UTP_WeaponComponent::UnTargeting()
 {
-	m_WeaponData = *data;
+	FVector startCamLoc = Character->GetStartCamRelativeLoc();
+	UCameraComponent* cam = Character->GetFirstPersonCameraComponent();
+	cam->SetRelativeLocation(FMath::VInterpTo(cam->GetRelativeLocation(),
+		startCamLoc, GetWorld()->DeltaTimeSeconds, 4.f));
+	if (cam->GetComponentLocation().Equals(startCamLoc))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(m_TargetingHandle);
+	}
+
+	m_CurTargetingValue += 1.f;
+	if (m_CurTargetingValue > m_FOVMax)
+	{
+		m_CurTargetingValue = m_FOVMax;
+	}
+	cam->SetFieldOfView(m_CurTargetingValue);
 }
 
 bool UTP_WeaponComponent::TryAttachWeapon(ASAC1Character* TargetCharacter)
 {
 	Character = TargetCharacter;
-	if (!IsValid(Character))
-	{
-		return false;
-	}
+	m_CurTargetingValue = Character->GetFirstPersonCameraComponent()->FieldOfView;
+	m_FOVMin = m_CurTargetingValue * 0.75f;
+	m_FOVMax = m_CurTargetingValue;
 	if(!Character->TryAddWeapon(this, m_WeaponData.State))
 	{		
 		return false;
@@ -445,4 +479,24 @@ void UTP_WeaponComponent::EatFood()
 		m_TotalArmo = 0;
 		--m_CurArmo;
 	}
+}
+
+bool UTP_WeaponComponent::GetIsADS()
+{
+	return m_IsTargeting;
+}
+
+void UTP_WeaponComponent::SetName(const FName& name)
+{
+	m_Name = name;
+}
+
+void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
+{
+	m_WeaponData = *data;
+}
+
+void UTP_WeaponComponent::SetWeaponUI(ESlateVisibility visible)
+{
+	m_HUD->SetWeaponUI(visible, m_Name, m_CurArmo, m_TotalArmo);
 }
