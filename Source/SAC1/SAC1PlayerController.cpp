@@ -74,6 +74,10 @@ void ASAC1PlayerController::SetupInputComponent()
 	AIRecon->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(AIRecon, EKeys::C);
 
+	ToggleCheat	= NewObject<UInputAction>(this);
+	ToggleCheat->ValueType = EInputActionValueType::Boolean;
+	m_IMC->MapKey(ToggleCheat, EKeys::P);
+
 	m_Move = NewObject<UInputAction>(this);
 	m_Move->ValueType = EInputActionValueType::Axis3D;
 	MoveModifier(m_IMC, m_Move, EKeys::W);

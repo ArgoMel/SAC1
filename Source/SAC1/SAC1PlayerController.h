@@ -56,6 +56,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<class UInputAction> AIRecon;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<class UInputAction> ToggleCheat;
+
 
 private:
 	static void MoveModifier(UInputMappingContext* IMC, UInputAction* IA, FKey key,

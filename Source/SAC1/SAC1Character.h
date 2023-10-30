@@ -69,6 +69,7 @@ protected:
 	ETeam		m_Team;
 	int m_CurWeaponIndex;
 	int m_WeaponIndexDir;
+	bool m_IsInvisible;
 	
 protected:
 	UFUNCTION()
@@ -87,6 +88,7 @@ protected:
 	void Jump();
 	void StopJumping();
 	void Sprint();
+	void ToggleCheat();
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void CollectPickUps();
