@@ -38,6 +38,7 @@ AAIPawn::AAIPawn()
 		&AAIPawn::BodyHit);
 
 	mBody->SetCollisionProfileName(TEXT("AI"));
+	mHead->SetCollisionProfileName(TEXT("AI"));
 
 	mMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -479,6 +480,19 @@ void AAIPawn::DeathEnd()
 		Mtrl->SetScalarParameterValue(TEXT("DissolveEnable"),
 			1.f);
 	}
+
+
+	mMovement->StopMovementImmediately();
+	mMovement->Velocity = FVector::Zero();
+
+
+	mMesh->SetCollisionProfileName(TEXT("Ragdoll"));
+	SetActorEnableCollision(true);
+	mMesh->SetAllBodiesSimulatePhysics(true);
+	mMesh->SetSimulatePhysics(true);
+	mMesh->WakeAllRigidBodies();
+	mMesh->bBlendPhysics = true;
+	mMesh->SetLinearDamping(20000.f);
 
 
 	if (mRandomDeadSound.IsEmpty())
