@@ -43,20 +43,20 @@ void UBTService_TargetDetect::TickNode(UBehaviorTreeComponent& OwnerComp,
 		param);
 
 	// 디버깅 용(에디터)으로 출력한다.
-#if ENABLE_DRAW_DEBUG
-
-	// Collision 값에 따라 true일 경우 red, false일 경우 green으로
-	// 출력한다.
-	FColor	DrawColor = Collision ? FColor::Red : FColor::Green;
-
-	// FRotationMatrix::MakeFromZ(GetActorForwardVector()) : Z축을 캐릭터
-	// 의 앞쪽으로 만들어주는 회전 행렬을 구한다.(FMatrix로 결과가 나온다)
-	// 그래서 .ToQuat() 을 이용해서 FQuat(회전값)으로 변환한다.
-	DrawDebugSphere(GetWorld(), AILoc,
-		AIPawn->GetAIState()->GetData()->InteractionDistance,
-		20, DrawColor, false, 0.35f);
-
-#endif
+//#if ENABLE_DRAW_DEBUG
+//
+//	// Collision 값에 따라 true일 경우 red, false일 경우 green으로
+//	// 출력한다.
+//	FColor	DrawColor = Collision ? FColor::Red : FColor::Green;
+//
+//	// FRotationMatrix::MakeFromZ(GetActorForwardVector()) : Z축을 캐릭터
+//	// 의 앞쪽으로 만들어주는 회전 행렬을 구한다.(FMatrix로 결과가 나온다)
+//	// 그래서 .ToQuat() 을 이용해서 FQuat(회전값)으로 변환한다.
+//	DrawDebugSphere(GetWorld(), AILoc,
+//		AIPawn->GetAIState()->GetData()->InteractionDistance,
+//		20, DrawColor, false, 0.35f);
+//
+//#endif
 
 	// 충돌이 되었다면 Blackboard의 Target 변수에 충돌된 물체를 지정하고
 	// 충돌이 아니면 nullptr을 지정한다.
