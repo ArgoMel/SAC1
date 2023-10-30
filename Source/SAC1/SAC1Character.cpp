@@ -6,11 +6,15 @@
 #include "SAC1GameInstance.h"
 #include "SAC1HUD.h"
 #include "Actor_PickUp.h"
+#include "Actor_PickUpWeapon.h"
 #include "TP_WeaponComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Effect/DecalEffect.h"
+
+TArray<FName> ASAC1Character::ItemNames = 
+{ TEXT("Rifle"),TEXT("Pistol"),TEXT("Knife"),TEXT("Granade"),TEXT("FireBottle"),TEXT("Heal"),TEXT("Flare") };
 
 ASAC1Character::ASAC1Character()
 {
@@ -93,25 +97,6 @@ ASAC1Character::ASAC1Character()
 void ASAC1Character::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	USAC1GameInstance* gameInst = GetWorld()->GetGameInstance<USAC1GameInstance>();
-	if (IsValid(gameInst))
-	{
-		int32 size = m_Weapons.Num();
-		for (int32 i = 0; i < size; ++i)
-		{
-			if (gameInst->GetHasWeapons(i))
-			{
-				FActorSpawnParameters spawnParams;
-				spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				m_Weapons[i] = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("Weapon"));
-				//GetWorld()->Component
-				if (IsValid(m_Weapons[i]) && m_Weapons[i]->TryAttachWeapon(this))
-				{
-					m_Weapons[i]->AttachWeapon();
-				}
-			}
-		}
-	}
 }
 
 void ASAC1Character::BeginPlay()
@@ -124,6 +109,28 @@ void ASAC1Character::BeginPlay()
 	{
 		controller->PlayerCameraManager->ViewPitchMax = 70.f;
 		controller->PlayerCameraManager->ViewPitchMin = -40.f;
+	}
+
+	USAC1GameInstance* gameInst = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	if (IsValid(gameInst))
+	{
+		int32 size = m_Weapons.Num();
+		for (int32 i = 0; i < size; ++i)
+		{
+			if (gameInst->GetHasWeapons(i))
+			{
+				AActor_PickUpWeapon* pickUP = GetWorld()->SpawnActor<AActor_PickUpWeapon>(FActorSpawnParameters());
+				if (IsValid(pickUP) && pickUP->GetActive())
+				{
+					pickUP->SetName(ItemNames[i]);
+					if (pickUP->PickedUpBy(this))
+					{
+						pickUP->SetActive(false);
+						m_Weapons[i]->AttachWeapon();
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -451,3 +458,17 @@ bool ASAC1Character::GetIsADS()
 	}
 	return GetCurWeapon()->GetIsADS();
 }
+/*			
+FActorSpawnParameters spawnParams;
+spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+TSubclassOf<UTP_WeaponComponent> weaponClass = UTP_WeaponComponent::StaticClass();
+UTP_WeaponComponent* newWeapon = Cast<UTP_WeaponComponent>(AddComponentByClass(weaponClass, true, FTransform::Identity, true));
+if (IsValid(newWeapon))
+{
+	newWeapon->SetName(TEXT("Rifle"));
+	if (newWeapon->TryAttachWeapon(this))
+	{
+		newWeapon->AttachWeapon();
+	}
+}
+*/

@@ -65,7 +65,6 @@ bool AActor_PickUpWeapon::PickedUpBy(APawn* pawn)
 	if (IsValid(player) && m_ItemState->GetItemData()->ItemKind == EItem::Weapon)
 	{
 		m_Weapon->SetName(m_Name);
-		m_Weapon->SetWeaponData(m_ItemState->GetWeaponData());
 		m_IsActive= !m_Weapon->TryAttachWeapon(player);
 	}
 	Super::PickedUpBy(pawn);

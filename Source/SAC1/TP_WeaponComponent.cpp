@@ -4,6 +4,7 @@
 #include "SAC1Projectile.h"
 #include "SAC1PlayerController.h"
 #include "SAC1HUD.h"
+#include "SAC1GameInstance.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -496,6 +497,12 @@ bool UTP_WeaponComponent::GetIsADS()
 void UTP_WeaponComponent::SetName(const FName& name)
 {
 	m_Name = name;
+	USAC1GameInstance* gameInst = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	if (!IsValid(gameInst))
+	{
+		return;
+	}
+	m_WeaponData = *gameInst->FindWeaponData(name);
 }
 
 void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
@@ -505,5 +512,9 @@ void UTP_WeaponComponent::SetWeaponData(FWeaponData* data)
 
 void UTP_WeaponComponent::SetWeaponUI(ESlateVisibility visible)
 {
+	if(!IsValid(m_HUD))
+	{
+		return;
+	}
 	m_HUD->SetWeaponUI(visible, m_Name, m_CurArmo, m_TotalArmo);
 }
