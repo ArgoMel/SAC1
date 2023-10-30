@@ -114,6 +114,7 @@ public:
 	void OnPlayerDeath();
 	void PickUpArmo(ECharacterEquip equip,float value);
 
+	bool GetIsSprinting(){ return m_IsSprinting; }
 	bool GetIsADS();
 	FVector GetStartCamRelativeLoc() { return m_StartCamRelativeLoc; }
 	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
