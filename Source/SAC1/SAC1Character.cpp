@@ -46,7 +46,6 @@ ASAC1Character::ASAC1Character()
 	m_SpringArm->TargetArmLength = 0.f;
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	//m_Camera->SetupAttachment(GetMesh(), TEXT("head"));
 	m_Camera->SetupAttachment(m_SpringArm);
 	m_Camera->SetRelativeLocation(m_StartCamRelativeLoc);
 	m_Camera->SetRelativeRotation(FRotator(-90.f, 90.f, 0.f));
