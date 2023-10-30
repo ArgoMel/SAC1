@@ -3,13 +3,18 @@
 #include "SAC1PlayerController.h"
 #include "SAC1AnimInstance.h"
 #include "SAC1PlayerState.h"
+#include "SAC1GameInstance.h"
 #include "SAC1HUD.h"
 #include "Actor_PickUp.h"
+#include "Actor_PickUpWeapon.h"
 #include "TP_WeaponComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Effect/DecalEffect.h"
+
+TArray<FName> ASAC1Character::ItemNames = 
+{ TEXT("Rifle"),TEXT("Pistol"),TEXT("Knife"),TEXT("Granade"),TEXT("FireBottle"),TEXT("Heal"),TEXT("Flare") };
 
 ASAC1Character::ASAC1Character()
 {
@@ -46,7 +51,6 @@ ASAC1Character::ASAC1Character()
 	m_SpringArm->TargetArmLength = 0.f;
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	//m_Camera->SetupAttachment(GetMesh(), TEXT("head"));
 	m_Camera->SetupAttachment(m_SpringArm);
 	m_Camera->SetRelativeLocation(m_StartCamRelativeLoc);
 	m_Camera->SetRelativeRotation(FRotator(-90.f, 90.f, 0.f));
@@ -90,6 +94,11 @@ ASAC1Character::ASAC1Character()
 	}
 }
 
+void ASAC1Character::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+}
+
 void ASAC1Character::BeginPlay()
 {
 	Super::BeginPlay();
@@ -100,6 +109,28 @@ void ASAC1Character::BeginPlay()
 	{
 		controller->PlayerCameraManager->ViewPitchMax = 70.f;
 		controller->PlayerCameraManager->ViewPitchMin = -40.f;
+	}
+
+	USAC1GameInstance* gameInst = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	if (IsValid(gameInst))
+	{
+		int32 size = m_Weapons.Num();
+		for (int32 i = 0; i < size; ++i)
+		{
+			if (gameInst->GetHasWeapons(i))
+			{
+				AActor_PickUpWeapon* pickUP = GetWorld()->SpawnActor<AActor_PickUpWeapon>(FActorSpawnParameters());
+				if (IsValid(pickUP) && pickUP->GetActive())
+				{
+					pickUP->SetName(ItemNames[i]);
+					if (pickUP->PickedUpBy(this))
+					{
+						pickUP->SetActive(false);
+						m_Weapons[i]->AttachWeapon();
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -361,6 +392,8 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 	}
 	m_Weapons[index] = weapon;
 	m_CurWeaponIndex = index;
+	USAC1GameInstance* gameInst = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	gameInst->SetHasWeapons(index,true);
 	SetCurWeapon();
 	return true;
 }
@@ -425,3 +458,17 @@ bool ASAC1Character::GetIsADS()
 	}
 	return GetCurWeapon()->GetIsADS();
 }
+/*			
+FActorSpawnParameters spawnParams;
+spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+TSubclassOf<UTP_WeaponComponent> weaponClass = UTP_WeaponComponent::StaticClass();
+UTP_WeaponComponent* newWeapon = Cast<UTP_WeaponComponent>(AddComponentByClass(weaponClass, true, FTransform::Identity, true));
+if (IsValid(newWeapon))
+{
+	newWeapon->SetName(TEXT("Rifle"));
+	if (newWeapon->TryAttachWeapon(this))
+	{
+		newWeapon->AttachWeapon();
+	}
+}
+*/

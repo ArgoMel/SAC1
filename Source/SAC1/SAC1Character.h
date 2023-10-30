@@ -20,6 +20,7 @@ class ASAC1Character : public ACharacter
 public:
 	ASAC1Character();
 protected:
+	virtual void OnConstruction(const FTransform& Transform);
 	virtual void BeginPlay();
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	virtual float TakeDamage(float DamageAmount,
@@ -27,6 +28,9 @@ protected:
 		class AController* EventInstigator, AActor* DamageCauser);
 
 protected:
+	//TStaticArray<FName, 2> ItemNames = { TEXT("d"), 0 };
+	static TArray<FName> ItemNames;// = { TEXT("d") };
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
 	TObjectPtr<USpringArmComponent> m_SpringArm;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
