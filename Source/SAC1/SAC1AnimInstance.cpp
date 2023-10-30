@@ -16,6 +16,7 @@ USAC1AnimInstance::USAC1AnimInstance()
 	m_DistanceCurveValueLastFrame = 0.f;
 	m_DistanceCurveValue = 0.f;
 	m_IsAccerelating = false;
+	m_IsSprinting = false;
 	m_DoOnce = false;
 	m_IsADS = false;
 
@@ -134,7 +135,7 @@ void USAC1AnimInstance::BaseVariableSetting()
 	m_IsAccerelating = moveComp->GetCurrentAcceleration().Length() > 0.f;
 	//m_IsCrouching = m_Character->m_IsCrouching;
 	m_IsInAir = moveComp->IsFalling();
-	//m_IsSprinting = m_Character->m_IsSprinting;
+	m_IsSprinting = m_Character->m_IsSprinting;
 	m_IsADS = m_Character->GetIsADS();
 }
 

@@ -31,6 +31,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
 	float m_Speed;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
+	bool m_IsSprinting;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Anim", meta = (AllowPrivateAccess = true))
 	bool m_IsInAir;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Offset", meta = (AllowPrivateAccess = true))
