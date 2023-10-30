@@ -118,6 +118,7 @@ public:
 	bool GetIsADS();
 	FVector GetStartCamRelativeLoc() { return m_StartCamRelativeLoc; }
 	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
+	USpringArmComponent* GetSpringArmComponent() const { return m_SpringArm; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }
 };
 
