@@ -276,7 +276,9 @@ void UTP_WeaponComponent::ReverseRecoil()
 
 void UTP_WeaponComponent::StartTargeting()
 {
-	if (!GetVisibleFlag()||m_WeaponData.AttackType!=EAttackType::Shoot)
+	if (!GetVisibleFlag()
+		||m_WeaponData.AttackType!=EAttackType::Shoot
+		||Character->GetIsSprinting())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(m_TargetingHandle);
 		return;
@@ -288,7 +290,9 @@ void UTP_WeaponComponent::StartTargeting()
 
 void UTP_WeaponComponent::StopTargeting()
 {
-	if (!GetVisibleFlag() || m_WeaponData.AttackType != EAttackType::Shoot)
+	if (!GetVisibleFlag()
+		||m_WeaponData.AttackType!=EAttackType::Shoot
+		||Character->GetIsSprinting())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(m_TargetingHandle);
 		return;
@@ -300,8 +304,11 @@ void UTP_WeaponComponent::StopTargeting()
 
 void UTP_WeaponComponent::Targeting()
 {
-	FVector ironSightLoc = GetSocketTransform(TEXT("Ironsight")).GetLocation();
+	FTransform ironSightTransform = GetSocketTransform(TEXT("Ironsight"));
+	FTransform ironSightTransform2 = GetSocketTransform(TEXT("Ironsight"),ERelativeTransformSpace::RTS_ParentBoneSpace);
+	FVector ironSightLoc = ironSightTransform.GetLocation();
 	UCameraComponent* cam = Character->GetFirstPersonCameraComponent();
+
 	cam->SetWorldLocation(FMath::VInterpTo(cam->GetComponentLocation(),
 		ironSightLoc, GetWorld()->DeltaTimeSeconds, 4.f));
 	if (cam->GetComponentLocation().Equals(ironSightLoc))

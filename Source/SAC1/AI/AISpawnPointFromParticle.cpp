@@ -14,9 +14,8 @@ AAISpawnPointFromParticle::AAISpawnPointFromParticle()
 
 	SetRootComponent(mRoot);
 
-	mRoot->bVisualizeComponent = true;
-
 #if WITH_EDITORONLY_DATA
+	mRoot->bVisualizeComponent = true;
 
 	mArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 

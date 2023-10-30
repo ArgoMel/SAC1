@@ -57,6 +57,7 @@ void AActor_SpawnVolume::SpawnPickUp()
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = this;
 		spawnParams.Instigator = GetInstigator();
+		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		FVector spawnLoc = GetRandomPointInVolume();
 		FRotator spawnRot;
 		spawnRot.Yaw = FMath::FRand() * 360.f* (float)m_IsRotateZ;
@@ -69,12 +70,12 @@ void AActor_SpawnVolume::SpawnPickUp()
 		SetSpawningActive(true);
 		++m_SpawnCount;
 
-		AAIPawn* spawnedPawn = Cast<AAIPawn>(spawnedActor);
-		if (IsValid(spawnedPawn))
-		{
-			spawnLoc.Z = spawnedPawn->GetHalfHeight();
-			spawnedPawn->SetActorLocation(spawnLoc);
-		}
+		//AAIPawn* spawnedPawn = Cast<AAIPawn>(spawnedActor);
+		//if (IsValid(spawnedPawn))
+		//{
+		//	spawnLoc.Z = spawnedPawn->GetHalfHeight();
+		//	spawnedPawn->SetActorLocation(spawnLoc);
+		//}
 
 		AActor_PickUp* spawnedPickUp = Cast<AActor_PickUp>(spawnedActor);
 		if(IsValid(spawnedPickUp) && !m_Names.IsEmpty())

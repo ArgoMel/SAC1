@@ -69,6 +69,7 @@ protected:
 	ETeam		m_Team;
 	int m_CurWeaponIndex;
 	int m_WeaponIndexDir;
+	bool m_IsInvisible;
 	
 protected:
 	UFUNCTION()
@@ -87,6 +88,7 @@ protected:
 	void Jump();
 	void StopJumping();
 	void Sprint();
+	void ToggleCheat();
 
 	UFUNCTION(BlueprintCallable, Category = "Pickup")
 	void CollectPickUps();
@@ -114,9 +116,11 @@ public:
 	void OnPlayerDeath();
 	void PickUpArmo(ECharacterEquip equip,float value);
 
+	bool GetIsSprinting(){ return m_IsSprinting; }
 	bool GetIsADS();
 	FVector GetStartCamRelativeLoc() { return m_StartCamRelativeLoc; }
 	FVector2D GetScreenRotVec()	{return m_ScreenRotVec;}
+	USpringArmComponent* GetSpringArmComponent() const { return m_SpringArm; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return m_Camera; }
 };
 
