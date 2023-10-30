@@ -305,12 +305,12 @@ void UTP_WeaponComponent::StopTargeting()
 void UTP_WeaponComponent::Targeting()
 {
 	FTransform ironSightTransform = GetSocketTransform(TEXT("Ironsight"));
+	FTransform ironSightTransform2 = GetSocketTransform(TEXT("Ironsight"),ERelativeTransformSpace::RTS_ParentBoneSpace);
 	FVector ironSightLoc = ironSightTransform.GetLocation();
 	UCameraComponent* cam = Character->GetFirstPersonCameraComponent();
+
 	cam->SetWorldLocation(FMath::VInterpTo(cam->GetComponentLocation(),
 		ironSightLoc, GetWorld()->DeltaTimeSeconds, 4.f));
-	cam->SetWorldRotation(FMath::RInterpTo(cam->GetComponentRotation(),
-		ironSightTransform.Rotator(), GetWorld()->DeltaTimeSeconds, 50.f));
 	if (cam->GetComponentLocation().Equals(ironSightLoc))
 	{
 		GetWorld()->GetTimerManager().ClearTimer(m_TargetingHandle);

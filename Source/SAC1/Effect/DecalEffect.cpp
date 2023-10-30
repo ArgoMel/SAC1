@@ -7,9 +7,9 @@ ADecalEffect::ADecalEffect()
 	mDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("Decal"));
 
 	SetRootComponent(mDecal);
-
+#if WITH_EDITORONLY_DATA
 	mDecal->bVisualizeComponent = true;
-
+#endif
 	mDecal->DecalSize = FVector(128.0, 256.0, 256.0);
 	mDecal->SetRelativeRotation(FRotator(-90.0, 0.0, 0.0));
 

@@ -8,9 +8,10 @@ ATrigger::ATrigger()
 	mBody = CreateDefaultSubobject<UBoxComponent>(TEXT("Body"));
 
 	SetRootComponent(mBody);
+#if WITH_EDITORONLY_DATA
 
 	mBody->bVisualizeComponent = true;
-
+#endif
 	mBody->SetBoxExtent(FVector(100.0, 100.0, 100.0));
 
 	mBody->SetCollisionProfileName(TEXT("ObjectTrigger"));
