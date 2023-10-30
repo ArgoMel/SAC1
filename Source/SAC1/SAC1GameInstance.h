@@ -16,7 +16,13 @@ public:
 
 private:
 	TObjectPtr<UDataTable>	mPlayerDataTable;
+	TObjectPtr<UDataTable>	m_WeaponDataTable;
+	TArray<bool> m_HasWeapons;
 
 public:
 	const FPlayerDataTable* FindPlayerData(const FName& Name);
+	const FWeaponData* FindWeaponData(const FName& Name);
+
+	void SetHasWeapons(int32 index,bool b);
+	bool GetHasWeapons(int32 index);
 };
