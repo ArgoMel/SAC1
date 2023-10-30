@@ -20,6 +20,7 @@ class ASAC1Character : public ACharacter
 public:
 	ASAC1Character();
 protected:
+	virtual void OnConstruction(const FTransform& Transform);
 	virtual void BeginPlay();
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	virtual float TakeDamage(float DamageAmount,

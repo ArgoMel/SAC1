@@ -3,6 +3,7 @@
 #include "SAC1PlayerController.h"
 #include "SAC1AnimInstance.h"
 #include "SAC1PlayerState.h"
+#include "SAC1GameInstance.h"
 #include "SAC1HUD.h"
 #include "Actor_PickUp.h"
 #include "TP_WeaponComponent.h"
@@ -86,6 +87,30 @@ ASAC1Character::ASAC1Character()
 	if (NS_BloodEffect.Succeeded())
 	{
 		m_BloodFill = NS_BloodEffect.Object;
+	}
+}
+
+void ASAC1Character::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	USAC1GameInstance* gameInst = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	if (IsValid(gameInst))
+	{
+		int32 size = m_Weapons.Num();
+		for (int32 i = 0; i < size; ++i)
+		{
+			if (gameInst->GetHasWeapons(i))
+			{
+				FActorSpawnParameters spawnParams;
+				spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				m_Weapons[i] = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("Weapon"));
+				//GetWorld()->Component
+				if (IsValid(m_Weapons[i]) && m_Weapons[i]->TryAttachWeapon(this))
+				{
+					m_Weapons[i]->AttachWeapon();
+				}
+			}
+		}
 	}
 }
 
@@ -360,6 +385,8 @@ bool ASAC1Character::TryAddWeapon(UTP_WeaponComponent* weapon, ECharacterEquip e
 	}
 	m_Weapons[index] = weapon;
 	m_CurWeaponIndex = index;
+	USAC1GameInstance* gameInst = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	gameInst->SetHasWeapons(index,true);
 	SetCurWeapon();
 	return true;
 }
