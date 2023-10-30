@@ -25,6 +25,7 @@ ASAC1Character::ASAC1Character()
 	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
 	m_IsInvertY = true;
+	m_IsInvisible = false;
 	m_Team = ETeam::Team1;
 	m_StartCamRelativeLoc = FVector(20., 15., 0.);
 
@@ -117,6 +118,7 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		input->BindAction(controller->m_Move, ETriggerEvent::Triggered, this, &ASAC1Character::Move);
 		input->BindAction(controller->m_LShift, ETriggerEvent::Started, this, &ASAC1Character::Sprint);
 		input->BindAction(controller->m_LShift, ETriggerEvent::Completed, this, &ASAC1Character::Sprint);
+		input->BindAction(controller->ToggleCheat, ETriggerEvent::Completed, this, &ASAC1Character::ToggleCheat);
 		controller->SetNewController();
 	}
 }
@@ -124,6 +126,10 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 	AController* EventInstigator, AActor* DamageCauser)
 {
+	if(m_IsInvisible)
+	{
+		return DamageAmount;
+	}
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	ASAC1PlayerState* state = Cast<ASAC1PlayerState>(GetPlayerState());
 	if (IsValid(state))
@@ -238,6 +244,11 @@ void ASAC1Character::Sprint()
 	{
 		GetCharacterMovement()->MaxWalkSpeed = m_MaxWalkSpeed;
 	}
+}
+
+void ASAC1Character::ToggleCheat()
+{
+	m_IsInvisible = !m_IsInvisible;
 }
 
 void ASAC1Character::CollectPickUps()
