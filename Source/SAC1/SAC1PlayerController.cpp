@@ -2,12 +2,12 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "PCM_FPS.h"
 
 ASAC1PlayerController::ASAC1PlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	//bShowMouseCursor = true;
+	PlayerCameraManagerClass = APCM_FPS::StaticClass();
 }
 
 void ASAC1PlayerController::OnConstruction(const FTransform& Transform)

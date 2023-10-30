@@ -70,13 +70,6 @@ void AActor_SpawnVolume::SpawnPickUp()
 		SetSpawningActive(true);
 		++m_SpawnCount;
 
-		//AAIPawn* spawnedPawn = Cast<AAIPawn>(spawnedActor);
-		//if (IsValid(spawnedPawn))
-		//{
-		//	spawnLoc.Z = spawnedPawn->GetHalfHeight();
-		//	spawnedPawn->SetActorLocation(spawnLoc);
-		//}
-
 		AActor_PickUp* spawnedPickUp = Cast<AActor_PickUp>(spawnedActor);
 		if(IsValid(spawnedPickUp) && !m_Names.IsEmpty())
 		{
