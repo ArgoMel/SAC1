@@ -492,7 +492,10 @@ void AAIPawn::DeathEnd()
 	mMesh->SetSimulatePhysics(true);
 	mMesh->WakeAllRigidBodies();
 	mMesh->bBlendPhysics = true;
-	mMesh->SetLinearDamping(20000.f);
+	mMesh->SetLinearDamping(20000.f);   
+
+
+
 
 
 	if (mRandomDeadSound.IsEmpty())
