@@ -49,6 +49,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UNiagaraSystem> m_BloodFill;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect", meta = (AllowPrivateAccess = true))
+	TArray<TObjectPtr<USoundBase>> mRandomDeadSound;
+
 	TObjectPtr<class UDefaultAIAnimInstance>	mAnim;
 
 	// 생성된 스폰포인트를 알고 있게 해준다.

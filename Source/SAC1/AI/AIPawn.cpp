@@ -72,6 +72,18 @@ AAIPawn::AAIPawn()
 	{
 		mBloodDecal = MIBloodDecalRE.Object;
 	}
+
+
+	for (int i = 1; i <= 4; ++i)
+	{
+		const FString string = FString::Printf(TEXT("/Script/Engine.SoundWave'/Game/ZombiSound/randomsound/Death_0%d.Death_0%d'"), i, i);
+
+		ConstructorHelpers::FObjectFinder<USoundBase>	DeadSound(*string);
+		if (DeadSound.Succeeded())
+		{
+			mRandomDeadSound.Add(DeadSound.Object);
+		}
+	}
 }
 
 void AAIPawn::LoadAIData()
@@ -467,6 +479,14 @@ void AAIPawn::DeathEnd()
 		Mtrl->SetScalarParameterValue(TEXT("DissolveEnable"),
 			1.f);
 	}
+
+
+	if (mRandomDeadSound.IsEmpty())
+	{
+		return;
+	}
+	int32 randIndex = FMath::Rand() % mRandomDeadSound.Num();
+	UGameplayStatics::PlaySoundAtLocation(this, mRandomDeadSound[randIndex], GetActorLocation());
 
 	mDissolveEnable = true;
 }
