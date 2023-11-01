@@ -8,7 +8,7 @@
 
 UBTService_TargetDetect::UBTService_TargetDetect()
 {
-	NodeName = TEXT("TargetDetect");
+	NodeName = TEXT("TargzetDetect");
 	Interval = 0.5f;
 	RandomDeviation = 0.1f;
 }
