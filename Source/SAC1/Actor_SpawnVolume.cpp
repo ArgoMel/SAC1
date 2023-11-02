@@ -21,6 +21,10 @@ AActor_SpawnVolume::AActor_SpawnVolume()
 		m_SpawnArea->SetCollisionProfileName(TEXT("NoCollision"));
 		m_SpawnArea->SetGenerateOverlapEvents(false);
 		m_SpawnArea->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+
+#if WITH_EDITORONLY_DATA
+		m_SpawnArea->bVisualizeComponent = true;
+#endif
 	}
 }
 
