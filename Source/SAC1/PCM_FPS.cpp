@@ -12,7 +12,11 @@ void APCM_FPS::BeginPlay()
 	m_Character = Cast<ASAC1Character>(PCOwner->Player);
 	if (IsValid(m_Character))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("dsdd"));
+		UE_LOG(LogTemp, Warning, TEXT("APCM_FPS"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APCM_FPS Failed"));
 	}
 }
 

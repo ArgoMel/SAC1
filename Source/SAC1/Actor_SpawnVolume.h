@@ -17,7 +17,7 @@ public:
 
 private:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Spawn", meta = (AllowPrivateAccess = true))
-	TObjectPtr<class UBoxComponent> m_SpawnArea;
+	TObjectPtr<UBoxComponent> m_SpawnArea;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Spawn")

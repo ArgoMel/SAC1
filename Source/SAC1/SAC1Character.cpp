@@ -25,7 +25,7 @@ ASAC1Character::ASAC1Character()
 	m_IsSprinting = false;
 	m_CanMove = true;
 
-	m_CameraSpeed = 50.f;
+	m_CameraSpeed = 25.f;
 	m_CurWeaponIndex = -1;
 	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
@@ -289,25 +289,25 @@ void ASAC1Character::CollectPickUps()
 		return;
 	}
 	TArray<FHitResult> results;
-	FVector extent = FVector(GetCapsuleComponent()->GetScaledCapsuleRadius());
+	FVector extent = FVector(GetCapsuleComponent()->GetScaledCapsuleRadius())*0.5f;
 	extent.Z = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	FVector traceStart = GetActorLocation() -GetActorUpVector()* extent.Z*0.5;
 	FVector traceEnd = traceStart + GetActorForwardVector() * extent.X;
 	FCollisionQueryParams param(NAME_None, false, this);
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel2, FCollisionShape::MakeBox(extent), param);
-#if ENABLE_DRAW_DEBUG
-	FColor drawColor;
-	if (isCol)
-	{
-		drawColor = FColor::Red;
-	}
-	else
-	{
-		drawColor = FColor::Green;
-	}
-	DrawDebugBox(GetWorld(), (traceStart+ traceEnd)*0.5, extent, drawColor, false, 0.5f);
-#endif
+//#if ENABLE_DRAW_DEBUG
+//	FColor drawColor;
+//	if (isCol)
+//	{
+//		drawColor = FColor::Red;
+//	}
+//	else
+//	{
+//		drawColor = FColor::Green;
+//	}
+//	DrawDebugBox(GetWorld(), (traceStart+ traceEnd)*0.5, extent, drawColor, false, 0.5f);
+//#endif
 	if (isCol)
 	{		
 		for (auto& result : results)
