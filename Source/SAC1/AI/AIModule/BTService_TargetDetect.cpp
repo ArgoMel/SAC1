@@ -27,20 +27,65 @@ void UBTService_TargetDetect::TickNode(UBehaviorTreeComponent& OwnerComp,
 	if (!IsValid(AIPawn))
 		return;
 
+	/*
+
+	FVector	AILoc = AIPawn->GetActorLocation();
+
+AILoc.Z -= AIPawn->GetHalfHeight();
+
+FHitResult	result;
+
+FCollisionQueryParams	param(NAME_None, false, AIPawn);
+
+bool Collision = GetWorld()->SweepSingleByChannel(result,
+	AILoc, AILoc,
+	FQuat::Identity,
+	ECollisionChannel::ECC_GameTraceChannel4,
+	FCollisionShape::MakeSphere(AIPawn->GetAIState()->GetData()->InteractionDistance),
+	param);
+
+
+*/
+
+
+
 	FVector	AILoc = AIPawn->GetActorLocation();
 
 	AILoc.Z -= AIPawn->GetHalfHeight();
+
+	FVector SweepDirection = FVector(1.0f, 0.0f, 0.0f); // 스위핑 방향 설정 (이 예제에서는 X축으로 스위핑)
+	float SweepDistance = AIPawn->GetAIState()->GetData()->InteractionDistance;
+
 
 	FHitResult	result;
 
 	FCollisionQueryParams	param(NAME_None, false, AIPawn);
 
 	bool Collision = GetWorld()->SweepSingleByChannel(result,
-		AILoc, AILoc,
+		AILoc, AILoc + SweepDirection * SweepDistance,
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel4,
-		FCollisionShape::MakeSphere(AIPawn->GetAIState()->GetData()->InteractionDistance),
-		param);
+		FCollisionShape::MakeBox(FVector(SweepDistance, SweepDistance, 450.f)), param);
+
+
+//
+//#if ENABLE_DRAW_DEBUG
+//
+//	FColor	DrawColor;
+//
+//	if (Collision)
+//	{
+//		DrawColor = FColor::Red;
+//	}
+//	else
+//	{
+//		DrawColor = FColor::Green;
+//	}
+//
+//	DrawDebugBox(GetWorld(), AILoc, FVector(SweepDistance, SweepDistance, 450.f), DrawColor, false, 0.35f);
+//
+//#endif
+
 
 	// 디버깅 용(에디터)으로 출력한다.
 //#if ENABLE_DRAW_DEBUG
