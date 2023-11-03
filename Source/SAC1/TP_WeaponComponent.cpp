@@ -477,10 +477,11 @@ void UTP_WeaponComponent::ThrowThing()
 
 void UTP_WeaponComponent::EatFood()
 {
-	auto state = Character->GetPlayerState<ASAC1PlayerState>();
-	if (IsValid(state))
+	USAC1GameInstance* instance = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	//auto state = Character->GetPlayerState<ASAC1PlayerState>();
+	if (IsValid(instance))
 	{
-		state->AddHp(m_WeaponData.BulletCount);
+		instance->AddHp(m_WeaponData.BulletCount);
 	}
 	--m_TotalArmo;
 	if (m_TotalArmo < 0)

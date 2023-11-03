@@ -70,18 +70,18 @@ void ASAC1Projectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
 		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(data->ExplosionRadius), param);
-#if ENABLE_DRAW_DEBUG
-	FColor drawColor;
-	if (isCol)
-	{
-		drawColor = FColor::Red;
-	}
-	else
-	{
-		drawColor = FColor::Green;
-	}
-	DrawDebugSphere(GetWorld(), (traceStart + traceEnd) * 0.5, data->ExplosionRadius,0, drawColor, false, 0.5f);
-#endif
+//#if ENABLE_DRAW_DEBUG
+//	FColor drawColor;
+//	if (isCol)
+//	{
+//		drawColor = FColor::Red;
+//	}
+//	else
+//	{
+//		drawColor = FColor::Green;
+//	}
+//	DrawDebugSphere(GetWorld(), (traceStart + traceEnd) * 0.5, data->ExplosionRadius,0, drawColor, false, 0.5f);
+//#endif
 	if (isCol)
 	{
 		for (auto& result : results)
