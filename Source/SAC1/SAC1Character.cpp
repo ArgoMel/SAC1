@@ -24,6 +24,7 @@ ASAC1Character::ASAC1Character()
 
 	m_CameraSpeed = 25.f;
 	m_CurWeaponIndex = -1;
+	m_TargetIndexForChangeWeapon = -1;
 	m_WeaponIndexDir = 0;
 	m_IsInvertX = false;
 	m_IsInvertY = true;
@@ -147,7 +148,7 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		input->BindAction(controller->m_LShift, ETriggerEvent::Started, this, &ASAC1Character::Sprint);
 		input->BindAction(controller->m_LShift, ETriggerEvent::Completed, this, &ASAC1Character::Sprint);
 		input->BindAction(controller->ToggleCheat, ETriggerEvent::Started, this, &ASAC1Character::ToggleCheat);
-		input->BindAction(controller->WeaponSlot, ETriggerEvent::Started, this, &ASAC1Character::ChangeWeapon);
+		input->BindAction(controller->WeaponSlot, ETriggerEvent::Started, this, &ASAC1Character::ChangeWeaponByNum);
 		controller->SetNewController();
 	}
 }
@@ -244,11 +245,25 @@ void ASAC1Character::CameraRotation(const FInputActionValue& Value)
 
 void ASAC1Character::ChangeWeapon(const FInputActionValue& Value)
 {	
-	if(m_CurWeaponIndex==-1)
+	if(m_CurWeaponIndex==-1||m_AnimInst->IsAnyMontagePlaying())
 	{
 		return;
 	}
 	m_WeaponIndexDir = (int)Value.Get<float>();
+	m_AnimInst->ChangeWeapon();
+}
+
+void ASAC1Character::ChangeWeaponByNum(const FInputActionValue& Value)
+{
+	if (m_CurWeaponIndex == -1 || m_AnimInst->IsAnyMontagePlaying())
+	{
+		return;
+	}
+	m_TargetIndexForChangeWeapon= (int)Value.Get<FVector>().X;
+	if(m_CurWeaponIndex+1 == m_TargetIndexForChangeWeapon)
+	{
+		return;
+	}
 	m_AnimInst->ChangeWeapon();
 }
 
@@ -369,6 +384,11 @@ void ASAC1Character::SetCurWeapon()
 		weapon->SetVisibility(false);
 	}
 	m_WeaponIndexDir = 0;
+	if(m_TargetIndexForChangeWeapon!=-1&& m_TargetIndexForChangeWeapon< m_Weapons.Num())
+	{
+		m_CurWeaponIndex = m_TargetIndexForChangeWeapon-1;
+		m_TargetIndexForChangeWeapon = -1;
+	}
 	if (!IsValid(m_Weapons[m_CurWeaponIndex])) 
 	{
 		return; 
