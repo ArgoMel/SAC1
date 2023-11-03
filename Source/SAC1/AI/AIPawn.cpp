@@ -432,6 +432,8 @@ void AAIPawn::BodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 		}
 	}
 
+	//에러확인용 주석
+
 }
 
 // Called every frame
