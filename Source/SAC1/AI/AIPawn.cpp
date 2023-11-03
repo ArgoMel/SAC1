@@ -218,6 +218,8 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 			mAnim->ChangeAnim(EAIAnimType::Death);
 
 		mBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		mHead->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		mMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 		AAIController* AI = Cast<AAIController>(GetController());
 
@@ -428,6 +430,7 @@ void AAIPawn::Attack()
 		0, DrawColor, false, 1.f);
 #endif
 
+
 	if (Collision)
 	{
 		FActorSpawnParameters	ActorParam;
@@ -469,6 +472,7 @@ void AAIPawn::Attack()
 		FDamageEvent	DmgEvent;
 		result.GetActor()->TakeDamage(Dmg, DmgEvent, GetController(),
 			this);
+
 	}
 }
 
@@ -480,7 +484,6 @@ void AAIPawn::DeathEnd()
 		Mtrl->SetScalarParameterValue(TEXT("DissolveEnable"),
 			1.f);
 	}
-
 
 	mMovement->StopMovementImmediately();
 	mMovement->Velocity = FVector::Zero();
@@ -495,9 +498,6 @@ void AAIPawn::DeathEnd()
 	mMesh->SetLinearDamping(20000.f);   
 
 
-
-
-
 	if (mRandomDeadSound.IsEmpty())
 	{
 		return;
@@ -505,5 +505,13 @@ void AAIPawn::DeathEnd()
 	int32 randIndex = FMath::Rand() % mRandomDeadSound.Num();
 	UGameplayStatics::PlaySoundAtLocation(this, mRandomDeadSound[randIndex], GetActorLocation());
 
+
 	mDissolveEnable = true;
+
+
+	mBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	mHead->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	mMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+
 }
