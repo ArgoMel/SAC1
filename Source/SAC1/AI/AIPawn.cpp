@@ -195,10 +195,21 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	FVector loc = GetActorLocation();
 	loc.Z -= mBody->GetScaledCapsuleHalfHeight();
-	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
+	ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(-45., 90., 0.), actorParam);
 	decal->SetDecalMaterial(mBloodDecal);
 	decal->SetLifeSpan(5.f);
 	decal->SetDecalSize(FVector(200));
+
+	//FActorSpawnParameters	actorParam;
+	//actorParam.SpawnCollisionHandlingOverride =
+	//	ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	//FVector loc = GetActorLocation();
+	//loc.Z -= mBody->GetScaledCapsuleHalfHeight();
+	//ADecalEffect* decal = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
+	//decal->SetDecalMaterial(mBloodDecal);
+	//decal->SetLifeSpan(5.f);
+	//decal->SetDecalSize(FVector(1.f,200.f,200.f));
+
 
 
 	if (IsValid(m_BloodFill))
