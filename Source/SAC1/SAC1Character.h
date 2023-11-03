@@ -28,9 +28,6 @@ protected:
 		class AController* EventInstigator, AActor* DamageCauser);
 
 protected:
-	//TStaticArray<FName, 2> ItemNames = { TEXT("d"), 0 };
-	static TArray<FName> ItemNames;// = { TEXT("d") };
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
 	TObjectPtr<USpringArmComponent> m_SpringArm;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Component")
@@ -73,6 +70,7 @@ protected:
 	ETeam		m_Team;
 	int m_CurWeaponIndex;
 	int m_WeaponIndexDir;
+	int m_TargetIndexForChangeWeapon;
 	bool m_IsInvisible;
 	
 protected:
@@ -89,6 +87,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void CameraRotation(const FInputActionValue& Value);
 	void ChangeWeapon(const FInputActionValue& Value);
+	void ChangeWeaponByNum(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
 	void Sprint();

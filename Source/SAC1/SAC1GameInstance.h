@@ -17,6 +17,7 @@ public:
 private:
 	TObjectPtr<UDataTable>	mPlayerDataTable;
 	TObjectPtr<UDataTable>	m_WeaponDataTable;
+	TArray<FName>	m_WeaponNames;
 	TArray<bool> m_HasWeapons;
 
 public:
@@ -31,6 +32,15 @@ public:
 
 	void SetHasWeapons(int32 index,bool b);
 	bool GetHasWeapons(int32 index);
+
+	FName GetWeaponName(int32 index)
+	{
+		if(index<0||index>= m_WeaponNames.Num())
+		{
+			return FName();
+		}
+		return m_WeaponNames[index];
+	}
 
 	bool AddHp(int32 hp);
 };

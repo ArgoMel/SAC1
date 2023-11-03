@@ -49,6 +49,7 @@ enum class ECharacterEquip : uint8
 	FireBottle,
 	Food,
 	Flare,
+	Max,
 };
 
 UENUM(BlueprintType)

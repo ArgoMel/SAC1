@@ -59,10 +59,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<class UInputAction> ToggleCheat;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<class UInputAction> WeaponSlot;
+
 
 private:
 	static void MoveModifier(UInputMappingContext* IMC, UInputAction* IA, FKey key,
 		bool isNegate = false, bool isSwizzle = false, EInputAxisSwizzle swizzleOrder = EInputAxisSwizzle::YXZ);
+	static void NumModifier(UInputMappingContext* IMC, UInputAction* IA, FKey key, FVector vec);
 
 public:
 	void SetNewController();

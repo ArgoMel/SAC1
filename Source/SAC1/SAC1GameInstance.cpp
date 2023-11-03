@@ -23,6 +23,7 @@ USAC1GameInstance::USAC1GameInstance()
 void USAC1GameInstance::Init()
 {
 	Super::Init();
+	m_WeaponNames = m_WeaponDataTable->GetRowNames();
 }
 
 const FPlayerDataTable* USAC1GameInstance::FindPlayerData(const FName& Name)
