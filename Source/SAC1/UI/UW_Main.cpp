@@ -1,4 +1,5 @@
 #include "UW_Main.h"
+#include "../SAC1GameInstance.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
@@ -39,6 +40,11 @@ void UUW_Main::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 void UUW_Main::RestartBtnClick()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), *UGameplayStatics::GetCurrentLevelName(GetWorld()));
+	USAC1GameInstance* instance = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	if (IsValid(instance))
+	{
+		instance->PlayerHP = instance->PlayerHPMax;
+	}
 }
 
 void UUW_Main::ExitBtnClick()

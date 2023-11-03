@@ -3,6 +3,8 @@
 USAC1GameInstance::USAC1GameInstance()
 {
 	m_HasWeapons.Init(false, (int32)ECharacterEquip::Food);
+	PlayerHP = 0;
+	PlayerHPMax = 0;
 
 	static ConstructorHelpers::FObjectFinder<UDataTable> PlayerTable(TEXT(
 		"/Script/Engine.DataTable'/Game/Data/DT_PlayerData.DT_PlayerData'"));
@@ -49,4 +51,18 @@ bool USAC1GameInstance::GetHasWeapons(int32 index)
 		return false;
 	}
 	return m_HasWeapons[index];
+}
+
+bool USAC1GameInstance::AddHp(int32 hp)
+{
+	PlayerHP += hp;
+	if (PlayerHP > PlayerHPMax)
+	{
+		PlayerHP = PlayerHPMax;
+	}
+	if (PlayerHP < 0)
+	{
+		return true;
+	}
+	return false;
 }

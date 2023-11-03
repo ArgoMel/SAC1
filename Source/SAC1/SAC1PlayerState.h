@@ -16,5 +16,4 @@ public:
 	void InitPlayerData(const FName& name);
 	FPlayerDataTable* GetData();
 	void SetPlayerData(FPlayerDataTable* data);
-	bool AddHp(int32 hp);
 };

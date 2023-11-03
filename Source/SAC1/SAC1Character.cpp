@@ -162,10 +162,10 @@ float ASAC1Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		return DamageAmount;
 	}
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	ASAC1PlayerState* state = Cast<ASAC1PlayerState>(GetPlayerState());
-	if (IsValid(state))
+	USAC1GameInstance* instance = GetWorld()->GetGameInstance<USAC1GameInstance>();
+	if (IsValid(instance))
 	{
-		if(state->AddHp(-(int)DamageAmount))
+		if(instance->AddHp(-(int)DamageAmount))
 		{
 			OnPlayerDeath();
 		}

@@ -7,6 +7,8 @@ void ASAC1PlayerState::InitPlayerData(const FName& name)
 	if (IsValid(gameInst))
 	{
 		m_data = *gameInst->FindPlayerData(name);
+		gameInst->PlayerHP=m_data.HPMax;
+		gameInst->PlayerHPMax=m_data.HPMax;
 	}
 }
 
@@ -18,18 +20,4 @@ FPlayerDataTable* ASAC1PlayerState::GetData()
 void ASAC1PlayerState::SetPlayerData(FPlayerDataTable* data)
 {
 	m_data = *data;
-}
-
-bool ASAC1PlayerState::AddHp(int32 hp)
-{
-	m_data.HP += hp;
-	if (m_data.HP > m_data.HPMax)
-	{
-		m_data.HP = m_data.HPMax;
-	}
-	if (m_data.HP < 0)
-	{
-		return true;
-	}
-	return false;
 }
