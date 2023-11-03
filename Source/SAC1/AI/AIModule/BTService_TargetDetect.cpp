@@ -27,45 +27,45 @@ void UBTService_TargetDetect::TickNode(UBehaviorTreeComponent& OwnerComp,
 	if (!IsValid(AIPawn))
 		return;
 
-	/*
-
-	FVector	AILoc = AIPawn->GetActorLocation();
-
-AILoc.Z -= AIPawn->GetHalfHeight();
-
-FHitResult	result;
-
-FCollisionQueryParams	param(NAME_None, false, AIPawn);
-
-bool Collision = GetWorld()->SweepSingleByChannel(result,
-	AILoc, AILoc,
-	FQuat::Identity,
-	ECollisionChannel::ECC_GameTraceChannel4,
-	FCollisionShape::MakeSphere(AIPawn->GetAIState()->GetData()->InteractionDistance),
-	param);
-
-
-*/
-
-
+	
 
 	FVector	AILoc = AIPawn->GetActorLocation();
 
 	AILoc.Z -= AIPawn->GetHalfHeight();
-
-	FVector SweepDirection = FVector(1.0f, 0.0f, 0.0f); // 스위핑 방향 설정 (이 예제에서는 X축으로 스위핑)
-	float SweepDistance = AIPawn->GetAIState()->GetData()->InteractionDistance;
-
 
 	FHitResult	result;
 
 	FCollisionQueryParams	param(NAME_None, false, AIPawn);
 
 	bool Collision = GetWorld()->SweepSingleByChannel(result,
-		AILoc, AILoc + SweepDirection * SweepDistance,
+		AILoc, AILoc,
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel4,
-		FCollisionShape::MakeBox(FVector(SweepDistance, SweepDistance, 450.f)), param);
+		FCollisionShape::MakeSphere(AIPawn->GetAIState()->GetData()->InteractionDistance),
+		param);
+
+
+
+
+
+
+	//FVector	AILoc = AIPawn->GetActorLocation();
+
+	//AILoc.Z -= AIPawn->GetHalfHeight();
+
+	//FVector SweepDirection = FVector(1.0f, 0.0f, 0.0f); // 스위핑 방향 설정 (이 예제에서는 X축으로 스위핑)
+	//float SweepDistance = AIPawn->GetAIState()->GetData()->InteractionDistance;
+
+
+	//FHitResult	result;
+
+	//FCollisionQueryParams	param(NAME_None, false, AIPawn);
+
+	//bool Collision = GetWorld()->SweepSingleByChannel(result,
+	//	AILoc, AILoc + SweepDirection * SweepDistance,
+	//	FQuat::Identity,
+	//	ECollisionChannel::ECC_GameTraceChannel4,
+	//	FCollisionShape::MakeBox(FVector(SweepDistance, SweepDistance, 450.f)), param);
 
 
 //
