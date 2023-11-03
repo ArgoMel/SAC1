@@ -24,7 +24,7 @@ AActor_PickUpWeapon::AActor_PickUpWeapon()
 
 	m_Weapon = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("WeaponComponent"));
 	m_Weapon->SetupAttachment(m_Collider);
-	m_Weapon->SetCustomDepthStencilValue(17);
+	m_Weapon->SetCustomDepthStencilValue(19);
 
 	m_ItemState = CreateDefaultSubobject<UAC_ItemState>(TEXT("ItemState"));
 }
@@ -88,7 +88,7 @@ void AActor_PickUpWeapon::OverlapEnd(UPrimitiveComponent* comp, AActor* otherAct
 	UPrimitiveComponent* otherComp, int32 index)
 {
 	m_HUD->SetInteractionText(ESlateVisibility::Collapsed, m_ItemState->GetItemData()->UIText);
-	m_Weapon->SetCustomDepthStencilValue(17);
+	m_Weapon->SetCustomDepthStencilValue(19);
 }
 
 void AActor_PickUpWeapon::LoadItemData()

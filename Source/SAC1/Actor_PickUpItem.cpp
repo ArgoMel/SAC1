@@ -13,14 +13,14 @@ AActor_PickUpItem::AActor_PickUpItem()
 
 	GetStaticMeshComponent()->SetCollisionProfileName(TEXT("NoCollision"));
 	GetStaticMeshComponent()->bRenderCustomDepth = true;
-	GetStaticMeshComponent()->SetCustomDepthStencilValue(17);
+	GetStaticMeshComponent()->SetCustomDepthStencilValue(19);
 
 	m_Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	m_Collider->SetupAttachment(GetStaticMeshComponent());
 	m_Collider->SetGenerateOverlapEvents(true);
 	m_Collider->SetCollisionProfileName(TEXT("PlayerTrigger"));
 	m_Collider->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
-	m_Collider->SetSphereRadius(150.f);
+	m_Collider->SetSphereRadius(100.f);
 
 	m_ItemState = CreateDefaultSubobject<UAC_ItemState>(TEXT("ItemState"));
 }
@@ -112,7 +112,7 @@ void AActor_PickUpItem::OverlapEnd(UPrimitiveComponent* comp, AActor* otherActor
 	UPrimitiveComponent* otherComp, int32 index)
 {
 	m_HUD->SetInteractionText(ESlateVisibility::Collapsed, m_ItemState->GetItemData()->UIText);
-	GetStaticMeshComponent()->SetCustomDepthStencilValue(17);
+	GetStaticMeshComponent()->SetCustomDepthStencilValue(19);
 }
 
 void AActor_PickUpItem::LoadItemData()
