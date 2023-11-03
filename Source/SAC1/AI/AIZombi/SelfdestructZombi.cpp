@@ -82,18 +82,18 @@ void ASelfdestructZombi::Attack()
 
 	bool isCol = GetWorld()->SweepMultiByChannel(results, traceStart, traceEnd, FQuat::Identity,
 		ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(300.f), param);
-#if ENABLE_DRAW_DEBUG
-	FColor drawColor;
-	if (isCol)
-	{
-		drawColor = FColor::Red;
-	}
-	else
-	{
-		drawColor = FColor::Green;
-	}
-	DrawDebugSphere(GetWorld(), (traceStart + traceEnd) * 0.5, 300.f, 0, drawColor, false, 0.5f);
-#endif
+//#if ENABLE_DRAW_DEBUG
+//	FColor drawColor;
+//	if (isCol)
+//	{
+//		drawColor = FColor::Red;
+//	}
+//	else
+//	{
+//		drawColor = FColor::Green;
+//	}
+//	DrawDebugSphere(GetWorld(), (traceStart + traceEnd) * 0.5, 300.f, 0, drawColor, false, 0.5f);
+//#endif
 	if (isCol)
 	{
 		for (auto& result : results)
