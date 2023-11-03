@@ -284,6 +284,7 @@ void AAIPawn::BodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 
 
 	float Dmg = state->GetData()->AttackPoint;
+	
 
 	FActorSpawnParameters	actorParam;
 	actorParam.SpawnCollisionHandlingOverride =
@@ -294,6 +295,22 @@ void AAIPawn::BodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 	decal->SetDecalMaterial(mBloodDecal);
 	decal->SetLifeSpan(5.f);
 	decal->SetDecalSize(FVector(200));
+
+
+
+	//float DmgHead = state->GetData()->(AttackPoint * 2.f);
+
+	//FActorSpawnParameters	actorParamHead;
+	//actorParamHead.SpawnCollisionHandlingOverride =
+	//	ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	//FVector locHead = GetActorLocation();
+	//locHead.Z -= mHead->GetScaledCapsuleHalfHeight();
+	//ADecalEffect* decalHead = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
+	//decalHead->SetDecalMaterial(mBloodDecal);
+	//decalHead->SetLifeSpan(5.f);
+	//decalHead->SetDecalSize(FVector(200));
+
+
 
 
 	if (IsValid(m_BloodFill))
@@ -478,6 +495,7 @@ void AAIPawn::Attack()
 
 void AAIPawn::DeathEnd()
 {
+	
 	// Dissolve를 활성화한다.
 	for (auto& Mtrl : mMaterialArray)
 	{
@@ -489,13 +507,13 @@ void AAIPawn::DeathEnd()
 	mMovement->Velocity = FVector::Zero();
 
 
-	mMesh->SetCollisionProfileName(TEXT("Ragdoll"));
+/*	mMesh->SetCollisionProfileName(TEXT("Ragdoll"));
 	SetActorEnableCollision(true);
 	mMesh->SetAllBodiesSimulatePhysics(true);
 	mMesh->SetSimulatePhysics(true);
 	mMesh->WakeAllRigidBodies();
 	mMesh->bBlendPhysics = true;
-	mMesh->SetLinearDamping(20000.f);   
+	mMesh->SetLinearDamping(20000.f);  */ 
 
 
 	if (mRandomDeadSound.IsEmpty())

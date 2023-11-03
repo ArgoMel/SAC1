@@ -19,6 +19,7 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 
 	m_CurTargetingValue = 0.f;
 	m_IsTargeting = false;
+	m_IsReloading = false;
 
 	SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
@@ -87,7 +88,7 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UTP_WeaponComponent::Fire()
 {	
-	if (!IsValid(Character) || m_CurArmo <= 0 || !GetVisibleFlag())
+	if (!IsValid(Character) || m_CurArmo <= 0 || !GetVisibleFlag()|| m_IsReloading)
 	{
 		OnStopFire();
 		return;
@@ -182,7 +183,7 @@ void UTP_WeaponComponent::PickUpArmo(float value)
 
 void UTP_WeaponComponent::OnStartFire()
 {
-	if (!IsValid(Character) || m_CurArmo <= 0|| !GetVisibleFlag())
+	if (!IsValid(Character) || m_CurArmo <= 0|| !GetVisibleFlag()|| m_IsReloading)
 	{
 		OnStopFire();
 		return;
@@ -219,9 +220,7 @@ void UTP_WeaponComponent::OnStartReload()
 			animInst->Montage_Play(m_WeaponData.ReloadAnimation, 1.f);
 		}
 	}
-	FTimerHandle reloadHandle;
-	GetWorld()->GetTimerManager().SetTimer(reloadHandle, this,
-		&UTP_WeaponComponent::Reload, m_WeaponData.ReloadTime, false);
+	m_IsReloading = true;
 }
 
 void UTP_WeaponComponent::Reload()
@@ -245,6 +244,7 @@ void UTP_WeaponComponent::Reload()
 		m_TotalArmo = 0;
 	}
 	SetWeaponUI(ESlateVisibility::Visible);
+	m_IsReloading = false;
 }
 
 void UTP_WeaponComponent::StartHorizontalRecoil(float value)

@@ -24,6 +24,7 @@ private:
 	FRotator m_StartRot;
 	FName		m_Name;
 	bool m_IsAttached;
+	bool m_IsReloading;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
@@ -52,6 +53,8 @@ private:
 	void OnStartFire();
 	void OnStopFire();
 	void OnStartReload();
+
+	UFUNCTION(BlueprintCallable)
 	void Reload();
 
 	UFUNCTION()
@@ -83,6 +86,10 @@ public:
 	void PickUpArmo(float value);
 
 	bool GetIsADS();
+	bool GetIsReloading()
+	{
+		return m_IsReloading;
+	}
 	void SetName(const FName& name);
 	void SetWeaponData(FWeaponData* data);
 	void SetWeaponUI(ESlateVisibility visible);
