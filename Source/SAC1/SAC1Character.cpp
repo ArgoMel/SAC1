@@ -288,6 +288,12 @@ void ASAC1Character::CollectPickUps()
 	{
 		return;
 	}
+	UTP_WeaponComponent* curWeapon= GetCurWeapon();
+	if(IsValid(curWeapon)&& curWeapon->GetIsReloading())
+	{
+		return;
+	}
+
 	TArray<FHitResult> results;
 	FVector extent = FVector(GetCapsuleComponent()->GetScaledCapsuleRadius())*0.5f;
 	extent.Z = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
