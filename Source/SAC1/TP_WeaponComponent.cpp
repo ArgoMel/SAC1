@@ -369,6 +369,7 @@ void UTP_WeaponComponent::AttachWeapon()
 	PickUpArmo(m_WeaponData.ArmoCountWhenPick);
 	Reload();
 	SetRelativeLocationAndRotation(m_WeaponData.WeaponOffset, m_WeaponData.WeaponRot);
+	SetCustomDepthStencilValue(0);
 
 	ASAC1PlayerController* controller = Cast<ASAC1PlayerController>(Character->GetController());
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(controller->InputComponent);
