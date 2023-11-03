@@ -435,7 +435,9 @@ void AAIPawn::Attack()
 		ECollisionChannel::ECC_GameTraceChannel4,
 		FCollisionShape::MakeSphere(50.f), param);
 
-	// 디버깅 용(에디터)으로 출력한다.
+	/*
+	
+		// 디버깅 용(에디터)으로 출력한다.
 #if ENABLE_DRAW_DEBUG
 
 	// Collision 값에 따라 true일 경우 red, false일 경우 green으로
@@ -448,6 +450,10 @@ void AAIPawn::Attack()
 	DrawDebugCircle(GetWorld(), (Start + End) / 2.f, 50.f,
 		0, DrawColor, false, 1.f);
 #endif
+	
+	*/
+
+
 
 
 	if (Collision)
