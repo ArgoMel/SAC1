@@ -78,20 +78,16 @@ void ASAC1PlayerController::SetupInputComponent()
 	ToggleCheat->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(ToggleCheat, EKeys::P);
 
-	//TArray<FKey> numKeys = { EKeys::Zero ,EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five,EKeys::Six,EKeys::Seven };
-	//int32 size = (int)ECharacterEquip::Max;
-	//for(int32 i=0;i<size;++i)
-	//{
-	//	WeaponSlot[i] = NewObject<UInputAction>(this);
-	//	WeaponSlot[i]->ValueType = EInputActionValueType::Boolean;
-	//	m_IMC->MapKey(WeaponSlot[i], numKeys[i]);
-	//}
 	WeaponSlot = NewObject<UInputAction>(this);
 	WeaponSlot->ValueType = EInputActionValueType::Axis3D;
-	for (int32 i = 0; i < 10; ++i)
-	{
-		NumModifier(m_IMC, WeaponSlot, EKeys::Zero, FVector(i));
-	}
+	//NumModifier(m_IMC, WeaponSlot, EKeys::Zero, FVector(0.));
+	NumModifier(m_IMC, WeaponSlot, EKeys::One, FVector(1.));
+	NumModifier(m_IMC, WeaponSlot, EKeys::Two, FVector(2.));
+	NumModifier(m_IMC, WeaponSlot, EKeys::Three, FVector(3.));
+	NumModifier(m_IMC, WeaponSlot, EKeys::Four, FVector(4.));
+	NumModifier(m_IMC, WeaponSlot, EKeys::Five, FVector(5.));
+	NumModifier(m_IMC, WeaponSlot, EKeys::Six, FVector(6.));
+	NumModifier(m_IMC, WeaponSlot, EKeys::Seven, FVector(7.));
 	
 	m_Move = NewObject<UInputAction>(this);
 	m_Move->ValueType = EInputActionValueType::Axis3D;

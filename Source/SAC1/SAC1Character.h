@@ -70,6 +70,7 @@ protected:
 	ETeam		m_Team;
 	int m_CurWeaponIndex;
 	int m_WeaponIndexDir;
+	int m_TargetIndexForChangeWeapon;
 	bool m_IsInvisible;
 	
 protected:
@@ -86,6 +87,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void CameraRotation(const FInputActionValue& Value);
 	void ChangeWeapon(const FInputActionValue& Value);
+	void ChangeWeaponByNum(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
 	void Sprint();
