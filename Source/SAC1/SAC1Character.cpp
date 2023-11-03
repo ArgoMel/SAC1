@@ -13,9 +13,6 @@
 #include "InputActionValue.h"
 #include "Effect/DecalEffect.h"
 
-TArray<FName> ASAC1Character::ItemNames = 
-{ TEXT("Rifle"),TEXT("Pistol"),TEXT("Knife"),TEXT("Granade"),TEXT("FireBottle"),TEXT("Heal"),TEXT("Flare") };
-
 ASAC1Character::ASAC1Character()
 {
 	m_MoveForwardValue = 0.f;
@@ -122,7 +119,7 @@ void ASAC1Character::BeginPlay()
 				AActor_PickUpWeapon* pickUP = GetWorld()->SpawnActor<AActor_PickUpWeapon>(FActorSpawnParameters());
 				if (IsValid(pickUP) && pickUP->GetActive())
 				{
-					pickUP->SetName(ItemNames[i]);
+					pickUP->SetName(gameInst->GetWeaponName(i));
 					if (pickUP->PickedUpBy(this))
 					{
 						pickUP->SetActive(false);
@@ -149,7 +146,8 @@ void ASAC1Character::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		input->BindAction(controller->m_Move, ETriggerEvent::Triggered, this, &ASAC1Character::Move);
 		input->BindAction(controller->m_LShift, ETriggerEvent::Started, this, &ASAC1Character::Sprint);
 		input->BindAction(controller->m_LShift, ETriggerEvent::Completed, this, &ASAC1Character::Sprint);
-		input->BindAction(controller->ToggleCheat, ETriggerEvent::Completed, this, &ASAC1Character::ToggleCheat);
+		input->BindAction(controller->ToggleCheat, ETriggerEvent::Started, this, &ASAC1Character::ToggleCheat);
+		input->BindAction(controller->WeaponSlot, ETriggerEvent::Started, this, &ASAC1Character::ChangeWeapon);
 		controller->SetNewController();
 	}
 }

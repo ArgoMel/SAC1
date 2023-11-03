@@ -78,6 +78,21 @@ void ASAC1PlayerController::SetupInputComponent()
 	ToggleCheat->ValueType = EInputActionValueType::Boolean;
 	m_IMC->MapKey(ToggleCheat, EKeys::P);
 
+	//TArray<FKey> numKeys = { EKeys::Zero ,EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five,EKeys::Six,EKeys::Seven };
+	//int32 size = (int)ECharacterEquip::Max;
+	//for(int32 i=0;i<size;++i)
+	//{
+	//	WeaponSlot[i] = NewObject<UInputAction>(this);
+	//	WeaponSlot[i]->ValueType = EInputActionValueType::Boolean;
+	//	m_IMC->MapKey(WeaponSlot[i], numKeys[i]);
+	//}
+	WeaponSlot = NewObject<UInputAction>(this);
+	WeaponSlot->ValueType = EInputActionValueType::Axis3D;
+	for (int32 i = 0; i < 10; ++i)
+	{
+		NumModifier(m_IMC, WeaponSlot, EKeys::Zero, FVector(i));
+	}
+	
 	m_Move = NewObject<UInputAction>(this);
 	m_Move->ValueType = EInputActionValueType::Axis3D;
 	MoveModifier(m_IMC, m_Move, EKeys::W);
@@ -117,6 +132,15 @@ void ASAC1PlayerController::MoveModifier(UInputMappingContext* IMC, UInputAction
 		swizzle->Order = swizzleOrder;
 		mapping.Modifiers.Add(swizzle);
 	}
+}
+
+void ASAC1PlayerController::NumModifier(UInputMappingContext* IMC, UInputAction* IA, FKey key, FVector vec)
+{
+	FEnhancedActionKeyMapping& mapping = IMC->MapKey(IA, key);
+	UObject* outer = IMC->GetOuter();
+	UInputModifierScalar* scalar = NewObject<UInputModifierScalar>(outer);
+	scalar->Scalar = vec;
+	mapping.Modifiers.Add(scalar);
 }
 
 void ASAC1PlayerController::SetNewController()
