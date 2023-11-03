@@ -268,6 +268,70 @@ float AAIPawn::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 
 void AAIPawn::BodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	Begin Map
+		Begin Level
+		Begin Actor Class = / Script / SAC1.Actor_PickUpItem Name = Actor_PickUpItem_1 Archetype = / Script / SAC1.Actor_PickUpItem'/Script/SAC1.Default__Actor_PickUpItem'
+		Begin Object Class = / Script / Engine.StaticMeshComponent Name = "StaticMeshComponent0" Archetype = / Script / Engine.StaticMeshComponent'/Script/SAC1.Default__Actor_PickUpItem:StaticMeshComponent0' ExportPath = / Script / Engine.StaticMeshComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_1.StaticMeshComponent0"'
+		End Object
+		Begin Object Class = / Script / Engine.ParticleSystemComponent Name = "Particle" Archetype = / Script / Engine.ParticleSystemComponent'/Script/SAC1.Default__Actor_PickUpItem:Particle' ExportPath = / Script / Engine.ParticleSystemComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_1.Particle"'
+		End Object
+		Begin Object Class = / Script / Engine.SphereComponent Name = "Collider" Archetype = / Script / Engine.SphereComponent'/Script/SAC1.Default__Actor_PickUpItem:Collider' ExportPath = / Script / Engine.SphereComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_1.Collider"'
+		End Object
+		Begin Object Class = / Script / SAC1.AC_ItemState Name = "ItemState" Archetype = / Script / SAC1.AC_ItemState'/Script/SAC1.Default__Actor_PickUpItem:ItemState' ExportPath = / Script / SAC1.AC_ItemState'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_1.ItemState"'
+		End Object
+		Begin Object Name = "StaticMeshComponent0" ExportPath = / Script / Engine.StaticMeshComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_1.StaticMeshComponent0"'
+		StaticMesh = / Script / Engine.StaticMesh'"/Game/Safe_House/meshes/SM_machine_gun_ammo_box_opened.SM_machine_gun_ammo_box_opened"'
+		StaticMeshImportVersion = 1
+		RelativeLocation = (X = -23.000000, Y = -781.000000, Z = 594.000000)
+		End Object
+		Begin Object Name = "Particle" ExportPath = / Script / Engine.ParticleSystemComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_1.Particle"'
+		AttachParent = "StaticMeshComponent0"
+		End Object
+		Begin Object Name = "Collider" ExportPath = / Script / Engine.SphereComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_1.Collider"'
+		AttachParent = "StaticMeshComponent0"
+		End Object
+		Begin Object Name = "ItemState" ExportPath = / Script / SAC1.AC_ItemState'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_1.ItemState"'
+		m_Name = "RiflePack"
+		m_ItemData = (MaxHP = -1, Value = 30, UIText = "\'F\'로 라이플 탄약 줍기", ItemKind = Consumable, ItemStaticMesh = / Script / Engine.StaticMesh'"/Game/Safe_House/meshes/SM_machine_gun_ammo_box_opened.SM_machine_gun_ammo_box_opened"')
+		End Object
+		m_ItemState = "ItemState"
+		StaticMeshComponent = "StaticMeshComponent0"
+		RootComponent = "StaticMeshComponent0"
+		ActorLabel = "Actor_PickUpItem1"
+		End Actor
+		Begin Actor Class = / Script / SAC1.Actor_PickUpItem Name = Actor_PickUpItem_5 Archetype = / Script / SAC1.Actor_PickUpItem'/Script/SAC1.Default__Actor_PickUpItem'
+		Begin Object Class = / Script / Engine.StaticMeshComponent Name = "StaticMeshComponent0" Archetype = / Script / Engine.StaticMeshComponent'/Script/SAC1.Default__Actor_PickUpItem:StaticMeshComponent0' ExportPath = / Script / Engine.StaticMeshComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_5.StaticMeshComponent0"'
+		End Object
+		Begin Object Class = / Script / Engine.ParticleSystemComponent Name = "Particle" Archetype = / Script / Engine.ParticleSystemComponent'/Script/SAC1.Default__Actor_PickUpItem:Particle' ExportPath = / Script / Engine.ParticleSystemComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_5.Particle"'
+		End Object
+		Begin Object Class = / Script / Engine.SphereComponent Name = "Collider" Archetype = / Script / Engine.SphereComponent'/Script/SAC1.Default__Actor_PickUpItem:Collider' ExportPath = / Script / Engine.SphereComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_5.Collider"'
+		End Object
+		Begin Object Class = / Script / SAC1.AC_ItemState Name = "ItemState" Archetype = / Script / SAC1.AC_ItemState'/Script/SAC1.Default__Actor_PickUpItem:ItemState' ExportPath = / Script / SAC1.AC_ItemState'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_5.ItemState"'
+		End Object
+		Begin Object Name = "StaticMeshComponent0" ExportPath = / Script / Engine.StaticMeshComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_5.StaticMeshComponent0"'
+		StaticMesh = / Script / Engine.StaticMesh'"/Game/Safe_House/meshes/SM_machine_gun_ammo_box_opened.SM_machine_gun_ammo_box_opened"'
+		StaticMeshImportVersion = 1
+		RelativeLocation = (X = -24.000000, Y = -818.000000, Z = 594.000000)
+		End Object
+		Begin Object Name = "Particle" ExportPath = / Script / Engine.ParticleSystemComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_5.Particle"'
+		AttachParent = "StaticMeshComponent0"
+		End Object
+		Begin Object Name = "Collider" ExportPath = / Script / Engine.SphereComponent'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_5.Collider"'
+		AttachParent = "StaticMeshComponent0"
+		End Object
+		Begin Object Name = "ItemState" ExportPath = / Script / SAC1.AC_ItemState'"/Game/00_HotelMap/Hotel_powerRoom.Hotel_powerRoom:PersistentLevel.Actor_PickUpItem_5.ItemState"'
+		m_Name = "RiflePack"
+		m_ItemData = (MaxHP = -1, Value = 30, UIText = "\'F\'로 라이플 탄약 줍기", ItemKind = Consumable, ItemStaticMesh = / Script / Engine.StaticMesh'"/Game/Safe_House/meshes/SM_machine_gun_ammo_box_opened.SM_machine_gun_ammo_box_opened"')
+		End Object
+		m_ItemState = "ItemState"
+		StaticMeshComponent = "StaticMeshComponent0"
+		RootComponent = "StaticMeshComponent0"
+		ActorLabel = "Actor_PickUpItem5"
+		End Actor
+		End Level
+		Begin Surface
+		End Surface
+		End Map
 
 	ASAC1Character* player = Cast<ASAC1Character>(OtherActor);
 	if (!IsValid(player))
@@ -284,6 +348,7 @@ void AAIPawn::BodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 
 
 	float Dmg = state->GetData()->AttackPoint;
+	
 
 	FActorSpawnParameters	actorParam;
 	actorParam.SpawnCollisionHandlingOverride =
@@ -294,6 +359,22 @@ void AAIPawn::BodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 	decal->SetDecalMaterial(mBloodDecal);
 	decal->SetLifeSpan(5.f);
 	decal->SetDecalSize(FVector(200));
+
+
+
+	//float DmgHead = state->GetData()->(AttackPoint * 2.f);
+
+	//FActorSpawnParameters	actorParamHead;
+	//actorParamHead.SpawnCollisionHandlingOverride =
+	//	ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	//FVector locHead = GetActorLocation();
+	//locHead.Z -= mHead->GetScaledCapsuleHalfHeight();
+	//ADecalEffect* decalHead = GetWorld()->SpawnActor<ADecalEffect>(loc, FRotator(0., 90., 0.), actorParam);
+	//decalHead->SetDecalMaterial(mBloodDecal);
+	//decalHead->SetLifeSpan(5.f);
+	//decalHead->SetDecalSize(FVector(200));
+
+
 
 
 	if (IsValid(m_BloodFill))
@@ -478,6 +559,7 @@ void AAIPawn::Attack()
 
 void AAIPawn::DeathEnd()
 {
+	
 	// Dissolve를 활성화한다.
 	for (auto& Mtrl : mMaterialArray)
 	{
@@ -489,13 +571,13 @@ void AAIPawn::DeathEnd()
 	mMovement->Velocity = FVector::Zero();
 
 
-	mMesh->SetCollisionProfileName(TEXT("Ragdoll"));
+/*	mMesh->SetCollisionProfileName(TEXT("Ragdoll"));
 	SetActorEnableCollision(true);
 	mMesh->SetAllBodiesSimulatePhysics(true);
 	mMesh->SetSimulatePhysics(true);
 	mMesh->WakeAllRigidBodies();
 	mMesh->bBlendPhysics = true;
-	mMesh->SetLinearDamping(20000.f);   
+	mMesh->SetLinearDamping(20000.f);  */ 
 
 
 	if (mRandomDeadSound.IsEmpty())
