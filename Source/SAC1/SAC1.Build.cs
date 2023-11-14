@@ -21,7 +21,10 @@ public class SAC1 : ModuleRules
             "CinematicCamera",
             "HeadMountedDisplay", 
 			"EnhancedInput",
-            "Niagara"
+            "Niagara",
+            "LevelSequence",
+            "MovieScene",
+            "MediaAssets"
         });
 	}
 }
